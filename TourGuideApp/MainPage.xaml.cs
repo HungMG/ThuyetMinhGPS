@@ -1,24 +1,31 @@
-﻿namespace TourGuideApp
+﻿using Microsoft.Maui.Controls;
+using TourGuideApp.Models;  
+using TourGuideApp.Services;
+
+namespace TourGuideApp;
+
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    private DatabaseService _dbService;
+
+    public MainPage()
     {
-        int count = 0;
+        InitializeComponent();
+        _dbService = new DatabaseService();
+    }
 
-        public MainPage()
-        {
-            InitializeComponent();
-        }
+    // Hàm này chạy ngay khi màn hình vừa hiện lên
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
 
-        private void OnCounterClicked(object? sender, EventArgs e)
-        {
-            count++;
+        // 1. Chạy hàm tạo dữ liệu mẫu
+        await _dbService.SeedDataAsync();
 
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
+        // 2. Lấy toàn bộ dữ liệu ra
+        var danhSachPOI = await _dbService.GetAllPOIsAsync();
 
-            SemanticScreenReader.Announce(CounterBtn.Text);
-        }
+        // 3. Đổ dữ liệu vào giao diện
+        poiListView.ItemsSource = danhSachPOI;
     }
 }
