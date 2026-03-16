@@ -5,7 +5,8 @@ namespace TourGuideApp.Models
     [Table("POI")]
     public class POI
     {
-        [PrimaryKey] // Nếu bạn muốn DB tự tạo ID thì thêm [AutoIncrement]
+        [PrimaryKey]
+        [AutoIncrement] // CHÍNH LÀ DÒNG NÀY ĐÂY! Giúp Id tự động nhảy 1, 2, 3...
         public int Id { get; set; }
 
         public string Name { get; set; }

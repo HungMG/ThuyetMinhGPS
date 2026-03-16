@@ -12,13 +12,10 @@ namespace TourGuideApp.Services
         {
             if (_db != null) return;
 
-            // Xác định đường dẫn lưu file database trên điện thoại
-            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "TourGuide.db");
+            // Chỉ cần thêm chữ _v2 vào đây để app tạo một cái DB mới toanh
+            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "TourGuide_v2.db");
 
-            // Tạo kết nối
             _db = new SQLiteAsyncConnection(databasePath);
-
-            // Tạo bảng (nếu chưa tồn tại)
             await _db.CreateTableAsync<POI>();
         }
 

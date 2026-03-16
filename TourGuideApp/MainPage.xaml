@@ -1,36 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="TourGuideApp.MainPage">
+             x:Class="TourGuideApp.MainPage"
+             BackgroundColor="#FAF7F2">
+    <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
 
-    <Grid RowDefinitions="Auto,*" Padding="20">
-
-        <Label Grid.Row="0" 
-               Text="Danh sách Điểm đến (Test DB)" 
-               FontSize="22" 
-               FontAttributes="Bold" 
-               Margin="0,0,0,20"/>
+        <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
+            <Label Text="Điểm Thuyết Minh" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+            <Label Text="Các điểm trong khu vực" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
+        </VerticalStackLayout>
 
         <CollectionView Grid.Row="1" x:Name="poiListView">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="0,0,0,10" Padding="15" CornerRadius="8" BackgroundColor="#F0F0F0">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding Name}" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold" 
-                                   TextColor="Black"/>
+                    <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
 
-                            <Label Text="{Binding Description}" 
-                                   FontSize="16" 
-                                   TextColor="DimGray"
-                                   Margin="0,4,0,0"/>
-                        </VerticalStackLayout>
+                            <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
+                                <Label Text="🍲" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Frame>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
+                                <Label Text="{Binding Description}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+
+                                <HorizontalStackLayout Margin="0,8,0,0" Spacing="5">
+                                    <Label Text="📍" FontSize="12"/>
+                                    <Label Text="Đang tính..." FontSize="12" FontAttributes="Bold" TextColor="#C0502E"/>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+
+                            <Frame Grid.Column="2" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" HasShadow="False" Padding="0" VerticalOptions="Center">
+                                <Label Text="▶" FontSize="18" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                            </Frame>
+
+                        </Grid>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-
     </Grid>
 
 </ContentPage>
