@@ -7,7 +7,7 @@
 	<VerticalStackLayout Padding="20,40,20,0" Spacing="20">
 
 		<Label
-            Text="Càiđặt"
+            Text="Cài đặt"
             FontSize="28"
             FontAttributes="Bold"
             TextColor="#4A3A31"/>

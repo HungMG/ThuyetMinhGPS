@@ -22,7 +22,7 @@
         <Tab Title="QR" Icon="qr_icon.png">
             <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
         </Tab>
-        <Tab Title="Càiđặt" Icon="settings_icon.png">
+        <Tab Title="Cài đặt" Icon="settings_icon.png">
             <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
         </Tab>
     </TabBar>
