@@ -12,7 +12,7 @@
 
     <TabBar>
         <Tab Title="Bản đồ" Icon="map_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+            <ShellContent ContentTemplate="{DataTemplate views:MapPage}" />
         </Tab>
 
         <Tab Title="Điểm" Icon="pin_icon.png">
@@ -23,7 +23,7 @@
             <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
         </Tab>
         <Tab Title="Cài đặt" Icon="settings_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+            <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
         </Tab>
     </TabBar>
 

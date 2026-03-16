@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TourGuideApp.Views.SettingsPage"
+             BackgroundColor="#FAF7F2">
+
+	<VerticalStackLayout Padding="20,40,20,0" Spacing="20">
+
+		<Label
+            Text="Cài đặt"
+            FontSize="28"
+            FontAttributes="Bold"
+            TextColor="#4A3A31"/>
+
+		<!-- Auto audio -->
+		<Frame CornerRadius="15"
+               BackgroundColor="White"
+               BorderColor="#E8E0D5">
+
+			<HorizontalStackLayout Padding="15" Spacing="10">
+
+				<Label Text="🔊"
+                       FontSize="20"
+                       VerticalOptions="Center"/>
+
+				<Label Text="Tự động phát thuyết minh"
+                       VerticalOptions="Center"
+                       HorizontalOptions="StartAndExpand"/>
+
+				<Switch IsToggled="True"/>
+			</HorizontalStackLayout>
+
+		</Frame>
+
+
+		<!-- GPS -->
+		<Frame CornerRadius="15"
+               BackgroundColor="White"
+               BorderColor="#E8E0D5">
+
+			<HorizontalStackLayout Padding="15" Spacing="10">
+
+				<Label Text="📍"
+                       FontSize="20"
+                       VerticalOptions="Center"/>
+
+				<Label Text="Sử dụng GPS"
+                       VerticalOptions="Center"
+                       HorizontalOptions="StartAndExpand"/>
+
+				<Switch IsToggled="True"/>
+
+			</HorizontalStackLayout>
+
+		</Frame>
+
+
+		<!-- About -->
+		<Frame CornerRadius="15"
+               BackgroundColor="White"
+               BorderColor="#E8E0D5">
+
+			<VerticalStackLayout Padding="15">
+
+				<Label Text="Thông tin ứng dụng"
+                       FontAttributes="Bold"
+                       FontSize="16"/>
+
+				<Label Text="TourGuide App"
+                       FontSize="14"/>
+
+				<Label Text="Version 1.0"
+                       FontSize="14"/>
+
+			</VerticalStackLayout>
+
+		</Frame>
+
+	</VerticalStackLayout>
+
+</ContentPage>
