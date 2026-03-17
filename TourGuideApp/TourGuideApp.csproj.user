@@ -3,30 +3,7 @@
   <PropertyGroup>
     <IsFirstTimeProjectOpen>False</IsFirstTimeProjectOpen>
     <ActiveDebugFramework>net9.0-android</ActiveDebugFramework>
-    <ActiveDebugProfile>Xiaomi 25028RN03L (Android 15.0 - API 35)</ActiveDebugProfile>
-    <SelectedPlatformGroup>PhysicalDevice</SelectedPlatformGroup>
+    <ActiveDebugProfile>Android Emulator</ActiveDebugProfile>
+    <SelectedPlatformGroup>Emulator</SelectedPlatformGroup>
   </PropertyGroup>
-  <ItemGroup>
-    <None Update="App.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="AppShell.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="MainPage.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Platforms\Windows\App.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Platforms\Windows\Package.appxmanifest">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Resources\Styles\Colors.xaml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Resources\Styles\Styles.xaml">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
 </Project>
