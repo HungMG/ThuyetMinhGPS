@@ -12,7 +12,6 @@ namespace TourGuideApp.Services
         {
             if (_db != null) return;
 
-            // Chỉ cần thêm chữ _v2 vào đây để app tạo một cái DB mới toanh
             var databasePath = Path.Combine(FileSystem.AppDataDirectory, "TourGuide_v3.db");
 
             _db = new SQLiteAsyncConnection(databasePath);
@@ -33,7 +32,7 @@ namespace TourGuideApp.Services
             var poi = await _db.Table<POI>().Where(p => p.Id == poiId).FirstOrDefaultAsync();
             if (poi != null)
             {
-                // Thay vì IsVisited = true, mình lưu thời gian hiện tại
+                
                 poi.LastPlayedTime = DateTime.Now;
                 await _db.UpdateAsync(poi);
             }
@@ -55,8 +54,8 @@ namespace TourGuideApp.Services
                 Longitude = 106.695083,
                 TriggerRadius = 100,
                 Description = "Nơi lưu giữ dấu ấn lịch sử hào hùng.",
-                Priority = 1,          // Thêm độ ưu tiên
-                LastPlayedTime = null  // Thay cho IsVisited = false (null nghĩa là chưa phát bao giờ)
+                Priority = 1,          
+                LastPlayedTime = null  
             },
             new POI
             {
