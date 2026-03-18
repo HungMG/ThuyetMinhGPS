@@ -16,6 +16,11 @@
         <Tab Title="Điểm" Icon="icon_list.png">
             <ShellContent Route="MainPage" ContentTemplate="{DataTemplate local:MainPage}" />
         </Tab>
+        
+        <Tab Title="Yêu thích" Icon="icon_list.png">
+            <ShellContent Route="FavoritePage" ContentTemplate="{DataTemplate views:FavoritePage}" />
+        </Tab>
+        
         <Tab Title="QR" Icon="icon_qr.png">
             <ShellContent Route="QRCodePage" ContentTemplate="{DataTemplate views:QRCodePage}" />
         </Tab>
