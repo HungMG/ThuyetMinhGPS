@@ -4,26 +4,24 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:TourGuideApp"
-    xmlns:views="clr-namespace:TourGuideApp.Views" 
-    Shell.FlyoutBehavior="Disabled"
-    Shell.TabBarBackgroundColor="#FFFFFF"
-    Shell.TabBarTitleColor="#C0502E"
-    Shell.TabBarUnselectedColor="#999999">
-
+    
+    xmlns:views="clr-namespace:TourGuideApp.Views"
+    
+    Shell.FlyoutBehavior="Disabled">
     <TabBar>
-        <Tab Title="Bản đồ" Icon="map_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate views:MapPage}" />
+        <Tab Title="Bản đồ" Icon="icon_map.png">
+            <ShellContent Route="MapPage" ContentTemplate="{DataTemplate views:MapPage}" />
         </Tab>
 
-        <Tab Title="Điểm" Icon="pin_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
+        <Tab Title="Điểm" Icon="icon_list.png">
+            <ShellContent Route="MainPage" ContentTemplate="{DataTemplate local:MainPage}" />
+        </Tab>
+        <Tab Title="QR" Icon="icon_qr.png">
+            <ShellContent Route="QRCodePage" ContentTemplate="{DataTemplate views:QRCodePage}" />
         </Tab>
 
-        <Tab Title="QR" Icon="qr_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate local:MainPage}" />
-        </Tab>
-        <Tab Title="Cài đặt" Icon="settings_icon.png">
-            <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
+        <Tab Title="Cài đặt" Icon="icon_settings.png">
+            <ShellContent Route="SettingsPage" ContentTemplate="{DataTemplate views:SettingsPage}" />
         </Tab>
     </TabBar>
 
