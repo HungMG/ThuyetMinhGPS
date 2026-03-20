@@ -10,7 +10,10 @@
             <Label Text="Các điểm trong khu vực" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
         </VerticalStackLayout>
 
-        <CollectionView Grid.Row="1" x:Name="poiListView">
+        <CollectionView Grid.Row="1" 
+                        x:Name="poiListView" 
+                        SelectionMode="Single"
+                        SelectionChanged="OnItemSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">

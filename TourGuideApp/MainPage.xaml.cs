@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
 using TourGuideApp.Models;  
 using TourGuideApp.Services;
+using TourGuideApp.Views;
 
 namespace TourGuideApp;
 
@@ -50,6 +51,18 @@ public partial class MainPage : ContentPage
 
             // 4. Cập nhật thời gian vào Database để chống lặp
             await _dbService.UpdateLastPlayedTimeAsync(bestPOI.Id);
+        }
+    }
+    private async void OnItemSelected(object sender, SelectionChangedEventArgs e)
+    {
+        var selectedItem = e.CurrentSelection.FirstOrDefault();
+
+        if (selectedItem != null)
+        {
+            await Navigation.PushAsync(new DetailPage
+            {
+                BindingContext = selectedItem
+            });
         }
     }
 }
