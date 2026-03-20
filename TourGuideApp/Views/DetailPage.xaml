@@ -1,0 +1,11 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="TourGuideApp.Views.DetailPage">
+
+    <VerticalStackLayout Padding="20">
+        <Label Text="{Binding Name}" FontSize="24" FontAttributes="Bold"/>
+        <Label Text="{Binding Description}" FontSize="14"/>
+    </VerticalStackLayout>
+
+</ContentPage>
