@@ -2,11 +2,71 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             
+             xmlns:bs="http://pluginmauibottomsheet.com"
+             
              x:Class="TourGuideApp.Views.MapPage"
-             Title="Bản đồ Tuyến điểm">
+             Title="Bản đồ Tuyến điểm"
+             Shell.NavBarIsVisible="False">
 
     <Grid>
         <mapsui:MapView x:Name="tourMap" />
+
+        <Frame Margin="15,20,15,0" Padding="0" CornerRadius="25" HasShadow="True"
+               VerticalOptions="Start" HorizontalOptions="Fill" BackgroundColor="White"
+               BorderColor="#E8E0D5">
+
+            <SearchBar x:Name="mapSearchBar"
+                       Placeholder="Tìm kiếm địa điểm..."
+                       TextColor="#4A3A31" 
+                       PlaceholderColor="Gray" 
+                       BackgroundColor="Transparent"
+                       CancelButtonColor="#C0502E"
+                       SearchButtonPressed="OnSearchButtonPressed"
+                       TextChanged="OnSearchBarTextChanged"/>
+        </Frame>
+
+        <bs:BottomSheet x:Name="poiDetailPopup"
+                        IsOpen="False" 
+                        HasHandle="True"
+                        IsModal="True"
+                        CornerRadius="24">
+
+            <bs:BottomSheetContent>
+                <bs:BottomSheetContent.Content>
+
+                    <VerticalStackLayout Padding="20" Spacing="15" Margin="0,15,0,0">
+
+                        <BoxView WidthRequest="40" HeightRequest="4" CornerRadius="2" BackgroundColor="#E8E0D5" HorizontalOptions="Center"/>
+
+                        <Frame HeightRequest="180" CornerRadius="16" HasShadow="False" Padding="0" BorderColor="#E8E0D5">
+                            <Image x:Name="imgPoiImage" Aspect="AspectFill" Source="img_default_poi.png"/>
+                        </Frame>
+
+                        <Label x:Name="lblPoiName" Text="Tên địa điểm..." FontSize="22" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="📍" FontSize="14" VerticalOptions="Center"/>
+                            <Label x:Name="lblPoiAddress" Text="Đang tải tọa độ..." FontSize="14" TextColor="#8D7A6D"/>
+                        </HorizontalStackLayout>
+
+                        <BoxView HeightRequest="1" BackgroundColor="#E8E0D5" Margin="0,5"/>
+
+                        <Label x:Name="lblPoiDescription" Text="Mô tả chi tiết..." FontSize="14" TextColor="#4A3A31" LineHeight="1.3" MaxLines="10" LineBreakMode="WordWrap"/>
+
+                        <Button Text="Chỉ đường" 
+                                ImageSource="icon_directions.png"
+                                BackgroundColor="#C0502E" TextColor="White"
+                                CornerRadius="25"
+                                Margin="0,15,0,0"
+                                Clicked="OnNavigationClicked" />
+
+                    </VerticalStackLayout>
+
+                </bs:BottomSheetContent.Content>
+            </bs:BottomSheetContent>
+        </bs:BottomSheet>
+
     </Grid>
 
 </ContentPage>

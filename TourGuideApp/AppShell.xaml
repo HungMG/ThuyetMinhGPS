@@ -17,7 +17,7 @@
             <ShellContent Route="MainPage" ContentTemplate="{DataTemplate local:MainPage}" />
         </Tab>
         
-        <Tab Title="Yêu thích" Icon="icon_list.png">
+        <Tab Title="Yêu thích" Icon="heart.png">
             <ShellContent Route="FavoritePage" ContentTemplate="{DataTemplate views:FavoritePage}" />
         </Tab>
         

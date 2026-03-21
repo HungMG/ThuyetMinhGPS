@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
+using Plugin.Maui.BottomSheet.Hosting;
 
 namespace TourGuideApp; 
 
@@ -10,7 +11,8 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseSkiaSharp() // Cái công tắc bật cọ vẽ SkiaSharp bữa trước mình thêm vào
+            .UseSkiaSharp()
+            .UseBottomSheet()// Cái công tắc bật cọ vẽ SkiaSharp bữa trước mình thêm vào
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

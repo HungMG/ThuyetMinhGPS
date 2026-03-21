@@ -19,5 +19,7 @@ namespace TourGuideApp.Models
 
         public int Priority { get; set; }
         public DateTime? LastPlayedTime { get; set;}
+        public bool IsFavorite { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

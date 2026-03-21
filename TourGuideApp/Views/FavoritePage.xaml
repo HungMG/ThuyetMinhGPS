@@ -2,14 +2,48 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TourGuideApp.Views.FavoritePage"
-             BackgroundColor="#FAF7F2">
+             BackgroundColor="#FAF7F2"
+             Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
-
         <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
-            <Label Text="Các điểm yêu thích" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+            <Label Text="Góc Yêu Thích ❤️" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+            <Label Text="Những địa điểm bạn đã lưu lại" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
         </VerticalStackLayout>
 
+        <CollectionView Grid.Row="1" x:Name="favoriteListView">
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Margin="0,100,0,0">
+                    <Label Text="📭" FontSize="50" HorizontalOptions="Center"/>
+                    <Label Text="Bạn chưa lưu địa điểm nào cả!" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
+                            <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
+                                <Label Text="⭐" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Frame>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
+                                <Label Text="{Binding Description}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+                            </VerticalStackLayout>
+
+                            <ImageButton Grid.Column="2" 
+                                         Source="icon_trash.png" 
+                                         WidthRequest="24" HeightRequest="24" 
+                                         VerticalOptions="Center"
+                                         CommandParameter="{Binding .}"
+                                         Clicked="OnRemoveFavoriteClicked"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </Grid>
 
 </ContentPage>
