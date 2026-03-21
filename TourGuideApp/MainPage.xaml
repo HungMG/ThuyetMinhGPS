@@ -16,7 +16,7 @@
                         SelectionChanged="OnItemSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                    <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White" InputTransparent="True">
                         <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
 
                             <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
