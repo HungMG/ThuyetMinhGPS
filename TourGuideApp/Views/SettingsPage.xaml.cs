@@ -6,5 +6,9 @@
         {
             InitializeComponent();
         }
+        private async void OnOfflineTapped(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new OfflinePage());
+        }
     }
 }

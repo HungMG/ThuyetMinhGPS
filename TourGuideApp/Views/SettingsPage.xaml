@@ -61,6 +61,11 @@
                BackgroundColor="White"
                BorderColor="#E8E0D5">
 
+
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnOfflineTapped"/>
+            </Frame.GestureRecognizers>
+
             <Grid Padding="15" ColumnDefinitions="*,Auto">
 
                 <Label Text="Ngoại tuyến"
