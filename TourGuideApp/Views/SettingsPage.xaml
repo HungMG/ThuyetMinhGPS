@@ -2,107 +2,107 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="TourGuideApp.Views.SettingsPage"
-             BackgroundColor="#FAF7F2">
+             BackgroundColor="#FAF7F2"
+             Shell.NavBarIsVisible="False">
 
-    <VerticalStackLayout Padding="20,40,20,0" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="20,40,20,40" Spacing="20">
 
-        <Label
-            Text="Cài đặt"
-            FontFamily="Serif"
-            FontSize="28"
-            FontAttributes="Bold"
-            TextColor="#4A3A31"/>
+            <Label Text="Cài đặt"
+                   FontFamily="Serif"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#4A3A31"/>
 
-        <!-- Account -->
-        <Frame CornerRadius="15"
-               BackgroundColor="White"
-               BorderColor="#E8E0D5">
+            <Frame CornerRadius="15"
+                   BackgroundColor="White"
+                   BorderColor="#E8E0D5"
+                   HasShadow="False"
+                   Padding="15">
 
-            <Grid Padding="15" ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Tài khoản"
+                           FontAttributes="Bold"
+                           TextColor="#4A3A31"
+                           FontSize="16"
+                           VerticalOptions="Center"/>
 
-                <Label Text="Tài khoản"
-               FontAttributes="Bold"
-               FontSize="16"/>
+                    <Label Text=">"
+                           Grid.Column="1"
+                           FontSize="18"
+                           TextColor="Gray"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
 
-                <Label Text=">"
-               Grid.Column="1"
-               FontSize="18"
-               TextColor="Gray"
-               VerticalOptions="Center"/>
+            <Frame CornerRadius="15"
+                   BackgroundColor="White"
+                   BorderColor="#E8E0D5"
+                   HasShadow="False"
+                   Padding="15">
 
-            </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Tự động phát thuyết minh"
+                           FontAttributes="Bold"
+                           TextColor="#4A3A31"
+                           FontSize="16"
+                           VerticalOptions="Center"/>
 
-        </Frame>
+                    <Switch Grid.Column="1"
+                            IsToggled="True"
+                            OnColor="#C0502E"
+                            VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
 
-        <!-- Auto audio -->
-        <Frame CornerRadius="15"
-               BackgroundColor="White"
-               BorderColor="#E8E0D5">
+            <Frame CornerRadius="15"
+                   BackgroundColor="White"
+                   BorderColor="#E8E0D5"
+                   HasShadow="False"
+                   Padding="15">
 
-            <Grid Padding="15"
-                  ColumnDefinitions="*,Auto"
-                  VerticalOptions="Center">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnOfflineTapped"/>
+                </Frame.GestureRecognizers>
 
-                <Label Text="Tự động phát thuyết minh"
-                       FontAttributes="Bold"
-                       FontSize="16"
-                       VerticalOptions="Center"/>
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Ngoại tuyến"
+                           FontAttributes="Bold"
+                           TextColor="#4A3A31"
+                           FontSize="16"
+                           VerticalOptions="Center"/>
 
-                <Switch Grid.Column="1"
-                        IsToggled="True"
-                        VerticalOptions="Center"/>
+                    <Label Text=">"
+                           Grid.Column="1"
+                           FontSize="18"
+                           TextColor="Gray"
+                           VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
 
-            </Grid>
+            <Frame CornerRadius="15"
+                   BackgroundColor="White"
+                   BorderColor="#E8E0D5"
+                   HasShadow="False"
+                   Padding="15">
 
-        </Frame>
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Thông tin ứng dụng"
+                           FontAttributes="Bold"
+                           TextColor="#4A3A31"
+                           FontSize="16"/>
 
-        <!-- Offline -->
-        <Frame CornerRadius="15"
-               BackgroundColor="White"
-               BorderColor="#E8E0D5">
+                    <Label Text="TourGuide App"
+                           TextColor="#8D7A6D"
+                           FontSize="14"/>
 
+                    <Label Text="Version 1.0"
+                           TextColor="#8D7A6D"
+                           FontSize="14"/>
+                </VerticalStackLayout>
+            </Frame>
 
-            <Frame.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnOfflineTapped"/>
-            </Frame.GestureRecognizers>
-
-            <Grid Padding="15" ColumnDefinitions="*,Auto">
-
-                <Label Text="Ngoại tuyến"
-               FontAttributes="Bold"
-               FontSize="16"/>
-
-                <Label Text=">"
-               Grid.Column="1"
-               FontSize="18"
-               TextColor="Gray"
-               VerticalOptions="Center"/>
-
-            </Grid>
-
-        </Frame>
-
-        <!-- About -->
-        <Frame CornerRadius="15"
-               BackgroundColor="White"
-               BorderColor="#E8E0D5">
-
-            <VerticalStackLayout Padding="15">
-
-                <Label Text="Thông tin ứng dụng"
-                       FontAttributes="Bold"
-                       FontSize="16"/>
-
-                <Label Text="TourGuide App"
-                       FontSize="14"/>
-
-                <Label Text="Version 1.0"
-                       FontSize="14"/>
-
-            </VerticalStackLayout>
-
-        </Frame>
-
-    </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 
 </ContentPage>
