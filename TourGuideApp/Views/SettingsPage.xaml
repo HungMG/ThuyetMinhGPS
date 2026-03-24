@@ -13,7 +13,7 @@
                    FontSize="28"
                    FontAttributes="Bold"
                    TextColor="#4A3A31"/>
-
+            <!--Tài khoản-->
             <Frame CornerRadius="15"
                    BackgroundColor="White"
                    BorderColor="#E8E0D5"
@@ -34,7 +34,7 @@
                            VerticalOptions="Center"/>
                 </Grid>
             </Frame>
-
+            <!--Tự động phát thuyết minh-->
             <Frame CornerRadius="15"
                    BackgroundColor="White"
                    BorderColor="#E8E0D5"
@@ -54,7 +54,7 @@
                             VerticalOptions="Center"/>
                 </Grid>
             </Frame>
-
+            <!--Ngoại tuyến-->
             <Frame CornerRadius="15"
                    BackgroundColor="White"
                    BorderColor="#E8E0D5"
@@ -79,7 +79,7 @@
                            VerticalOptions="Center"/>
                 </Grid>
             </Frame>
-
+            <!--Thông tin ứng dụng-->
             <Frame CornerRadius="15"
                    BackgroundColor="White"
                    BorderColor="#E8E0D5"
@@ -100,6 +100,36 @@
                            TextColor="#8D7A6D"
                            FontSize="14"/>
                 </VerticalStackLayout>
+            </Frame>
+            <!--Đăng xuất-->
+            <Frame CornerRadius="15"
+                   BackgroundColor="#FFECEC"
+                   BorderColor="#FFB3B3"
+                   HasShadow="False"
+                   Padding="15">
+
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLogoutTapped"/>
+                </Frame.GestureRecognizers>
+                
+                <Grid ColumnDefinitions="*,Auto">
+
+                                <!-- Text -->
+                <Label Text="Đăng xuất"
+                       FontAttributes="Bold"
+                       FontSize="16"
+                       TextColor="#D32F2F"
+                       VerticalOptions="Center"/>
+
+                                <!-- Icon -->
+                <Label Text="⎋"
+                       Grid.Column="1"
+                       FontSize="18"
+                       TextColor="#D32F2F"
+                       VerticalOptions="Center"/>
+
+                </Grid>
+
             </Frame>
 
         </VerticalStackLayout>

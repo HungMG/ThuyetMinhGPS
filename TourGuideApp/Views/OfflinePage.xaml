@@ -6,7 +6,7 @@
 
     <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
         <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
-            <Label Text="Không có mạng  ư?? Đây là những địa điểm bạn đã tải:" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+            <Label Text="Không có mạng ư?? Đây là những địa điểm bạn đã tải:" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
         </VerticalStackLayout>
     </Grid>
 

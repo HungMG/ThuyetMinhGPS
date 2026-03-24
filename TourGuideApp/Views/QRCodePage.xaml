@@ -10,5 +10,11 @@
                 FontSize="28"
                 FontAttributes="Bold"
                 TextColor="#4A3A31"/>
+        
+        <Label
+               Text="Đưa mã QR vào khung"
+               FontSize="14"
+               TextColor="Gray"
+               HorizontalOptions="Center"/>
     </VerticalStackLayout>
 </ContentPage>

@@ -12,9 +12,6 @@
            FontSize="24"
            FontAttributes="Bold"/>
 
-        <!-- Description -->
-        <Label Text="{Binding Description}"
-           FontSize="18"/>
 
         <!-- Hàng icon -->
         <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
@@ -62,6 +59,10 @@
             </Frame>
 
         </Grid>
+
+        <!-- Description -->
+        <Label Text="{Binding Description}"
+           FontSize="18"/>
 
     </VerticalStackLayout>
 
