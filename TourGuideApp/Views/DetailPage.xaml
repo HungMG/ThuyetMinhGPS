@@ -30,20 +30,6 @@
                VerticalOptions="Center"/>
             </Frame>
 
-            <!-- 🡻 tải xuống -->
-            <Frame Grid.Column="2"
-           WidthRequest="40" HeightRequest="40"
-           CornerRadius="20"
-           BackgroundColor="#C0502E"
-           HasShadow="False"
-           Padding="0">
-                <Label Text="⬇"
-               FontSize="30"
-               TextColor="White"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"/>
-            </Frame>
-
             <!-- ❤️ yêu thích -->
             <Frame Grid.Column="3"
            WidthRequest="40" HeightRequest="40"
