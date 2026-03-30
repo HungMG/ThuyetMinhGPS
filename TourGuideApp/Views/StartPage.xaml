@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TourGuideApp.Views.StartPage"
+             BackgroundColor="#FAF7F2"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid>
+        <ScrollView HorizontalOptions="Fill" VerticalOptions="Fill" VerticalScrollBarVisibility="Never">
+
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Fill" Spacing="30" Padding="0, 50">
+
+                <VerticalStackLayout Spacing="5" HorizontalOptions="Center">
+                    <Label Text="📍" FontSize="60" HorizontalOptions="Center"/>
+                    <Label Text="TourGuide" FontSize="36" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif" HorizontalOptions="Center"/>
+                    <Label Text="Khám phá thành phố theo cách của bạn" FontSize="14" TextColor="#8D7A6D" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="1" WidthRequest="250" BackgroundColor="#E8E0D5" Margin="0,10" HorizontalOptions="Center"/>
+
+                <Label Text="Chọn ngôn ngữ / Select Language" FontSize="16" TextColor="#4A3A31" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+                <VerticalStackLayout Spacing="20" HorizontalOptions="Center">
+
+                    <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                        <Frame WidthRequest="120" HeightRequest="120" CornerRadius="20" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnVietnameseTapped"/>
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                                <Label Text="🇻🇳" FontSize="40" HorizontalOptions="Center"/>
+                                <Label Text="Tiếng Việt" FontSize="16" TextColor="#4A3A31" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <Frame WidthRequest="120" HeightRequest="120" CornerRadius="20" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnEnglishTapped"/>
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                                <Label Text="🇬🇧" FontSize="40" HorizontalOptions="Center"/>
+                                <Label Text="English" FontSize="16" TextColor="#4A3A31" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                        <Frame WidthRequest="120" HeightRequest="120" CornerRadius="20" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnChineseTapped"/>
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                                <Label Text="🇨🇳" FontSize="40" HorizontalOptions="Center"/>
+                                <Label Text="中文" FontSize="16" TextColor="#4A3A31" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <Frame WidthRequest="120" HeightRequest="120" CornerRadius="20" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnKoreanTapped"/>
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                                <Label Text="🇰🇷" FontSize="40" HorizontalOptions="Center"/>
+                                <Label Text="한국어" FontSize="16" TextColor="#4A3A31" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Spacing="20" HorizontalOptions="Center">
+                        <Frame WidthRequest="120" HeightRequest="120" CornerRadius="20" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="0">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnJapaneseTapped"/>
+                            </Frame.GestureRecognizers>
+                            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                                <Label Text="🇯🇵" FontSize="40" HorizontalOptions="Center"/>
+                                <Label Text="日本語" FontSize="16" TextColor="#4A3A31" FontAttributes="Bold" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

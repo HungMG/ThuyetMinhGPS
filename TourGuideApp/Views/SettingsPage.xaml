@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
              x:Class="TourGuideApp.Views.SettingsPage"
              BackgroundColor="#FAF7F2"
              Shell.NavBarIsVisible="False">
@@ -8,77 +9,49 @@
     <ScrollView>
         <VerticalStackLayout Padding="20,40,20,40" Spacing="20">
 
-            <Label Text="Cài đặt"
+            <Label Text="{x:Static lang:AppLang.SetTitle}"
                    FontFamily="Serif"
                    FontSize="28"
                    FontAttributes="Bold"
                    TextColor="#4A3A31"/>
-            
-            <!--Tự động phát thuyết minh-->
-            <Frame CornerRadius="15"
-                   BackgroundColor="White"
-                   BorderColor="#E8E0D5"
-                   HasShadow="False"
-                   Padding="15">
 
+            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
                 <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Tự động phát thuyết minh"
-                           FontAttributes="Bold"
-                           TextColor="#4A3A31"
-                           FontSize="16"
-                           VerticalOptions="Center"/>
+                    <Label Text="Ngôn ngữ / Language" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
 
-                    <Switch Grid.Column="1"
-                            IsToggled="True"
-                            OnColor="#C0502E"
-                            VerticalOptions="Center"/>
+                    <Picker x:Name="LanguagePicker" Grid.Column="1" WidthRequest="140" HorizontalTextAlignment="End" SelectedIndexChanged="OnLanguageChanged">
+                        <Picker.Items>
+                            <x:String>🇻🇳 Tiếng Việt</x:String>
+                            <x:String>🇬🇧 English</x:String>
+                            <x:String>🇨🇳 中文</x:String>
+                            <x:String>🇰🇷 한국어</x:String>
+                            <x:String>🇯🇵 日本語</x:String>
+                        </Picker.Items>
+                    </Picker>
                 </Grid>
             </Frame>
-            <!--Ngoại tuyến-->
-            <Frame CornerRadius="15"
-                   BackgroundColor="White"
-                   BorderColor="#E8E0D5"
-                   HasShadow="False"
-                   Padding="15">
+            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="{x:Static lang:AppLang.SetAutoAudio}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                    <Switch Grid.Column="1" IsToggled="True" OnColor="#C0502E" VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
 
+            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnOfflineTapped"/>
                 </Frame.GestureRecognizers>
-
                 <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Ngoại tuyến"
-                           FontAttributes="Bold"
-                           TextColor="#4A3A31"
-                           FontSize="16"
-                           VerticalOptions="Center"/>
-
-                    <Label Text=">"
-                           Grid.Column="1"
-                           FontSize="18"
-                           TextColor="Gray"
-                           VerticalOptions="Center"/>
+                    <Label Text="{x:Static lang:AppLang.SetOffline}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                    <Label Text=">" Grid.Column="1" FontSize="18" TextColor="Gray" VerticalOptions="Center"/>
                 </Grid>
             </Frame>
-            <!--Thông tin ứng dụng-->
-            <Frame CornerRadius="15"
-                   BackgroundColor="White"
-                   BorderColor="#E8E0D5"
-                   HasShadow="False"
-                   Padding="15">
 
+            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
                 <VerticalStackLayout Spacing="5">
-                    <Label Text="Thông tin ứng dụng"
-                           FontAttributes="Bold"
-                           TextColor="#4A3A31"
-                           FontSize="16"/>
-
-                    <Label Text="TourGuide App"
-                           TextColor="#8D7A6D"
-                           FontSize="14"/>
-
-                    <Label Text="Version 1.0"
-                           TextColor="#8D7A6D"
-                           FontSize="14"/>
+                    <Label Text="{x:Static lang:AppLang.SetAppInfo}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16"/>
+                    <Label Text="TourGuide App" TextColor="#8D7A6D" FontSize="14"/>
+                    <Label Text="{x:Static lang:AppLang.SetVersion}" TextColor="#8D7A6D" FontSize="14"/>
                 </VerticalStackLayout>
             </Frame>
 

@@ -1,5 +1,8 @@
-﻿using TourGuideApp.Services;
-using TourGuideApp.Models; // Đổi lại cho khớp với namespace của bạn
+﻿using Mapsui.UI.Maui;
+using Mapsui.Projections;
+using TourGuideApp.Services;
+using System.Linq;
+using TourGuideApp.Models; // 👇 ĐÃ DỜI LÊN ĐÂY
 
 namespace TourGuideApp.Views;
 
@@ -26,25 +29,22 @@ public partial class FavoritePage : ContentPage
         favoriteListView.ItemsSource = danhSachYeuThich;
     }
 
+
     // Sự kiện khi bấm nút Xóa (Thùng rác)
     private async void OnRemoveFavoriteClicked(object sender, EventArgs e)
     {
-        // 1. Xác định xem người dùng đang bấm vào món nào
         var button = sender as ImageButton;
         var poiBiXoa = button?.CommandParameter as POI;
 
         if (poiBiXoa != null)
         {
-            // 2. Hỏi lại cho chắc ăn
-            bool xacNhan = await DisplayAlert("Xác nhận", $"Bạn có chắc muốn bỏ '{poiBiXoa.Name}' khỏi danh sách yêu thích?", "Đồng ý", "Hủy");
+            // 👇 ĐÃ SỬA: Đổi poiBiXoa.Name thành poiBiXoa.CurrentName 👇
+            bool xacNhan = await DisplayAlert("Xác nhận", $"Bạn có chắc muốn bỏ '{poiBiXoa.CurrentName}' khỏi danh sách yêu thích?", "Đồng ý", "Hủy");
 
             if (xacNhan)
             {
-                // 3. Tắt cờ yêu thích và lưu xuống DB
                 poiBiXoa.IsFavorite = false;
                 await _dbService.UpdatePOIAsync(poiBiXoa);
-
-                // 4. Load lại danh sách cho nó biến mất khỏi màn hình
                 await LoadFavoritesAsync();
             }
         }

@@ -1,13 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
              x:Class="TourGuideApp.MainPage"
              BackgroundColor="#FAF7F2">
     <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
 
         <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
-            <Label Text="Điểm Thuyết Minh" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
-            <Label Text="Các điểm trong khu vực" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
+            <Label Text="{x:Static lang:AppLang.MainTitle}" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+            <Label Text="{x:Static lang:AppLang.MainSubtitle}" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
         </VerticalStackLayout>
 
         <CollectionView Grid.Row="1" 
@@ -20,16 +21,17 @@
                         <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
 
                             <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
-                                <Label Text="🍲" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                <Label Text="📍" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
                             </Frame>
 
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
-                                <Label Text="{Binding Description}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+
+                                <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
+                                <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
 
                                 <HorizontalStackLayout Margin="0,8,0,0" Spacing="5">
-                                    <Label Text="📍" FontSize="12"/>
-                                    <Label Text="Đang tính..." FontSize="12" FontAttributes="Bold" TextColor="#C0502E"/>
+                                    <Label Text="📏" FontSize="12"/>
+                                    <Label Text="{x:Static lang:AppLang.MainCalculating}" FontSize="12" FontAttributes="Bold" TextColor="#C0502E"/>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
 

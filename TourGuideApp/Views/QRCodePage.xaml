@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             
+             xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
+             
              x:Class="TourGuideApp.Views.QRCodePage"
-             BackgroundColor="#FAF7F2">
+             BackgroundColor="#FAF7F2"
+             Shell.NavBarIsVisible="False">
+
     <VerticalStackLayout Padding="20,40,20,0" Spacing="20">
-        <Label
-                Text="Quét mã QR"
-                FontFamily="Serif"
-                FontSize="28"
-                FontAttributes="Bold"
-                TextColor="#4A3A31"/>
-        
-        <Label
-               Text="Đưa mã QR vào khung"
+        <Label Text="{x:Static lang:AppLang.QRTitle}"
+               FontFamily="Serif"
+               FontSize="28"
+               FontAttributes="Bold"
+               TextColor="#4A3A31"/>
+
+        <Label Text="{x:Static lang:AppLang.QRSubtitle}"
                FontSize="14"
                TextColor="Gray"
                HorizontalOptions="Center"/>

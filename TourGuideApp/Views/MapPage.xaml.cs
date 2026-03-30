@@ -1,19 +1,15 @@
 ﻿using Mapsui.UI.Maui;
 using Mapsui.Projections;
 using TourGuideApp.Services;
-using System.Linq; // Thêm cái này để xài hàm lọc danh sách
+using System.Linq;
+using TourGuideApp.Models;
 
 namespace TourGuideApp.Views;
-using TourGuideApp.Models;
 
 public partial class MapPage : ContentPage
 {
     private DatabaseService _dbService;
-
-    // Cuốn sổ tay ghi nhớ các địa điểm đã đọc thuyết minh
     private List<int> _daDocThuyetMinh = new List<int>();
-
-    // Biến tạm để nút Dẫn Đường lấy tọa độ
     private POI _temporaryPoi;
 
     public MapPage()
@@ -26,27 +22,19 @@ public partial class MapPage : ContentPage
         tourMap.IsMyLocationButtonVisible = false;
         tourMap.IsNorthingButtonVisible = false;
 
-        // 👇 LẮNG NGHE CÚ CHẠM CỦA NGƯỜI DÙNG ĐỂ THÊM ĐIỂM 👇
         tourMap.MapClicked += TourMap_MapClicked;
     }
 
-    // 1. Khi vừa mở tab Bản đồ lên
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
-        // Gọi hàm mới: Tải TẤT CẢ điểm (vì từ khóa đang bỏ trống "")
         await FilterAndShowPins("");
-
-        await GetCurrentLocationAsync();  // Gọi hàm bật GPS theo dõi bạn
+        await GetCurrentLocationAsync();
     }
 
-    // 2. Khi bạn rời khỏi tab Bản đồ (Sang tab khác)
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-
-        // Ngắt lắng nghe GPS để tiết kiệm pin cho điện thoại
         Geolocation.LocationChanged -= Geolocation_LocationChanged;
         Geolocation.StopListeningForeground();
     }
@@ -55,15 +43,13 @@ public partial class MapPage : ContentPage
     // 👇 PHẦN 1: SỰ KIỆN TÌM KIẾM 👇
     // =========================================================
 
-    // Khi người dùng bấm nút Tìm kiếm (Kính lúp) trên bàn phím
     private async void OnSearchButtonPressed(object sender, EventArgs e)
     {
-        mapSearchBar.Unfocus(); // Ẩn bàn phím đi cho dễ nhìn
+        mapSearchBar.Unfocus();
         string keyword = mapSearchBar.Text?.ToLower() ?? "";
         await FilterAndShowPins(keyword);
     }
 
-    // Khi người dùng xóa chữ trên thanh tìm kiếm (Hiện lại tất cả)
     private async void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(e.NewTextValue))
@@ -73,67 +59,42 @@ public partial class MapPage : ContentPage
     }
 
     // =========================================================
-    // 👇 PHẦN 2: POPUP CHI TIẾT ĐỊA ĐIỂM (Plugin.Maui.BottomSheet) 👇
+    // 👇 PHẦN 2: POPUP CHI TIẾT ĐỊA ĐIỂM 👇
     // =========================================================
 
-    // Khi người dùng lấy tay chạm vào cái ghim đỏ
-    // =========================================================
-    // 👇 SỰ KIỆN CLICK GHIM ĐỎ (PIN): BẬT POPUP BottomSheet 👇
-    // =========================================================
     private void TourMap_PinClicked(object sender, PinClickedEventArgs e)
     {
-        e.Handled = true; // Chặn bong bóng mặc định của Mapsui
+        e.Handled = true;
 
-        // 1. Xác định địa điểm vừa được Click (tìm trong DB)
-        // Lưu ý: e.Pin.Address đang chứa Mô tả, tui sẽ xài Mô tả thật trong DB để Popup đẹp hơn
-        // e.Pin.Label chứa Tên.
         string tenDiaDiem = e.Pin.Label;
 
-        // 💡 Để tìm chính xác địa điểm trong DB, cách tốt nhất là dùng Tọa độ (Lat/Lon)
-        // Vì Tên có thể bị trùng. Tọa độ thì luôn duy nhất!
-        double lat = e.Pin.Position.Latitude;
-        double lon = e.Pin.Position.Longitude;
-
-        // Lấy danh sách điểm từ SQLite
-        // (Đây là lúc tui khuyên bạn nên lưu cái danh sách điểm ban đầu ra một biến global cho nhẹ,
-        // nhưng tạm thời tui code Get lại từ DB cho bạn dễ hình dung logic nhé).
-        // await _dbService.GetAllPOIsAsync() -> Lọc lại -> Tìm điểm có Lat/Lon khớp.
-        // Tui sẽ tạm thời giả định bạn đã có list dữ liệu 'allPOIs' nhé.
-
-        // Tạm thời để code Get lại từ DB nhé (không khuyến khích)
         Task.Run(async () => {
             var allPOIs = await _dbService.GetAllPOIsAsync();
             if (allPOIs == null) return;
 
-            // Tìm điểm trùng Tên (hoặc trùng tọa độ cho chính xác)
-            var currentPoi = allPOIs.FirstOrDefault(p => p.Name == tenDiaDiem);
+            // 👇 ĐÃ SỬA: Tìm kiếm dựa trên CurrentName (Ngôn ngữ hiện tại)
+            var currentPoi = allPOIs.FirstOrDefault(p => p.CurrentName == tenDiaDiem);
 
             if (currentPoi != null)
             {
-                // 👇 CHẠY TRÊN MAIN THREAD ĐỂ CẬP NHẬT GIAO DIỆN 👇
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    // 2. "Rót" dữ liệu thật từ SQLite vào các Label trong Popup BottomSheet
-                    lblPoiName.Text = currentPoi.Name;
-                    lblPoiDescription.Text = currentPoi.Description;
-                    lblPoiAddress.Text = $"{currentPoi.Latitude:F5}, {currentPoi.Longitude:F5}"; // VD: Hiện tọa độ làm địa chỉ
+                    // 👇 ĐÃ SỬA: Rót dữ liệu CurrentName và CurrentDescription
+                    lblPoiName.Text = currentPoi.CurrentName;
+                    lblPoiDescription.Text = currentPoi.CurrentDescription;
+                    lblPoiAddress.Text = $"{currentPoi.Latitude:F5}, {currentPoi.Longitude:F5}";
 
-                    // Cập nhật hình ảnh (dùng cái tên file mình vừa thêm vào model)
                     if (!string.IsNullOrWhiteSpace(currentPoi.ImageUrl))
                     {
                         imgPoiImage.Source = currentPoi.ImageUrl;
                     }
                     else
                     {
-                        // Nếu không có hình, xài hình mặc định
                         imgPoiImage.Source = "img_default_poi.png";
                     }
 
-                    // 💡 Lưu lại địa điểm hiện tại vào một biến tạm để nút Dẫn Đường xài
                     _temporaryPoi = currentPoi;
 
-                    // 3. TUYỆT CHIÊU: BẬT POPUP BottomSheet TRƯỢT LÊN!
-                    // Lần này bật full màn hình PeekHeight = 1500px luôn cho nó ngầu
                     poiDetailPopup.PeekHeight = 1500;
                     poiDetailPopup.IsOpen = true;
                 });
@@ -141,18 +102,17 @@ public partial class MapPage : ContentPage
         });
     }
 
-    // Sự kiện khi bấm nút Dẫn Đường trên Popup
     private async void OnNavigationClicked(object sender, EventArgs e)
     {
         if (_temporaryPoi == null) return;
 
-        // ✅ ✅ ĐÃ SỬA: Ẩn Popup đi cho đỡ vướng
-        poiDetailPopup.IsOpen = false; // 👇 ĐÃ SỬA: Dùng IsOpen = false cho Plugin.Maui.BottomSheet
+        poiDetailPopup.IsOpen = false;
 
         try
         {
             var toaDoDich = new Location(_temporaryPoi.Latitude, _temporaryPoi.Longitude);
-            var options = new MapLaunchOptions { Name = _temporaryPoi.Name, NavigationMode = NavigationMode.Driving };
+            // 👇 ĐÃ SỬA: Lấy tên theo ngôn ngữ hiện tại
+            var options = new MapLaunchOptions { Name = _temporaryPoi.CurrentName, NavigationMode = NavigationMode.Driving };
             await Microsoft.Maui.ApplicationModel.Map.OpenAsync(toaDoDich, options);
         }
         catch (Exception ex)
@@ -161,24 +121,23 @@ public partial class MapPage : ContentPage
         }
     }
 
-    // Hàm cốt lõi: Vừa Lọc vừa Cắm ghim đỏ lên bản đồ (vẫn giữ logic của bạn)
     private async Task FilterAndShowPins(string keyword)
     {
         var danhSachPOI = await _dbService.GetAllPOIsAsync();
         if (danhSachPOI == null) return;
 
-        // Nếu có gõ từ khóa -> Lọc danh sách
         if (!string.IsNullOrWhiteSpace(keyword))
         {
+            // 👇 ĐÃ SỬA: Lọc dựa trên ngôn ngữ hiện tại
             danhSachPOI = danhSachPOI.Where(p =>
-                p.Name.ToLower().Contains(keyword) ||
-                p.Description.ToLower().Contains(keyword)
+                (p.CurrentName != null && p.CurrentName.ToLower().Contains(keyword)) ||
+                (p.CurrentDescription != null && p.CurrentDescription.ToLower().Contains(keyword))
             ).ToList();
         }
 
         tourMap.Pins.Clear();
-        tourMap.PinClicked -= TourMap_PinClicked; // Xóa đăng ký cũ tránh lỗi click đúp
-        tourMap.PinClicked += TourMap_PinClicked; // Đăng ký sự kiện Click cho ghim
+        tourMap.PinClicked -= TourMap_PinClicked;
+        tourMap.PinClicked += TourMap_PinClicked;
 
         foreach (var poi in danhSachPOI)
         {
@@ -186,15 +145,14 @@ public partial class MapPage : ContentPage
             {
                 Position = new Position(poi.Latitude, poi.Longitude),
                 Type = PinType.Pin,
-                Label = poi.Name,
-                // Label đang chứa Tên, Address tạm thời chứa Description (vẫn giữ logic cũ)
-                Address = poi.Description,
+                // 👇 ĐÃ SỬA: Gán nhãn bằng ngôn ngữ hiện tại
+                Label = poi.CurrentName,
+                Address = poi.CurrentDescription,
                 Color = Colors.Red
             };
             tourMap.Pins.Add(pin);
         }
 
-        // Nếu tìm thấy kết quả thì Zoom camera tới điểm đầu tiên
         if (danhSachPOI.Any())
         {
             var firstPoi = danhSachPOI.First();
@@ -204,12 +162,13 @@ public partial class MapPage : ContentPage
         }
         else if (!string.IsNullOrWhiteSpace(keyword))
         {
+            // Tạm thời để tiếng Việt, nếu kỹ thì bạn đem dòng này vô file .resx luôn
             await DisplayAlert("Rất tiếc", "Không tìm thấy địa điểm nào phù hợp!", "Thử lại");
         }
     }
 
     // =========================================================
-    // 👇 PHẦN 3: GPS VÀ GEOFENCE (AUDIO) CỦA BẠN (GIỮ NGUYÊN) 👇
+    // 👇 PHẦN 3: GPS VÀ GEOFENCE (THUYẾT MINH SONG NGỮ) 👇
     // =========================================================
 
     private async Task GetCurrentLocationAsync()
@@ -240,12 +199,10 @@ public partial class MapPage : ContentPage
     {
         if (e.Location != null)
         {
-            // Dời chấm xanh và Camera 
             tourMap.MyLocationLayer.UpdateMyLocation(new Position(e.Location.Latitude, e.Location.Longitude));
             var toaDoMoi = SphericalMercator.FromLonLat(e.Location.Longitude, e.Location.Latitude);
             tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoMoi.x, toaDoMoi.y));
 
-            // Lấy lại danh sách POI từ Database
             var danhSachPOI = await _dbService.GetAllPOIsAsync();
             if (danhSachPOI == null) return;
 
@@ -257,56 +214,75 @@ public partial class MapPage : ContentPage
                 double khoangCachKm = Location.CalculateDistance(e.Location, toaDoDuLich, DistanceUnits.Kilometers);
                 double khoangCachMet = khoangCachKm * 1000;
 
-                // Cách dưới 50m -> Đọc thuyết minh
                 if (khoangCachMet <= 50)
                 {
                     _daDocThuyetMinh.Add(poi.Id);
-                    string cauChao = $"Chào mừng bạn đã đến với {poi.Name}. {poi.Description}";
 
-                    await TextToSpeech.Default.SpeakAsync(cauChao);
-                    await DisplayAlert("Đã tới nơi!", cauChao, "OK");
+                    // 👇 ĐÃ SỬA: Đọc Audio chuẩn tiếng Anh hoặc tiếng Việt
+                    // Đã xóa phần if/else cứng ngắc, thay bằng code động:
+                    string langCode = Preferences.Get("AppLanguage", "vi");
+
+                    // Lọc tìm giọng đọc thích hợp trên máy (chỉ cần lấy 2 chữ cái đầu là zh, ko, ja)
+                    var locales = await TextToSpeech.Default.GetLocalesAsync();
+                    var selectedLocale = locales.FirstOrDefault(l => l.Language.ToLower().StartsWith(langCode));
+
+                    var options = new SpeechOptions()
+                    {
+                        Locale = selectedLocale
+                    };
+
+                    // Không cần tự ghép chuỗi "Xin chào" nữa, đọc thẳng CurrentDescription là hay nhất
+                    string cauThuyetMinh = $"{poi.CurrentName}. {poi.CurrentDescription}";
+
+                    await TextToSpeech.Default.SpeakAsync(cauThuyetMinh, options);
+                    await DisplayAlert("Location Reached", poi.CurrentName, "OK");
                 }
             }
         }
     }
 
     // =========================================================
-    // 👇 PHẦN 4: SỰ KIỆN CHẠM BẢN ĐỒ ĐỂ THÊM ĐIỂM (GIỮ NGUYÊN) 👇
+    // 👇 PHẦN 4: SỰ KIỆN CHẠM BẢN ĐỒ ĐỂ THÊM ĐIỂM 👇
     // =========================================================
 
     private async void TourMap_MapClicked(object sender, MapClickedEventArgs e)
     {
-        // 1. Quá sướng! Mapsui đã tự tính sẵn Lat/Lon cho mình, không cần công thức gì hết!
         double viDo = e.Point.Latitude;
         double kinhDo = e.Point.Longitude;
 
-        // 2. Hỏi người dùng muốn làm gì?
-        string hanhDong = await DisplayActionSheet("Tọa độ mới", "Hủy", null, "Thêm địa điểm vào đây");
+        string langCode = Preferences.Get("AppLanguage", "vi");
+        string title = langCode == "en" ? "New Location" : "Tọa độ mới";
+        string cancel = langCode == "en" ? "Cancel" : "Hủy";
+        string addAction = langCode == "en" ? "Add location here" : "Thêm địa điểm vào đây";
 
-        if (hanhDong == "Thêm địa điểm vào đây")
+        string hanhDong = await DisplayActionSheet(title, cancel, null, addAction);
+
+        if (hanhDong == addAction)
         {
-            // 3. Hiện Popup cho họ nhập tên địa điểm
-            string tenDiaDiem = await DisplayPromptAsync("Tạo POI mới", "Nhập tên địa điểm:", "Lưu", "Hủy", "VD: Quán cafe cô Ba...");
+            string promptTitle = langCode == "en" ? "New POI" : "Tạo POI mới";
+            string promptMsg = langCode == "en" ? "Enter location name:" : "Nhập tên địa điểm:";
+            string saveBtn = langCode == "en" ? "Save" : "Lưu";
 
-            // Nếu họ không nhập gì hoặc bấm Hủy thì thôi
+            string tenDiaDiem = await DisplayPromptAsync(promptTitle, promptMsg, saveBtn, cancel);
+
             if (string.IsNullOrWhiteSpace(tenDiaDiem)) return;
 
-            // 4. Hiện Popup cho họ nhập mô tả
-            string moTa = await DisplayPromptAsync("Chi tiết", "Nhập mô tả cho nơi này:", "Lưu", "Hủy", "VD: Trà đào cực ngon!");
+            string descMsg = langCode == "en" ? "Enter description:" : "Nhập mô tả cho nơi này:";
+            string moTa = await DisplayPromptAsync("Chi tiết", descMsg, saveBtn, cancel);
 
-            // 5. Đóng gói dữ liệu và đẩy xuống Database
-            var diemMoi = new Models.POI // Nhớ kiểm tra lại chữ Models.POI xem đúng tên class của bạn chưa nha
+            // 👇 ĐÃ SỬA: Đóng gói dữ liệu vào đúng cột VI (cột EN sẽ tự copy theo nhờ DatabaseService)
+            var diemMoi = new POI
             {
-                Name = tenDiaDiem,
-                Description = moTa ?? "Không có mô tả",
-                Latitude = viDo,      // 👇 Đưa thẳng Vĩ độ vào đây
-                Longitude = kinhDo    // 👇 Đưa thẳng Kinh độ vào đây
+                Name_VI = tenDiaDiem,
+                Description_VI = moTa ?? "Không có mô tả",
+                Latitude = viDo,
+                Longitude = kinhDo
             };
 
             await _dbService.AddPOIAsync(diemMoi);
 
-            // 6. Thông báo thành công và TẢI LẠI BẢN ĐỒ NGAY LẬP TỨC!
-            await DisplayAlert("Thành công", $"Đã thêm '{tenDiaDiem}' vào bản đồ!", "OK");
+            string successMsg = langCode == "en" ? $"Added '{tenDiaDiem}'!" : $"Đã thêm '{tenDiaDiem}' vào bản đồ!";
+            await DisplayAlert(langCode == "en" ? "Success" : "Thành công", successMsg, "OK");
 
             await FilterAndShowPins("");
         }

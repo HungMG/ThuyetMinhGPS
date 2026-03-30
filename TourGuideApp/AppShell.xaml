@@ -4,28 +4,28 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:TourGuideApp"
-    
     xmlns:views="clr-namespace:TourGuideApp.Views"
-    
+    xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
     Shell.FlyoutBehavior="Disabled">
+
     <TabBar>
-        <Tab Title="Bản đồ" Icon="icon_map.png">
+        <Tab Title="{x:Static lang:AppLang.TabMap}" Icon="icon_map.png">
             <ShellContent Route="MapPage" ContentTemplate="{DataTemplate views:MapPage}" />
         </Tab>
 
-        <Tab Title="Điểm" Icon="icon_list.png">
+        <Tab Title="{x:Static lang:AppLang.TabPlaces}" Icon="icon_list.png">
             <ShellContent Route="MainPage" ContentTemplate="{DataTemplate local:MainPage}" />
         </Tab>
-        
-        <Tab Title="Yêu thích" Icon="heart.png">
+
+        <Tab Title="{x:Static lang:AppLang.TabFavorite}" Icon="heart.png">
             <ShellContent Route="FavoritePage" ContentTemplate="{DataTemplate views:FavoritePage}" />
         </Tab>
-        
-        <Tab Title="QR" Icon="icon_qr.png">
+
+        <Tab Title="{x:Static lang:AppLang.TabQR}" Icon="icon_qr.png">
             <ShellContent Route="QRCodePage" ContentTemplate="{DataTemplate views:QRCodePage}" />
         </Tab>
 
-        <Tab Title="Cài đặt" Icon="icon_settings.png">
+        <Tab Title="{x:Static lang:AppLang.TabSettings}" Icon="icon_settings.png">
             <ShellContent Route="SettingsPage" ContentTemplate="{DataTemplate views:SettingsPage}" />
         </Tab>
     </TabBar>
