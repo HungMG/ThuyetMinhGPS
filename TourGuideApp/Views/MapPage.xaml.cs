@@ -19,8 +19,10 @@ public partial class MapPage : ContentPage
 
         tourMap.Map?.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
         tourMap.IsZoomButtonVisible = false;
-        tourMap.IsMyLocationButtonVisible = false;
         tourMap.IsNorthingButtonVisible = false;
+
+        // 🌟 ĐÃ BẬT LẠI: Nút bấm định vị vị trí hiện tại của Mapsui 🌟
+        tourMap.IsMyLocationButtonVisible = true;
 
         tourMap.MapClicked += TourMap_MapClicked;
     }
@@ -72,14 +74,12 @@ public partial class MapPage : ContentPage
             var allPOIs = await _dbService.GetAllPOIsAsync();
             if (allPOIs == null) return;
 
-            // 👇 ĐÃ SỬA: Tìm kiếm dựa trên CurrentName (Ngôn ngữ hiện tại)
             var currentPoi = allPOIs.FirstOrDefault(p => p.CurrentName == tenDiaDiem);
 
             if (currentPoi != null)
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    // 👇 ĐÃ SỬA: Rót dữ liệu CurrentName và CurrentDescription
                     lblPoiName.Text = currentPoi.CurrentName;
                     lblPoiDescription.Text = currentPoi.CurrentDescription;
                     lblPoiAddress.Text = $"{currentPoi.Latitude:F5}, {currentPoi.Longitude:F5}";
@@ -111,11 +111,10 @@ public partial class MapPage : ContentPage
         try
         {
             var toaDoDich = new Location(_temporaryPoi.Latitude, _temporaryPoi.Longitude);
-            // 👇 ĐÃ SỬA: Lấy tên theo ngôn ngữ hiện tại
             var options = new MapLaunchOptions { Name = _temporaryPoi.CurrentName, NavigationMode = NavigationMode.Driving };
             await Microsoft.Maui.ApplicationModel.Map.OpenAsync(toaDoDich, options);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await DisplayAlert("Lỗi", "Không thể mở ứng dụng bản đồ.", "OK");
         }
@@ -128,7 +127,6 @@ public partial class MapPage : ContentPage
 
         if (!string.IsNullOrWhiteSpace(keyword))
         {
-            // 👇 ĐÃ SỬA: Lọc dựa trên ngôn ngữ hiện tại
             danhSachPOI = danhSachPOI.Where(p =>
                 (p.CurrentName != null && p.CurrentName.ToLower().Contains(keyword)) ||
                 (p.CurrentDescription != null && p.CurrentDescription.ToLower().Contains(keyword))
@@ -145,7 +143,6 @@ public partial class MapPage : ContentPage
             {
                 Position = new Position(poi.Latitude, poi.Longitude),
                 Type = PinType.Pin,
-                // 👇 ĐÃ SỬA: Gán nhãn bằng ngôn ngữ hiện tại
                 Label = poi.CurrentName,
                 Address = poi.CurrentDescription,
                 Color = Colors.Red
@@ -159,11 +156,6 @@ public partial class MapPage : ContentPage
             var toaDoZoom = SphericalMercator.FromLonLat(firstPoi.Longitude, firstPoi.Latitude);
             tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoZoom.x, toaDoZoom.y));
             tourMap.Map?.Navigator?.ZoomTo(2);
-        }
-        else if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            // Tạm thời để tiếng Việt, nếu kỹ thì bạn đem dòng này vô file .resx luôn
-            await DisplayAlert("Rất tiếc", "Không tìm thấy địa điểm nào phù hợp!", "Thử lại");
         }
     }
 
@@ -200,8 +192,10 @@ public partial class MapPage : ContentPage
         if (e.Location != null)
         {
             tourMap.MyLocationLayer.UpdateMyLocation(new Position(e.Location.Latitude, e.Location.Longitude));
-            var toaDoMoi = SphericalMercator.FromLonLat(e.Location.Longitude, e.Location.Latitude);
-            tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoMoi.x, toaDoMoi.y));
+
+            // Xóa dòng trượt tự động này đi nếu bạn không muốn bản đồ cứ giật giật chạy theo GPS
+            // var toaDoMoi = SphericalMercator.FromLonLat(e.Location.Longitude, e.Location.Latitude);
+            // tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoMoi.x, toaDoMoi.y));
 
             var danhSachPOI = await _dbService.GetAllPOIsAsync();
             if (danhSachPOI == null) return;
@@ -218,11 +212,7 @@ public partial class MapPage : ContentPage
                 {
                     _daDocThuyetMinh.Add(poi.Id);
 
-                    // 👇 ĐÃ SỬA: Đọc Audio chuẩn tiếng Anh hoặc tiếng Việt
-                    // Đã xóa phần if/else cứng ngắc, thay bằng code động:
                     string langCode = Preferences.Get("AppLanguage", "vi");
-
-                    // Lọc tìm giọng đọc thích hợp trên máy (chỉ cần lấy 2 chữ cái đầu là zh, ko, ja)
                     var locales = await TextToSpeech.Default.GetLocalesAsync();
                     var selectedLocale = locales.FirstOrDefault(l => l.Language.ToLower().StartsWith(langCode));
 
@@ -231,7 +221,6 @@ public partial class MapPage : ContentPage
                         Locale = selectedLocale
                     };
 
-                    // Không cần tự ghép chuỗi "Xin chào" nữa, đọc thẳng CurrentDescription là hay nhất
                     string cauThuyetMinh = $"{poi.CurrentName}. {poi.CurrentDescription}";
 
                     await TextToSpeech.Default.SpeakAsync(cauThuyetMinh, options);
@@ -242,7 +231,7 @@ public partial class MapPage : ContentPage
     }
 
     // =========================================================
-    // 👇 PHẦN 4: SỰ KIỆN CHẠM BẢN ĐỒ ĐỂ THÊM ĐIỂM 👇
+    // 👇 PHẦN 4: SỰ KIỆN CHẠM BẢN ĐỒ ĐỂ THÊM ĐIỂM ĐA NGÔN NGỮ 👇
     // =========================================================
 
     private async void TourMap_MapClicked(object sender, MapClickedEventArgs e)
@@ -251,40 +240,88 @@ public partial class MapPage : ContentPage
         double kinhDo = e.Point.Longitude;
 
         string langCode = Preferences.Get("AppLanguage", "vi");
-        string title = langCode == "en" ? "New Location" : "Tọa độ mới";
-        string cancel = langCode == "en" ? "Cancel" : "Hủy";
-        string addAction = langCode == "en" ? "Add location here" : "Thêm địa điểm vào đây";
+
+        // 1. Dịch thuật các nút bấm ActionSheet
+        string title = langCode switch { "en" => "New Location", "zh" => "新位置", "ko" => "새 위치", "ja" => "新しい場所", _ => "Tọa độ mới" };
+        string cancel = langCode switch { "en" => "Cancel", "zh" => "取消", "ko" => "취소", "ja" => "キャンセル", _ => "Hủy" };
+        string addAction = langCode switch { "en" => "Add location here", "zh" => "在此处添加", "ko" => "여기에 추가", "ja" => "ここに追加", _ => "Thêm địa điểm vào đây" };
 
         string hanhDong = await DisplayActionSheet(title, cancel, null, addAction);
 
         if (hanhDong == addAction)
         {
-            string promptTitle = langCode == "en" ? "New POI" : "Tạo POI mới";
-            string promptMsg = langCode == "en" ? "Enter location name:" : "Nhập tên địa điểm:";
-            string saveBtn = langCode == "en" ? "Save" : "Lưu";
+            // 2. Dịch thuật bảng nhập liệu Prompt
+            string promptTitle = langCode switch { "en" => "New POI", "zh" => "新景点", "ko" => "새 장소", "ja" => "新しいスポット", _ => "Tạo POI mới" };
+            string promptMsg = langCode switch { "en" => "Enter name:", "zh" => "输入名称:", "ko" => "이름 입력:", "ja" => "名前を入力:", _ => "Nhập tên địa điểm:" };
+            string saveBtn = langCode switch { "en" => "Save", "zh" => "保存", "ko" => "저장", "ja" => "保存", _ => "Lưu" };
 
             string tenDiaDiem = await DisplayPromptAsync(promptTitle, promptMsg, saveBtn, cancel);
-
             if (string.IsNullOrWhiteSpace(tenDiaDiem)) return;
 
-            string descMsg = langCode == "en" ? "Enter description:" : "Nhập mô tả cho nơi này:";
-            string moTa = await DisplayPromptAsync("Chi tiết", descMsg, saveBtn, cancel);
+            string descMsg = langCode switch { "en" => "Enter description:", "zh" => "输入描述:", "ko" => "설명 입력:", "ja" => "説明を入力:", _ => "Nhập mô tả:" };
+            string moTa = await DisplayPromptAsync(promptTitle, descMsg, saveBtn, cancel);
+            moTa ??= "Không có mô tả";
 
-            // 👇 ĐÃ SỬA: Đóng gói dữ liệu vào đúng cột VI (cột EN sẽ tự copy theo nhờ DatabaseService)
+            // 3. 🌟 TUYỆT CHIÊU: Ghi đè chữ người dùng nhập vào TẤT CẢ các cột ngôn ngữ
+            // Tránh trường hợp nhập bên Tiếng Anh xong chuyển qua Tiếng Nhật bị mất chữ
             var diemMoi = new POI
             {
                 Name_VI = tenDiaDiem,
-                Description_VI = moTa ?? "Không có mô tả",
+                Name_EN = tenDiaDiem,
+                Name_ZH = tenDiaDiem,
+                Name_KO = tenDiaDiem,
+                Name_JA = tenDiaDiem,
+                Description_VI = moTa,
+                Description_EN = moTa,
+                Description_ZH = moTa,
+                Description_KO = moTa,
+                Description_JA = moTa,
                 Latitude = viDo,
                 Longitude = kinhDo
             };
 
             await _dbService.AddPOIAsync(diemMoi);
 
-            string successMsg = langCode == "en" ? $"Added '{tenDiaDiem}'!" : $"Đã thêm '{tenDiaDiem}' vào bản đồ!";
-            await DisplayAlert(langCode == "en" ? "Success" : "Thành công", successMsg, "OK");
+            // 4. Dịch thuật thông báo thành công
+            string successTitle = langCode switch { "en" => "Success", "zh" => "成功", "ko" => "성공", "ja" => "成功", _ => "Thành công" };
+            string successMsg = langCode switch { "en" => $"Added '{tenDiaDiem}'!", "zh" => $"已添加 '{tenDiaDiem}'!", "ko" => $"'{tenDiaDiem}' 추가됨!", "ja" => $"'{tenDiaDiem}' を追加しました!", _ => $"Đã thêm '{tenDiaDiem}'!" };
 
+            await DisplayAlert(successTitle, successMsg, "OK");
             await FilterAndShowPins("");
+        }
+
+    }
+    // =========================================================
+    // 👇 HÀM XỬ LÝ NÚT TỰ ĐỊNH VỊ VỊ TRÍ 👇
+    // =========================================================
+    private void OnCenterLocationTapped(object sender, TappedEventArgs e)
+    {
+        // Kiểm tra xem máy đã bắt được GPS của người dùng chưa
+        if (tourMap.MyLocationLayer != null && tourMap.MyLocationLayer.MyLocation != null)
+        {
+            // Lấy tọa độ hiện tại
+            var loc = tourMap.MyLocationLayer.MyLocation;
+            var toaDoHienTai = SphericalMercator.FromLonLat(loc.Longitude, loc.Latitude);
+
+            // Trượt camera bản đồ về đúng chỗ đó
+            tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoHienTai.x, toaDoHienTai.y));
+
+            // Zoom lại gần cho dễ nhìn (Mức 2 là vừa đẹp)
+            tourMap.Map?.Navigator?.ZoomTo(2);
+        }
+        else
+        {
+            // Lỡ như mạng lag chưa load kịp GPS
+            string langCode = Preferences.Get("AppLanguage", "vi");
+            string msg = langCode switch
+            {
+                "en" => "Finding your location...",
+                "zh" => "正在查找您的位置...",
+                "ko" => "위치 찾는 중...",
+                "ja" => "現在地を検索中...",
+                _ => "Đang tìm vị trí của bạn, vui lòng đợi chút nhé!"
+            };
+            DisplayAlert(langCode == "en" ? "Info" : "Thông báo", msg, "OK");
         }
     }
 }

@@ -3,15 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:bs="http://pluginmauibottomsheet.com"
-             
              xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
-             
              x:Class="TourGuideApp.Views.MapPage"
              Title="Bản đồ"
              Shell.NavBarIsVisible="False">
 
     <Grid>
-        <mapsui:MapView x:Name="tourMap" />
+        <mapsui:MapView x:Name="tourMap" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+
+        <Frame WidthRequest="55" HeightRequest="55" CornerRadius="27.5" BackgroundColor="White" 
+               HorizontalOptions="End" VerticalOptions="End" Margin="0, 0, 20, 20" 
+               HasShadow="True" Padding="0">
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCenterLocationTapped"/>
+            </Frame.GestureRecognizers>
+            <Label Text="🎯" FontSize="26" HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Frame>
 
         <Frame Margin="15,20,15,0" Padding="0" CornerRadius="25" HasShadow="True"
                VerticalOptions="Start" HorizontalOptions="Fill" BackgroundColor="White"

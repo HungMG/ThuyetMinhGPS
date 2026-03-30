@@ -13,45 +13,92 @@ public partial class MainPage : ContentPage
 
     public MainPage()
     {
-        InitializeComponent(); // Dám cá là dán vào xong nó XANH MƯỢT luôn!
+        InitializeComponent();
         _dbService = new DatabaseService();
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _dbService.SeedDataAsync();
-        var danhSachPOI = await _dbService.GetAllPOIsAsync();
 
-        // Nó đã nhìn thấy poiListView!
-        poiListView.ItemsSource = danhSachPOI;
-    }
+        // 1. Gọi hàm nạp dữ liệu từ Database
+        LoadDataAsync();
 
-    public async Task TriggerTourGuideAsync(double currentLat, double currentLon)
-    {
-        var allPOIs = await _dbService.GetAllPOIsAsync();
-        var bestPOI = _geofenceEngine.GetBestPOIToTrigger(currentLat, currentLon, allPOIs, 5);
-
-        if (bestPOI != null)
+        // 2. Đặt mặc định cho Picker thuyết minh giống với ngôn ngữ App hiện tại
+        if (NarrationLangPicker.SelectedIndex == -1)
         {
-            await _narrationEngine.SpeakAsync("Xin chào, đây là Bưu Điện.", "vi");
-            await _narrationEngine.SpeakAsync("Hello, this is the Post Office.", "en");
-            await _narrationEngine.SpeakAsync("你好，这是邮局。", "zh");
-            await _dbService.UpdateLastPlayedTimeAsync(bestPOI.Id);
+            string currentAppLang = Preferences.Get("AppLanguage", "vi");
+            NarrationLangPicker.SelectedItem = currentAppLang;
         }
     }
 
-    private async void OnItemSelected(object sender, SelectedItemChangedEventArgs e)
+    // 🔥 ĐÃ THÊM HÀM LOADDATA MÀ BẠN QUÊN 🔥
+    private async void LoadDataAsync()
     {
-        var selectedItem = e.SelectedItem;
+        await _dbService.SeedDataAsync(); // Khởi tạo dữ liệu mẫu nếu chưa có
+        var danhSachPOI = await _dbService.GetAllPOIsAsync();
+        poiListView.ItemsSource = danhSachPOI; // Đổ dữ liệu lên màn hình
+    }
+
+    // 🔥 ĐÃ SỬA LỖI VĂNG APP KHI BẤM VÀO ĐỊA ĐIỂM (Dùng SelectionChangedEventArgs) 🔥
+    private async void OnItemSelected(object sender, SelectionChangedEventArgs e)
+    {
+        // CollectionView trả về một danh sách (dù mình chọn Single), nên phải lấy cái đầu tiên
+        var selectedItem = e.CurrentSelection.FirstOrDefault();
+
         if (selectedItem != null)
         {
             await Navigation.PushAsync(new DetailPage
             {
                 BindingContext = selectedItem
             });
-            // Bỏ chọn sau khi bấm
-            ((ListView)sender).SelectedItem = null;
+
+            // Bỏ chọn sau khi bấm (Ép đúng kiểu CollectionView)
+            ((CollectionView)sender).SelectedItem = null;
         }
+    }
+
+    // 🔥 HÀM PHÁT LOA ĐÃ SỬA CHUẨN XÁC THEO POI.CS 🔥
+    private async void OnPlayAudioTapped(object sender, TappedEventArgs e)
+    {
+        var selectedPOI = e.Parameter as POI;
+        if (selectedPOI == null) return;
+
+        int selectedIndex = NarrationLangPicker.SelectedIndex;
+
+        string narrationLang = "vi";
+        string textToRead = selectedPOI.Description_VI;
+
+        switch (selectedIndex)
+        {
+            case 1: // English
+                narrationLang = "en";
+                textToRead = selectedPOI.Description_EN;
+                break;
+            case 2: // Chinese
+                narrationLang = "zh";
+                textToRead = selectedPOI.Description_ZH;
+                break;
+            case 3: // Korean
+                narrationLang = "ko";
+                textToRead = selectedPOI.Description_KO;
+                break;
+            case 4: // Japanese
+                narrationLang = "ja";
+                textToRead = selectedPOI.Description_JA;
+                break;
+        }
+
+        // 🌟 BÍ KÍP CHỐNG CÂM: Nếu cột ngôn ngữ đó trong Database bị trống (Null)
+        // Mình tự động nhét tiếng Việt vào đọc tạm và báo cho khách biết!
+        if (string.IsNullOrWhiteSpace(textToRead))
+        {
+            await DisplayAlert("Thông báo", "Dữ liệu ngôn ngữ này đang được cập nhật. Tạm thời phát Tiếng Việt nhé!", "OK");
+            textToRead = selectedPOI.Description_VI;
+            narrationLang = "vi";
+        }
+
+        // Phát loa!
+        await _narrationEngine.SpeakAsync(textToRead, narrationLang);
     }
 }

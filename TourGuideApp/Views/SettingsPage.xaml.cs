@@ -29,7 +29,7 @@ public partial class SettingsPage : ContentPage
     }
 
     // Sự kiện khi người dùng chọn một ngôn ngữ khác trong hộp thoại
-    private void OnLanguageChanged(object sender, EventArgs e)
+    private async void OnLanguageChanged(object sender, EventArgs e) // 👈 Nhớ thêm chữ 'async' ở đây nha
     {
         // Chặn sự kiện lúc vừa mở trang lên
         if (!_isInitialized) return;
@@ -67,8 +67,15 @@ public partial class SettingsPage : ContentPage
         Thread.CurrentThread.CurrentUICulture = culture;
         AppLang.Culture = culture;
 
-        // 3. TUYỆT CHIÊU: Reset lại toàn bộ AppShell để chữ nghĩa tự dịch hết
-        Application.Current.MainPage = new AppShell();
+        // 🌟 BÍ KÍP TRỊ VĂNG APP NẰM Ở ĐÂY 🌟
+        // Bắt hệ thống đợi 200 mili-giây cho cái Menu Picker đóng lại an toàn tuyệt đối
+        await Task.Delay(200);
+
+        // Nhờ MainThread (Luồng chính) từ từ thay đổi giao diện để không bị sốc
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            Application.Current.MainPage = new AppShell();
+        });
     }
 
     // Cái hàm của tính năng Offline (của bạn)
