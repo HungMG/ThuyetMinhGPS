@@ -1,0 +1,119 @@
+﻿@model TourGuideAdmin.Models.POI
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>POI</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="TourId" class="control-label"></label>
+                <input asp-for="TourId" class="form-control" />
+                <span asp-validation-for="TourId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name_VI" class="control-label"></label>
+                <input asp-for="Name_VI" class="form-control" />
+                <span asp-validation-for="Name_VI" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name_EN" class="control-label"></label>
+                <input asp-for="Name_EN" class="form-control" />
+                <span asp-validation-for="Name_EN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name_ZH" class="control-label"></label>
+                <input asp-for="Name_ZH" class="form-control" />
+                <span asp-validation-for="Name_ZH" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name_KO" class="control-label"></label>
+                <input asp-for="Name_KO" class="form-control" />
+                <span asp-validation-for="Name_KO" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name_JA" class="control-label"></label>
+                <input asp-for="Name_JA" class="form-control" />
+                <span asp-validation-for="Name_JA" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Latitude" class="control-label"></label>
+                <input asp-for="Latitude" class="form-control" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Longitude" class="control-label"></label>
+                <input asp-for="Longitude" class="form-control" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TriggerRadius" class="control-label"></label>
+                <input asp-for="TriggerRadius" class="form-control" />
+                <span asp-validation-for="TriggerRadius" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Priority" class="control-label"></label>
+                <input asp-for="Priority" class="form-control" />
+                <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description_VI" class="control-label"></label>
+                <input asp-for="Description_VI" class="form-control" />
+                <span asp-validation-for="Description_VI" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description_EN" class="control-label"></label>
+                <input asp-for="Description_EN" class="form-control" />
+                <span asp-validation-for="Description_EN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description_ZH" class="control-label"></label>
+                <input asp-for="Description_ZH" class="form-control" />
+                <span asp-validation-for="Description_ZH" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description_KO" class="control-label"></label>
+                <input asp-for="Description_KO" class="form-control" />
+                <span asp-validation-for="Description_KO" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description_JA" class="control-label"></label>
+                <input asp-for="Description_JA" class="form-control" />
+                <span asp-validation-for="Description_JA" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsFavorite" /> @Html.DisplayNameFor(model => model.IsFavorite)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageUrl" class="control-label"></label>
+                <input asp-for="ImageUrl" class="form-control" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastPlayedTime" class="control-label"></label>
+                <input asp-for="LastPlayedTime" class="form-control" />
+                <span asp-validation-for="LastPlayedTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TourGuideAdmin</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TourGuideAdmin.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="d-flex">
+
+        <!-- Sidebar -->
+        <div class="bg-dark text-white p-3" style="width:250px; min-height:100vh;">
+            <h4>Admin Panel</h4>
+            <hr class="text-white" />
+            <ul class="nav flex-column">
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
+                        🏠 Home / Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-area="" asp-controller="POIs" asp-action="Index">
+                        📍 Quản lý Địa điểm (POI)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-area="" asp-controller="Tours" asp-action="Index">
+                        🛣️ Quản lý Tour
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">
+                        🛡️ Privacy
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-grow-1 p-4">
+            @RenderBody()
+        </div>
+
+    </div>
+</body>
+</html>

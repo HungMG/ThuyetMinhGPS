@@ -1,0 +1,53 @@
+﻿@page "/pois"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TourGuideAdmin.Models
+@using TourGuideAdmin.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<TourGuideAdmin.Models.AppDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="pois/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.POIs">
+    <PropertyColumn Property="poi => poi.TourId" />
+    <PropertyColumn Property="poi => poi.Name_VI" />
+    <PropertyColumn Property="poi => poi.Name_EN" />
+    <PropertyColumn Property="poi => poi.Name_ZH" />
+    <PropertyColumn Property="poi => poi.Name_KO" />
+    <PropertyColumn Property="poi => poi.Name_JA" />
+    <PropertyColumn Property="poi => poi.Latitude" />
+    <PropertyColumn Property="poi => poi.Longitude" />
+    <PropertyColumn Property="poi => poi.TriggerRadius" />
+    <PropertyColumn Property="poi => poi.Priority" />
+    <PropertyColumn Property="poi => poi.Description_VI" />
+    <PropertyColumn Property="poi => poi.Description_EN" />
+    <PropertyColumn Property="poi => poi.Description_ZH" />
+    <PropertyColumn Property="poi => poi.Description_KO" />
+    <PropertyColumn Property="poi => poi.Description_JA" />
+    <PropertyColumn Property="poi => poi.IsFavorite" />
+    <PropertyColumn Property="poi => poi.ImageUrl" />
+    <PropertyColumn Property="poi => poi.LastPlayedTime" />
+
+    <TemplateColumn Context="poi">
+        <a href="@($"pois/edit?id={poi.Id}")">Edit</a> |
+        <a href="@($"pois/details?id={poi.Id}")">Details</a> |
+        <a href="@($"pois/delete?id={poi.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private AppDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

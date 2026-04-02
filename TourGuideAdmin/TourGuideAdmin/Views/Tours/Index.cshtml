@@ -1,0 +1,55 @@
+﻿@model IEnumerable<TourGuideAdmin.Models.Tour>
+
+@{
+    ViewData["Title"] = "Quản lý Tour";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>🛣️ Danh sách Tour</h2>
+    <a asp-action="Create" class="btn btn-success">+ Thêm Tour mới</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th width="10%">ID</th>
+                        <th width="40%">Tên Tour (Tiếng Việt)</th>
+                        <th width="30%">Hình ảnh minh họa</th>
+                        <th class="text-center" width="20%">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge bg-secondary">Tour @Html.DisplayFor(modelItem => item.Id)</span>
+                            </td>
+                            <td class="fw-bold text-success">
+                                @Html.DisplayFor(modelItem => item.Name_VI)
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <span class="text-muted small">🔗 Có hình ảnh</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small"><i>Chưa có hình</i></span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">✏️ Sửa</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">📄 Chi tiết</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">🗑️ Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

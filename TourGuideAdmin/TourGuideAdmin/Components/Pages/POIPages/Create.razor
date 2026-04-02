@@ -1,0 +1,131 @@
+﻿@page "/pois/create"
+@using Microsoft.EntityFrameworkCore
+@using TourGuideAdmin.Models
+@inject IDbContextFactory<TourGuideAdmin.Models.AppDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>POI</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="POI" OnValidSubmit="AddPOI" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="tourid" class="form-label">TourId:</label> 
+                <InputNumber id="tourid" @bind-Value="POI.TourId" class="form-control" /> 
+                <ValidationMessage For="() => POI.TourId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="name_vi" class="form-label">Name_VI:</label> 
+                <InputText id="name_vi" @bind-Value="POI.Name_VI" class="form-control" /> 
+                <ValidationMessage For="() => POI.Name_VI" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="name_en" class="form-label">Name_EN:</label> 
+                <InputText id="name_en" @bind-Value="POI.Name_EN" class="form-control" /> 
+                <ValidationMessage For="() => POI.Name_EN" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="name_zh" class="form-label">Name_ZH:</label> 
+                <InputText id="name_zh" @bind-Value="POI.Name_ZH" class="form-control" /> 
+                <ValidationMessage For="() => POI.Name_ZH" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="name_ko" class="form-label">Name_KO:</label> 
+                <InputText id="name_ko" @bind-Value="POI.Name_KO" class="form-control" /> 
+                <ValidationMessage For="() => POI.Name_KO" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="name_ja" class="form-label">Name_JA:</label> 
+                <InputText id="name_ja" @bind-Value="POI.Name_JA" class="form-control" /> 
+                <ValidationMessage For="() => POI.Name_JA" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="latitude" class="form-label">Latitude:</label> 
+                <InputNumber id="latitude" @bind-Value="POI.Latitude" class="form-control" /> 
+                <ValidationMessage For="() => POI.Latitude" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="longitude" class="form-label">Longitude:</label> 
+                <InputNumber id="longitude" @bind-Value="POI.Longitude" class="form-control" /> 
+                <ValidationMessage For="() => POI.Longitude" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="triggerradius" class="form-label">TriggerRadius:</label> 
+                <InputNumber id="triggerradius" @bind-Value="POI.TriggerRadius" class="form-control" /> 
+                <ValidationMessage For="() => POI.TriggerRadius" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="priority" class="form-label">Priority:</label> 
+                <InputNumber id="priority" @bind-Value="POI.Priority" class="form-control" /> 
+                <ValidationMessage For="() => POI.Priority" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description_vi" class="form-label">Description_VI:</label> 
+                <InputText id="description_vi" @bind-Value="POI.Description_VI" class="form-control" /> 
+                <ValidationMessage For="() => POI.Description_VI" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description_en" class="form-label">Description_EN:</label> 
+                <InputText id="description_en" @bind-Value="POI.Description_EN" class="form-control" /> 
+                <ValidationMessage For="() => POI.Description_EN" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description_zh" class="form-label">Description_ZH:</label> 
+                <InputText id="description_zh" @bind-Value="POI.Description_ZH" class="form-control" /> 
+                <ValidationMessage For="() => POI.Description_ZH" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description_ko" class="form-label">Description_KO:</label> 
+                <InputText id="description_ko" @bind-Value="POI.Description_KO" class="form-control" /> 
+                <ValidationMessage For="() => POI.Description_KO" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description_ja" class="form-label">Description_JA:</label> 
+                <InputText id="description_ja" @bind-Value="POI.Description_JA" class="form-control" /> 
+                <ValidationMessage For="() => POI.Description_JA" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isfavorite" class="form-label">IsFavorite:</label> 
+                <InputCheckbox id="isfavorite" @bind-Value="POI.IsFavorite" class="form-check-input" /> 
+                <ValidationMessage For="() => POI.IsFavorite" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="imageurl" class="form-label">ImageUrl:</label> 
+                <InputText id="imageurl" @bind-Value="POI.ImageUrl" class="form-control" /> 
+                <ValidationMessage For="() => POI.ImageUrl" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lastplayedtime" class="form-label">LastPlayedTime:</label> 
+                <InputDate id="lastplayedtime" @bind-Value="POI.LastPlayedTime" class="form-control" /> 
+                <ValidationMessage For="() => POI.LastPlayedTime" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/pois">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private POI POI { get; set; } = default!;
+
+    protected override void OnInitialized() => POI ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddPOI()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.POIs.Add(POI);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/pois");
+    }
+}
