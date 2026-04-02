@@ -10,14 +10,13 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        // 1. Lục tìm xem khách đã chọn ngôn ngữ nào chưa
         string savedLang = Preferences.Get("AppLanguage", "");
 
         if (string.IsNullOrEmpty(savedLang))
         {
-            // 🌟 Lần đầu tải App (hoặc chưa chọn) -> Hiện trang chọn ngôn ngữ (StartPage)
-            // 👇 Đã sửa chữ WelcomePage thành StartPage
-            MainPage = new StartPage();
+            // 🌟 CỦA BẠN: MainPage = new StartPage();
+            // 🌟 SỬA THÀNH: Bao bọc trong NavigationPage để có thể dùng PushAsync
+            MainPage = new NavigationPage(new StartPage());
         }
         else
         {

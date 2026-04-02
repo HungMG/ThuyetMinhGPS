@@ -70,6 +70,33 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chọn một tour để bắt đầu khám phá.
+        /// </summary>
+        public static string ChooseTourSubtitle {
+            get {
+                return ResourceManager.GetString("ChooseTourSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sài Gòn trong tầm tay.
+        /// </summary>
+        public static string ExploreSubtitle {
+            get {
+                return ResourceManager.GetString("ExploreSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Khám phá.
+        /// </summary>
+        public static string ExploreTitle {
+            get {
+                return ResourceManager.GetString("ExploreTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bạn chưa lưu địa điểm nào cả!.
         /// </summary>
         public static string FavEmpty {
@@ -93,6 +120,24 @@ namespace TourGuideApp.Resources.Languages {
         public static string FavTitle {
             get {
                 return ResourceManager.GetString("FavTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lộ trình nổi bật.
+        /// </summary>
+        public static string FeaturedTours {
+            get {
+                return ResourceManager.GetString("FeaturedTours", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Khám phá tự do.
+        /// </summary>
+        public static string FreeExploration {
+            get {
+                return ResourceManager.GetString("FreeExploration", resourceCulture);
             }
         }
         
@@ -246,6 +291,15 @@ namespace TourGuideApp.Resources.Languages {
         public static string TabSettings {
             get {
                 return ResourceManager.GetString("TabSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chào mừng bạn đến với lộ trình {0}. Thời gian dự kiến là {1}..
+        /// </summary>
+        public static string WelcomeTourAudio {
+            get {
+                return ResourceManager.GetString("WelcomeTourAudio", resourceCulture);
             }
         }
     }

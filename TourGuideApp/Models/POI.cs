@@ -18,6 +18,8 @@ namespace TourGuideApp.Models
         public DateTime? LastPlayedTime { get; set; }
         public bool IsFavorite { get; set; }
 
+        public int TourId { get; set; }
+
         // 👇 CÁC CỘT DỮ LIỆU ĐA NGÔN NGỮ 👇
         public string Name_VI { get; set; }
         public string Name_EN { get; set; }

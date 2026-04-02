@@ -11,11 +11,13 @@ public partial class MapPage : ContentPage
     private DatabaseService _dbService;
     private List<int> _daDocThuyetMinh = new List<int>();
     private POI _temporaryPoi;
-
-    public MapPage()
+    private NarrationEngine _narrationEngine = new NarrationEngine();
+    private int _currentTourId = -1; // -1 nghĩa là hiển thị tất cả
+    public MapPage(int tourId = -1)
     {
         InitializeComponent();
         _dbService = new DatabaseService();
+        _currentTourId = tourId;
 
         tourMap.Map?.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
         tourMap.IsZoomButtonVisible = false;
@@ -40,6 +42,7 @@ public partial class MapPage : ContentPage
         Geolocation.LocationChanged -= Geolocation_LocationChanged;
         Geolocation.StopListeningForeground();
     }
+
 
     // =========================================================
     // 👇 PHẦN 1: SỰ KIỆN TÌM KIẾM 👇
@@ -125,6 +128,14 @@ public partial class MapPage : ContentPage
         var danhSachPOI = await _dbService.GetAllPOIsAsync();
         if (danhSachPOI == null) return;
 
+        // 🌟 KHÚC BẠN BỎ QUÊN LÀ Ở ĐÂY NÈ 🌟
+        // Lọc ra đúng những địa điểm thuộc cái Tour khách vừa bấm
+        if (_currentTourId != -1)
+        {
+            danhSachPOI = danhSachPOI.Where(p => p.TourId == _currentTourId).ToList();
+        }
+
+        // Lọc tiếp theo từ khóa tìm kiếm (nếu khách có gõ vào ô Search)
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             danhSachPOI = danhSachPOI.Where(p =>
@@ -155,7 +166,7 @@ public partial class MapPage : ContentPage
             var firstPoi = danhSachPOI.First();
             var toaDoZoom = SphericalMercator.FromLonLat(firstPoi.Longitude, firstPoi.Latitude);
             tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoZoom.x, toaDoZoom.y));
-            tourMap.Map?.Navigator?.ZoomTo(2);
+            tourMap.Map?.Navigator?.ZoomTo(2); // Zoom lại gần
         }
     }
 
@@ -189,44 +200,53 @@ public partial class MapPage : ContentPage
 
     private async void Geolocation_LocationChanged(object sender, GeolocationLocationChangedEventArgs e)
     {
-        if (e.Location != null)
+        if (e.Location == null) return;
+
+        // 1. Cập nhật vị trí của mình trên bản đồ
+        tourMap.MyLocationLayer.UpdateMyLocation(new Position(e.Location.Latitude, e.Location.Longitude));
+
+        // 2. Lấy danh sách địa điểm và lọc ra những điểm người dùng ĐANG ĐỨNG TRONG BÁN KÍNH
+        var allPOIs = await _dbService.GetAllPOIsAsync();
+
+        var poisInRange = allPOIs.Where(poi => {
+            var poiLoc = new Location(poi.Latitude, poi.Longitude);
+            double distanceMet = Location.CalculateDistance(e.Location, poiLoc, DistanceUnits.Kilometers) * 1000;
+
+            // Kiểm tra: Khoảng cách < Bán kính thiết lập của POI đó
+            return distanceMet <= poi.TriggerRadius;
+        }).ToList();
+
+        if (!poisInRange.Any()) return;
+
+        // 3. Chọn ra điểm có ĐỘ ƯU TIÊN (Priority) cao nhất và ĐÃ HẾT THỜI GIAN CHỜ (Cooldown)
+        // Ở đây tui để thời gian chờ là 30 phút (có thể chỉnh lại tùy ý)
+        var bestPOI = poisInRange
+            .Where(p => !p.LastPlayedTime.HasValue || (DateTime.Now - p.LastPlayedTime.Value).TotalMinutes >= 30)
+            .OrderByDescending(p => p.Priority)
+            .FirstOrDefault();
+
+        if (bestPOI != null)
         {
-            tourMap.MyLocationLayer.UpdateMyLocation(new Position(e.Location.Latitude, e.Location.Longitude));
+            // 4. Cập nhật thời gian vừa đọc để chống spam
+            bestPOI.LastPlayedTime = DateTime.Now;
+            await _dbService.UpdatePOIAsync(bestPOI); // Lưu lại vào DB để lần sau mở app vẫn nhớ
 
-            // Xóa dòng trượt tự động này đi nếu bạn không muốn bản đồ cứ giật giật chạy theo GPS
-            // var toaDoMoi = SphericalMercator.FromLonLat(e.Location.Longitude, e.Location.Latitude);
-            // tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoMoi.x, toaDoMoi.y));
-
-            var danhSachPOI = await _dbService.GetAllPOIsAsync();
-            if (danhSachPOI == null) return;
-
-            foreach (var poi in danhSachPOI)
+            // 5. Phát thuyết minh đa ngôn ngữ (Dùng đúng logic NarrationEngine)
+            string langCode = Preferences.Get("AppLanguage", "vi");
+            string textToRead = langCode switch
             {
-                if (_daDocThuyetMinh.Contains(poi.Id)) continue;
+                "en" => bestPOI.Description_EN,
+                "zh" => bestPOI.Description_ZH,
+                "ko" => bestPOI.Description_KO,
+                "ja" => bestPOI.Description_JA,
+                _ => bestPOI.Description_VI
+            };
 
-                var toaDoDuLich = new Location(poi.Latitude, poi.Longitude);
-                double khoangCachKm = Location.CalculateDistance(e.Location, toaDoDuLich, DistanceUnits.Kilometers);
-                double khoangCachMet = khoangCachKm * 1000;
+            // Gửi lệnh đọc cho loa
+            await _narrationEngine.SpeakAsync($"{bestPOI.CurrentName}. {textToRead}", langCode);
 
-                if (khoangCachMet <= 50)
-                {
-                    _daDocThuyetMinh.Add(poi.Id);
-
-                    string langCode = Preferences.Get("AppLanguage", "vi");
-                    var locales = await TextToSpeech.Default.GetLocalesAsync();
-                    var selectedLocale = locales.FirstOrDefault(l => l.Language.ToLower().StartsWith(langCode));
-
-                    var options = new SpeechOptions()
-                    {
-                        Locale = selectedLocale
-                    };
-
-                    string cauThuyetMinh = $"{poi.CurrentName}. {poi.CurrentDescription}";
-
-                    await TextToSpeech.Default.SpeakAsync(cauThuyetMinh, options);
-                    await DisplayAlert("Location Reached", poi.CurrentName, "OK");
-                }
-            }
+            // Hiện thông báo cho đẹp
+            await DisplayAlert(bestPOI.CurrentName, "Tự động thuyết minh đang phát...", "OK");
         }
     }
 

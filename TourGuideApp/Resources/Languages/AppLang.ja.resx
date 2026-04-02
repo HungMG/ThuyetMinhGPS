@@ -120,6 +120,15 @@
   <data name="BtnDirections" xml:space="preserve">
     <value>ルート案内</value>
   </data>
+  <data name="ChooseTourSubtitle" xml:space="preserve">
+    <value>ツアーを選んで探索を始めましょう</value>
+  </data>
+  <data name="ExploreSubtitle" xml:space="preserve">
+    <value>指先のサイゴン</value>
+  </data>
+  <data name="ExploreTitle" xml:space="preserve">
+    <value>探索</value>
+  </data>
   <data name="FavEmpty" xml:space="preserve">
     <value>保存された場所はまだありません！</value>
   </data>
@@ -128,6 +137,12 @@
   </data>
   <data name="FavTitle" xml:space="preserve">
     <value>お気に入り ❤️</value>
+  </data>
+  <data name="FeaturedTours" xml:space="preserve">
+    <value>おすすめツアー</value>
+  </data>
+  <data name="FreeExploration" xml:space="preserve">
+    <value>自由散策</value>
   </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>計算中...</value>
@@ -179,5 +194,8 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>設定</value>
+  </data>
+  <data name="WelcomeTourAudio" xml:space="preserve">
+    <value>ツアーへようこそ：{0}。 所要時間：{1}。</value>
   </data>
 </root>

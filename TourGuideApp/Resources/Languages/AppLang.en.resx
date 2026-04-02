@@ -120,6 +120,15 @@
   <data name="BtnDirections" xml:space="preserve">
     <value>Directions</value>
   </data>
+  <data name="ChooseTourSubtitle" xml:space="preserve">
+    <value>Choose a tour to start exploring</value>
+  </data>
+  <data name="ExploreSubtitle" xml:space="preserve">
+    <value>Saigon at your fingertips</value>
+  </data>
+  <data name="ExploreTitle" xml:space="preserve">
+    <value>Explore</value>
+  </data>
   <data name="FavEmpty" xml:space="preserve">
     <value>No saved places yet!</value>
   </data>
@@ -128,6 +137,12 @@
   </data>
   <data name="FavTitle" xml:space="preserve">
     <value>Favorites ❤️</value>
+  </data>
+  <data name="FeaturedTours" xml:space="preserve">
+    <value>Featured Tours</value>
+  </data>
+  <data name="FreeExploration" xml:space="preserve">
+    <value>Free Exploration</value>
   </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>Calculating...</value>
@@ -179,5 +194,8 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="WelcomeTourAudio" xml:space="preserve">
+    <value>Welcome to the {0} tour. Estimated time: {1}.</value>
   </data>
 </root>

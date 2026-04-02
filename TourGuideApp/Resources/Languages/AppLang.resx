@@ -120,6 +120,15 @@
   <data name="BtnDirections" xml:space="preserve">
     <value>Chỉ đường</value>
   </data>
+  <data name="ChooseTourSubtitle" xml:space="preserve">
+    <value>Chọn một tour để bắt đầu khám phá</value>
+  </data>
+  <data name="ExploreSubtitle" xml:space="preserve">
+    <value>Sài Gòn trong tầm tay</value>
+  </data>
+  <data name="ExploreTitle" xml:space="preserve">
+    <value>Khám phá</value>
+  </data>
   <data name="FavEmpty" xml:space="preserve">
     <value>Bạn chưa lưu địa điểm nào cả!</value>
   </data>
@@ -128,6 +137,12 @@
   </data>
   <data name="FavTitle" xml:space="preserve">
     <value>Góc Yêu Thích ❤️</value>
+  </data>
+  <data name="FeaturedTours" xml:space="preserve">
+    <value>Lộ trình nổi bật</value>
+  </data>
+  <data name="FreeExploration" xml:space="preserve">
+    <value>Khám phá tự do</value>
   </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>Đang tính...</value>
@@ -179,5 +194,8 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Cài đặt</value>
+  </data>
+  <data name="WelcomeTourAudio" xml:space="preserve">
+    <value>Chào mừng bạn đến với lộ trình {0}. Thời gian dự kiến là {1}.</value>
   </data>
 </root>

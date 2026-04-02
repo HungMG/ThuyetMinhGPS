@@ -120,6 +120,15 @@
   <data name="BtnDirections" xml:space="preserve">
     <value>路线</value>
   </data>
+  <data name="ChooseTourSubtitle" xml:space="preserve">
+    <value>选择一条路线开始探索</value>
+  </data>
+  <data name="ExploreSubtitle" xml:space="preserve">
+    <value>触手可及的西贡</value>
+  </data>
+  <data name="ExploreTitle" xml:space="preserve">
+    <value>探索</value>
+  </data>
   <data name="FavEmpty" xml:space="preserve">
     <value>您还没有保存任何地点！</value>
   </data>
@@ -128,6 +137,12 @@
   </data>
   <data name="FavTitle" xml:space="preserve">
     <value>我的收藏 ❤️</value>
+  </data>
+  <data name="FeaturedTours" xml:space="preserve">
+    <value>精选路线</value>
+  </data>
+  <data name="FreeExploration" xml:space="preserve">
+    <value>自由探索</value>
   </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>计算中...</value>
@@ -179,5 +194,8 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>设置</value>
+  </data>
+  <data name="WelcomeTourAudio" xml:space="preserve">
+    <value>欢迎参加：{0} 路线。 预计时间：{1}。</value>
   </data>
 </root>

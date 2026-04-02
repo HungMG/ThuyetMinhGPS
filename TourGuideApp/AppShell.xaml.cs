@@ -5,6 +5,7 @@
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute("mappage", typeof(TourGuideApp.Views.MapPage));
         }
     }
 }

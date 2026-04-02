@@ -3,78 +3,86 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
              x:Class="TourGuideApp.MainPage"
-             BackgroundColor="#FAF7F2">
+             BackgroundColor="#FAF7F2"
+             Shell.NavBarIsVisible="False">
+    <Grid RowDefinitions="Auto, *">
 
-    <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="20,50,20,20" BackgroundColor="White">
+            <VerticalStackLayout>
+                <Label Text="{x:Static lang:AppLang.ExploreTitle}" FontSize="30" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+                <Label Text="{x:Static lang:AppLang.ExploreSubtitle}" FontSize="15" TextColor="#8D7A6D"/>
+            </VerticalStackLayout>
+            <Picker x:Name="NarrationLangPicker" Grid.Column="1" WidthRequest="140" TextColor="#C0502E" TitleColor="#8D7A6D" FontAttributes="Bold" Title="Giọng đọc">
+                <Picker.Items>
+                    <x:String>🇻🇳 Tiếng Việt</x:String>
+                    <x:String>🇬🇧 English</x:String>
+                    <x:String>🇨🇳 中文</x:String>
+                    <x:String>🇰🇷 한국어</x:String>
+                    <x:String>🇯🇵 日本語</x:String>
+                </Picker.Items>
+            </Picker>
+        </Grid>
 
-        <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20" Spacing="10">
-            <Label Text="{x:Static lang:AppLang.MainTitle}" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="0,20,0,40">
 
-            <Grid ColumnDefinitions="*, Auto">
-                <Label Text="{x:Static lang:AppLang.MainSubtitle}" FontSize="14" TextColor="#8D7A6D" VerticalOptions="Center"/>
+                <Label Text="{x:Static lang:AppLang.FeaturedTours}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,0"/>
 
-                <HorizontalStackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center">
-                    <Label Text="🔊" VerticalOptions="Center"/>
-                    <Picker x:Name="NarrationLangPicker" Title="Giọng đọc" WidthRequest="140" FontSize="14" 
-        TextColor="#C0502E" TitleColor="#8D7A6D" FontAttributes="Bold">
-                        <Picker.Items>
-                            <x:String>🇻🇳 Tiếng Việt</x:String>
-                            <x:String>🇬🇧 English</x:String>
-                            <x:String>🇨🇳 中文</x:String>
-                            <x:String>🇰🇷 한국어</x:String>
-                            <x:String>🇯🇵 日本語</x:String>
-                        </Picker.Items>
-                    </Picker>
-                </HorizontalStackLayout>
-            </Grid>
-        </VerticalStackLayout>
-
-        <CollectionView Grid.Row="1" 
-                        x:Name="poiListView" 
-                        SelectionMode="Single"
-                        SelectionChanged="OnItemSelected">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
-
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup Name="CommonStates">
-                                <VisualState Name="Normal" />
-                                <VisualState Name="Selected">
-                                    <VisualState.Setters>
-                                        <Setter Property="BackgroundColor" Value="#F4EDE4" />
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-
-                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-
-                            <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
-                                <Label Text="📍" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <CollectionView x:Name="tourListView" SelectionMode="Single" SelectionChanged="OnTourSelected">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame WidthRequest="280" Margin="20,0,0,0" Padding="0" CornerRadius="16" HasShadow="True" BorderColor="Transparent" IsClippedToBounds="True">
+                                <Grid RowDefinitions="140, Auto">
+                                    <Image Grid.Row="0" Source="img_tour_default.jpg" Aspect="AspectFill" BackgroundColor="#D3C9C1"/>
+                                    <Frame Grid.Row="0" HorizontalOptions="End" VerticalOptions="Start" Margin="15" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnTourPlayAudioTapped" CommandParameter="{Binding .}"/>
+                                        </Frame.GestureRecognizers>
+                                        <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                                    </Frame>
+                                    <VerticalStackLayout Grid.Row="1" Padding="20">
+                                        <Label Text="{Binding CurrentName}" FontSize="18" FontAttributes="Bold" TextColor="#4A3A31"/>
+                                        <HorizontalStackLayout Margin="0,5,0,0" Spacing="5">
+                                            <Label Text="⏱️" FontSize="14"/>
+                                            <Label Text="{Binding EstimatedTime}" FontSize="14" FontAttributes="Bold" TextColor="#C0502E"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
                             </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
-                                <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+                <Label Text="{x:Static lang:AppLang.FreeExploration}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,20,20,0"/>
 
-                                <HorizontalStackLayout Margin="0,8,0,0" Spacing="5">
-                                    <Label Text="📏" FontSize="12"/>
-                                    <Label Text="{x:Static lang:AppLang.MainCalculating}" FontSize="12" FontAttributes="Bold" TextColor="#C0502E"/>
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-
-                            <Frame Grid.Column="2" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" HasShadow="False" Padding="0" VerticalOptions="Center">
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnPlayAudioTapped" CommandParameter="{Binding .}"/>
-                                </Frame.GestureRecognizers>
-                                <Label Text="▶" FontSize="18" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                <CollectionView x:Name="poiListView" SelectionMode="Single" SelectionChanged="OnPoiSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Margin="20,0,20,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                                <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
+                                    <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
+                                        <Label Text="📍" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Frame>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
+                                        <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+                                    </VerticalStackLayout>
+                                    <Frame Grid.Column="2" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0" VerticalOptions="Center">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnPoiPlayAudioTapped" CommandParameter="{Binding .}"/>
+                                        </Frame.GestureRecognizers>
+                                        <Label Text="▶" FontSize="18" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                                    </Frame>
+                                </Grid>
                             </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

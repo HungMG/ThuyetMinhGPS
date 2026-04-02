@@ -1,45 +1,67 @@
 ﻿using Microsoft.Maui.Media;
+using Plugin.Maui.Audio; // Đã thêm thư viện phát MP3
 
 namespace TourGuideApp.Services;
 
 public class NarrationEngine
 {
-    // CancellationToken dùng để "rút phích cắm" ép nó nín ngay lập tức nếu khách chuyển bài
     private CancellationTokenSource _cancelTokenSource;
+    private IAudioPlayer _audioPlayer; // Đầu đọc MP3
 
-    public async Task SpeakAsync(string text, string langCode)
+    // Thêm tham số audioFileName (Ví dụ: "dinhdoclap_vi.mp3")
+    public async Task SpeakAsync(string text, string langCode, string audioFileName = "")
     {
+        // 1. Dừng mọi âm thanh (cả MP3 lẫn TTS) đang phát trước đó
+        Stop();
+
+        // ----------------------------------------------------
+        // KỊCH BẢN A: ƯU TIÊN PHÁT FILE MP3 CHUYÊN NGHIỆP
+        // ----------------------------------------------------
+        if (!string.IsNullOrEmpty(audioFileName))
+        {
+            try
+            {
+                var audioManager = AudioManager.Current;
+                // Mở file MP3 từ thư mục Resources/Raw của MAUI
+                var stream = await FileSystem.OpenAppPackageFileAsync(audioFileName);
+                _audioPlayer = audioManager.CreatePlayer(stream);
+                _audioPlayer.Play();
+
+                Console.WriteLine("Đang phát file Audio MP3...");
+                return; // Đọc MP3 thành công thì thoát luôn, không dùng chị Google nữa
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Không tìm thấy file {audioFileName}. Đang chuyển sang chế độ TTS chữa cháy...");
+                // Lỗi không tìm thấy file -> Rớt xuống kịch bản B để chữa cháy
+            }
+        }
+
+        // ----------------------------------------------------
+        // KỊCH BẢN B: CHỮA CHÁY BẰNG CHỊ GOOGLE (TTS)
+        // ----------------------------------------------------
         if (string.IsNullOrWhiteSpace(text)) return;
 
-        // 1. Dừng ngay câu đang đọc (nếu có)
-        Stop();
         _cancelTokenSource = new CancellationTokenSource();
 
         try
         {
-            // 2. Lấy danh sách toàn bộ giọng đọc đang có trên điện thoại
             var locales = await TextToSpeech.Default.GetLocalesAsync();
-
-            // 3. Truy tìm giọng đọc phù hợp với ngôn ngữ khách chọn
-            // Dùng StartsWith để bao quát (VD: "zh" sẽ tóm được cả "zh-CN", "zh-TW")
             var matchedLocale = locales.FirstOrDefault(l =>
                 l.Language.StartsWith(langCode, StringComparison.OrdinalIgnoreCase));
 
-            // Cấu hình giọng đọc
             var options = new SpeechOptions
             {
-                Pitch = 1.0f,   // Độ thanh/trầm (1.0 là mặc định)
-                Volume = 1.0f,  // Âm lượng tối đa
-                Locale = matchedLocale // Gắn giọng đúng nước đó vào
+                Pitch = 1.0f,
+                Volume = 1.0f,
+                Locale = matchedLocale
             };
 
-            // 4. Bắt đầu đọc (và cho phép bị ngắt ngang bởi _cancelTokenSource)
             await TextToSpeech.Default.SpeakAsync(text, options, cancelToken: _cancelTokenSource.Token);
         }
         catch (TaskCanceledException)
         {
-            // Lỗi này văng ra khi mình chủ động ép nó ngắt âm thanh -> Bình thường, bỏ qua!
-            Console.WriteLine("Đã ngắt giọng đọc cũ.");
+            Console.WriteLine("Đã ngắt giọng đọc TTS cũ.");
         }
         catch (Exception ex)
         {
@@ -49,11 +71,20 @@ public class NarrationEngine
 
     public void Stop()
     {
+        // 1. Rút phích cắm chị Google
         if (_cancelTokenSource != null && !_cancelTokenSource.IsCancellationRequested)
         {
             _cancelTokenSource.Cancel();
             _cancelTokenSource.Dispose();
             _cancelTokenSource = null;
+        }
+
+        // 2. Rút phích cắm máy phát MP3
+        if (_audioPlayer != null && _audioPlayer.IsPlaying)
+        {
+            _audioPlayer.Stop();
+            _audioPlayer.Dispose();
+            _audioPlayer = null;
         }
     }
 }
