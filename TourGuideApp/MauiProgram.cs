@@ -3,7 +3,7 @@ using SkiaSharp.Views.Maui.Controls.Hosting;
 using Plugin.Maui.BottomSheet.Hosting;
 using Camera.MAUI;
 
-namespace TourGuideApp; 
+namespace TourGuideApp;
 
 public static class MauiProgram
 {

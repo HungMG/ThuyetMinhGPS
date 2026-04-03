@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TourGuideAdmin.Models;
+using TourGuideAdmin.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<TranslationService>();
 
 var app = builder.Build(); // Chữ app này bắt buộc phải VIẾT THƯỜNG!
 

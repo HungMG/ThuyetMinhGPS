@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Platform;
 using TourGuideApp.Models;
 using TourGuideApp.Services;
 using TourGuideApp.Views;
@@ -7,13 +8,14 @@ namespace TourGuideApp;
 
 public partial class MainPage : ContentPage
 {
-    private DatabaseService _dbService;
+    // 1. ĐỔI SANG DÙNG API SERVICE
+    private ApiService _apiService;
     private NarrationEngine _narrationEngine = new NarrationEngine();
 
     public MainPage()
     {
         InitializeComponent();
-        _dbService = new DatabaseService();
+        _apiService = new ApiService();
     }
 
     protected override void OnAppearing()
@@ -24,28 +26,21 @@ public partial class MainPage : ContentPage
         LoadDataAsync();
     }
 
-    private async void LoadDataAsync()
+    private async Task LoadDataAsync()
     {
-        await _dbService.SeedDataAsync();
-
-        var danhSachTour = await _dbService.GetAllToursAsync();
+        var danhSachTour = await _apiService.GetToursAsync();
         tourListView.ItemsSource = null;
         tourListView.ItemsSource = danhSachTour;
 
-        var tatCaPoi = await _dbService.GetAllPOIsAsync();
-        var diemTuDo = tatCaPoi.Where(p => p.TourId == 0).ToList();
+        var tatCaPoi = await _apiService.GetPOIsAsync();
         poiListView.ItemsSource = null;
-        poiListView.ItemsSource = diemTuDo;
+        poiListView.ItemsSource = tatCaPoi;
     }
-
     private async void OnTourSelected(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is Tour selectedTour)
         {
-            // Dùng Shell để điều hướng cho chắc chắn nhảy
-            // Chúng ta truyền TourId qua Constructor của MapPage ở bước sau
             await Shell.Current.Navigation.PushAsync(new MapPage(selectedTour.Id));
-
             ((CollectionView)sender).SelectedItem = null;
         }
     }
@@ -54,10 +49,18 @@ public partial class MainPage : ContentPage
     {
         if (e.CurrentSelection.FirstOrDefault() is POI selectedPoi)
         {
-            // Nếu bấm vào điểm tự do, truyền TourId = 0 để nó chỉ hiện các điểm tự do
             await Navigation.PushAsync(new MapPage(0));
             ((CollectionView)sender).SelectedItem = null;
         }
+    }
+
+    private async void OnRefreshing(object sender, EventArgs e)
+    {
+        // Bước 1: Gọi hàm hút dữ liệu mới nhất từ mạng về
+        await LoadDataAsync();
+
+        // Bước 2: Tải xong rồi thì giấu cái vòng xoay (Loading) đi
+        mainRefreshView.IsRefreshing = false;
     }
 
     // 🌟 CHỈ ĐỔI GIỌNG ĐỌC, KHÔNG ĐỔI GIAO DIỆN 🌟
@@ -67,15 +70,17 @@ public partial class MainPage : ContentPage
         {
             string lang = NarrationLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
 
-            // Lấy đúng cột ngôn ngữ để đọc, không dùng CurrentName
+            // XÓA BỎ mấy câu cứng nhắc cũ đi.
+            // Bây giờ nó sẽ đọc: Tên Tour + Lời giới thiệu (lấy từ Web) + Thời gian dự kiến.
             string introText = lang switch
             {
-                "en" => $"Welcome to the {tour.Name_EN} tour. Estimated time: {tour.EstimatedTime}.",
-                "zh" => $"欢迎参加：{tour.Name_ZH} 路线。 预计时间：{tour.EstimatedTime}。",
-                "ko" => $"투어에 오신 것을 환영합니다: {tour.Name_KO}. 예상 시간: {tour.EstimatedTime}.",
-                "ja" => $"ツアーへようこそ：{tour.Name_JA}。 所要時間：{tour.EstimatedTime}。",
-                _ => $"Chào mừng bạn đến với lộ trình: {tour.Name_VI}. Thời gian dự kiến là {tour.EstimatedTime}."
+                "en" => $"{tour.Name_EN}. {tour.Description_EN} Estimated time: {tour.EstimatedTime}.",
+                "zh" => $"{tour.Name_ZH}。 {tour.Description_ZH} 预计时间：{tour.EstimatedTime}。",
+                "ko" => $"{tour.Name_KO}. {tour.Description_KO} 예상 시간: {tour.EstimatedTime}.",
+                "ja" => $"{tour.Name_JA}。 {tour.Description_JA} 所要時間：{tour.EstimatedTime}。",
+                _ => $"{tour.Name_VI}. {tour.Description_VI} Thời gian dự kiến là {tour.EstimatedTime}."
             };
+
             await _narrationEngine.SpeakAsync(introText, lang);
         }
     }
@@ -86,7 +91,6 @@ public partial class MainPage : ContentPage
         {
             string lang = NarrationLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
 
-            // Lấy đúng cột ngôn ngữ để đọc
             string textToRead = lang switch
             {
                 "en" => $"{poi.Name_EN}. {poi.Description_EN}",
