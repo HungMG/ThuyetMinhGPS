@@ -1,53 +1,65 @@
-﻿using System.Net.Http.Json; // Dùng cái này của Microsoft, cực nhanh!
-using TourGuideApp.Models; // Đổi thành tên namespace thật của bạn
+﻿using System.Net.Http.Json;
+using TourGuideApp.Models;
+using System.Diagnostics;
 
 namespace TourGuideApp.Services
 {
     public class ApiService
     {
-        private readonly HttpClient _client;
-
-        // ĐIỀN ĐỊA CHỈ WEB ADMIN CỦA BẠN VÀO ĐÂY
-        // Thay 5136 bằng đúng cái số port localhost của bạn
-        private readonly string _baseUrl = "http://192.168.100.230";
+        private readonly HttpClient _httpClient;
 
         public ApiService()
         {
-            _client = new HttpClient();
+            _httpClient = new HttpClient();
+            // ⚠️ Nhớ đổi cái IP này thành IP máy tính của sếp hiện tại nhé!
+            _httpClient.BaseAddress = new Uri("http://192.168.1.231:5136/");
         }
 
-        // Hàm này sẽ hút toàn bộ danh sách địa điểm về
-        public async Task<List<POI>> GetPOIsAsync()
+        // 1. Chạy lên mạng gom Tour về giao cho Thủ kho
+        public async Task<bool> SyncToursAsync(DatabaseService dbService)
         {
             try
             {
-                string url = $"{_baseUrl}/api/POIsApi";
+                // Gọi điện lên Web xin danh sách Tour
+                // Đổi "api/Tours" thành "api/ToursApi"
+                var toursFromWeb = await _httpClient.GetFromJsonAsync<List<Tour>>("api/ToursApi");
 
-                // Hút dữ liệu và tự động nén vào List<POI>
-                var pois = await _client.GetFromJsonAsync<List<POI>>(url);
-
-                return pois ?? new List<POI>(); // Trả về danh sách (nếu rỗng thì trả về [])
+                if (toursFromWeb != null && toursFromWeb.Count > 0)
+                {
+                    // Đưa cho Thủ kho cất vào SQLite
+                    await dbService.SaveToursFromWebAsync(toursFromWeb);
+                    return true; // Báo cáo: "Đã cất kho thành công!"
+                }
+                return false;
             }
             catch (Exception ex)
             {
-                // Lỡ đứt cáp thì báo lỗi ra đây
-                Console.WriteLine($"🚨 LỖI MÁY BƠM: {ex.Message}");
-                return new List<POI>();
+                // 🚨 ĐIỂM ĂN TIỀN LÀ ĐÂY: Nếu rớt mạng, App sẽ rớt vào hàm Catch này.
+                // Nó sẽ không văng lỗi sập App, mà chỉ âm thầm báo "Thất bại".
+                Debug.WriteLine($"[MẤT MẠNG] Không thể đồng bộ Tour: {ex.Message}");
+                return false;
             }
         }
-        // Hàm này sẽ hút toàn bộ danh sách Tour về
-        public async Task<List<Tour>> GetToursAsync()
+
+        // 2. Chạy lên mạng gom Địa điểm (POI) về giao cho Thủ kho
+        public async Task<bool> SyncPOIsAsync(DatabaseService dbService)
         {
             try
             {
-                string url = $"{_baseUrl}/api/ToursApi"; // Nhớ trỏ đúng tên API của Tour
-                var tours = await _client.GetFromJsonAsync<List<Tour>>(url);
-                return tours ?? new List<Tour>();
+                // Đổi "api/POIs" thành "api/POIsApi"
+                var poisFromWeb = await _httpClient.GetFromJsonAsync<List<POI>>("api/POIsApi");
+
+                if (poisFromWeb != null && poisFromWeb.Count > 0)
+                {
+                    await dbService.SavePOIsFromWebAsync(poisFromWeb);
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"🚨 LỖI MÁY BƠM TOUR: {ex.Message}");
-                return new List<Tour>();
+                Debug.WriteLine($"[MẤT MẠNG] Không thể đồng bộ POI: {ex.Message}");
+                return false;
             }
         }
     }

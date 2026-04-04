@@ -38,7 +38,9 @@
                             <DataTemplate>
                                 <Frame WidthRequest="280" Margin="20,0,0,0" Padding="0" CornerRadius="16" HasShadow="True" BorderColor="Transparent" IsClippedToBounds="True">
                                     <Grid RowDefinitions="140, Auto">
-                                        <Image Grid.Row="0" Source="img_tour_default.jpg" Aspect="AspectFill" BackgroundColor="#D3C9C1"/>
+
+                                        <Image Grid.Row="0" Source="{Binding FullImageUrl, TargetNullValue='img_tour_default.jpg', FallbackValue='img_tour_default.jpg'}" Aspect="AspectFill" BackgroundColor="#D3C9C1"/>
+
                                         <Frame Grid.Row="0" HorizontalOptions="End" VerticalOptions="Start" Margin="15" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0">
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnTourPlayAudioTapped" CommandParameter="{Binding .}"/>
@@ -65,9 +67,12 @@
                             <DataTemplate>
                                 <Frame Margin="20,0,20,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
                                     <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                        <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
-                                            <Label Text="📍" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
-                                        </Frame>
+                                        <Image Grid.Column="0" WidthRequest="70" HeightRequest="70" Aspect="AspectFill" 
+       Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
+                                            <Image.Clip>
+                                                <RoundRectangleGeometry CornerRadius="12" Rect="0,0,70,70"/>
+                                            </Image.Clip>
+                                        </Image>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                             <Label Text="{Binding Name_VI}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
                                             <Label Text="{Binding Description_VI}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>

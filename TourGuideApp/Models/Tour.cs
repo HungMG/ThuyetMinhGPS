@@ -35,16 +35,17 @@ namespace TourGuideApp.Models
             }
         }
 
-        [JsonIgnore] // Khai báo này để lúc hút API nó không bị bối rối
+        [JsonIgnore]
+        [Ignore] // Thêm cái này để SQLite không cố lưu nó vào bảng nhé
         public string FullImageUrl
         {
             get
             {
                 if (string.IsNullOrEmpty(ImageUrl))
-                    return "img_tour_default.jpg"; // Nếu không có hình thì hiện hình mặc định
+                    return "img_tour_default.jpg";
 
-                // THAY SỐ IP BÊN DƯỚI BẰNG ĐÚNG SỐ IP MÁY TÍNH CỦA BẠN NHÉ (Giống bên ApiService)
-                return $"http://192.168.100.230:5136/images/tours/{ImageUrl}";
+                // ✅ SỬA LẠI ĐÚNG SỐ IP .217 CỦA SẾP NÈ
+                return $"http://192.168.1.231:5136/images/tours/{ImageUrl}";
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using System.Text.Json.Serialization; // 🌟 BẮT BUỘC THÊM CÁI NÀY VÀO TRÊN CÙNG
 
 namespace TourGuideApp.Models
 {
@@ -67,5 +68,12 @@ namespace TourGuideApp.Models
                 };
             }
         }
+
+        // 🌟 ĐÃ CẬP NHẬT IP MỚI VÀ THÊM JSON IGNORE
+        [Ignore]
+        [JsonIgnore]
+        public string FullImageUrl => string.IsNullOrEmpty(ImageUrl)
+            ? "img_poi_default.jpg"
+            : $"http://192.168.1.231:5136/images/pois/{ImageUrl}";
     }
 }

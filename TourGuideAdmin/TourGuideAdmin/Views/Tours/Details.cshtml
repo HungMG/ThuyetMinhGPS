@@ -1,86 +1,100 @@
 ﻿@model TourGuideAdmin.Models.Tour
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết Tour";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Tour</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_VI)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name_VI)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_EN)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name_EN)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_ZH)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name_ZH)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_KO)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name_KO)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_JA)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name_JA)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_VI)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description_VI)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_EN)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description_EN)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_ZH)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description_ZH)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_KO)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description_KO)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_JA)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description_JA)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-        <dt class="col-sm-3">Thời gian dự kiến</dt>
-        <dd class="col-sm-9">@Model.EstimatedTime</dd>
-    </dl>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🗺️ Chi tiết Tour: <span class="text-primary fw-bold">@Model.Name_VI</span></h2>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning fw-bold me-2 px-4 shadow-sm">✏️ Chỉnh sửa</a>
+        <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">🔙 Quay lại</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="~/images/tours/@Model.ImageUrl" class="card-img-top" alt="@Model.Name_VI" style="height: 250px; object-fit: cover;">
+            }
+            else
+            {
+                <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 250px;">
+                    <span class="text-muted">📷 Chưa có hình ảnh</span>
+                </div>
+            }
+
+            <div class="card-body bg-light">
+                <h5 class="card-title text-primary fw-bold mb-3">⏱️ Thông tin Lộ trình</h5>
+                <ul class="list-group list-group-flush rounded shadow-sm">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <b>Mã Tour (ID):</b> <span class="badge bg-info text-dark fs-6">@Model.Id</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <b>Thời gian dự kiến:</b>
+                        @if (!string.IsNullOrEmpty(Model.EstimatedTime))
+                        {
+                            <span class="text-danger fw-bold">@Model.EstimatedTime</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Chưa cập nhật</span>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-primary text-white fw-bold py-3">
+                🌍 Thuyết minh Tour (Đa ngôn ngữ)
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="langTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="vi-tab" data-bs-toggle="tab" data-bs-target="#vi" type="button" role="tab">🇻🇳 Tiếng Việt</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="en-tab" data-bs-toggle="tab" data-bs-target="#en" type="button" role="tab">🇬🇧 English</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="zh-tab" data-bs-toggle="tab" data-bs-target="#zh" type="button" role="tab">🇨🇳 中文</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="ko-tab" data-bs-toggle="tab" data-bs-target="#ko" type="button" role="tab">🇰🇷 한국어</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="ja-tab" data-bs-toggle="tab" data-bs-target="#ja" type="button" role="tab">🇯🇵 日本語</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-4 p-2" id="langTabsContent">
+                    <div class="tab-pane fade show active" id="vi" role="tabpanel">
+                        <h4 class="text-dark">@Model.Name_VI</h4>
+                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_VI</p>
+                    </div>
+                    <div class="tab-pane fade" id="en" role="tabpanel">
+                        <h4 class="text-dark">@Model.Name_EN</h4>
+                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_EN</p>
+                    </div>
+                    <div class="tab-pane fade" id="zh" role="tabpanel">
+                        <h4 class="text-dark">@Model.Name_ZH</h4>
+                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_ZH</p>
+                    </div>
+                    <div class="tab-pane fade" id="ko" role="tabpanel">
+                        <h4 class="text-dark">@Model.Name_KO</h4>
+                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_KO</p>
+                    </div>
+                    <div class="tab-pane fade" id="ja" role="tabpanel">
+                        <h4 class="text-dark">@Model.Name_JA</h4>
+                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_JA</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

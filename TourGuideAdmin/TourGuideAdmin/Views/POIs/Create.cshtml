@@ -1,118 +1,95 @@
 ﻿@model TourGuideAdmin.Models.POI
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thêm Địa điểm mới";
 }
 
-<h1>Create</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>✨ Thêm Địa điểm (POI) mới</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">🔙 Quay lại danh sách</a>
+</div>
 
-<h4>POI</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TourId" class="control-label"></label>
-                <input asp-for="TourId" class="form-control" />
-                <span asp-validation-for="TourId" class="text-danger"></span>
+
+            <div class="alert alert-info border-0 shadow-sm">
+                <strong>💡 Mẹo tự động:</strong> Giám đốc chỉ cần nhập <b>Tiếng Việt</b>. Hệ thống AI sẽ tự động dịch sang Anh, Trung, Hàn, Nhật ngay khi bấm Lưu!
             </div>
-            <div class="form-group">
-                <label asp-for="Name_VI" class="control-label"></label>
-                <input asp-for="Name_VI" class="form-control" />
-                <span asp-validation-for="Name_VI" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TourId" class="control-label fw-bold">Thuộc Tour (Mã ID) <span class="text-danger">*</span></label>
+                        <input asp-for="TourId" class="form-control" placeholder="VD: 1 (ID của Tour Sài Gòn)" required />
+                        <span asp-validation-for="TourId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Name_VI" class="control-label fw-bold">Tên Địa Điểm (Tiếng Việt) <span class="text-danger">*</span></label>
+                        <input asp-for="Name_VI" class="form-control" placeholder="VD: Dinh Độc Lập" required />
+                        <span asp-validation-for="Name_VI" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label asp-for="Latitude" class="control-label fw-bold">Vĩ độ (Latitude)</label>
+                            <input asp-for="Latitude" class="form-control" placeholder="VD: 10.7769" />
+                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label asp-for="Longitude" class="control-label fw-bold">Kinh độ (Longitude)</label>
+                            <input asp-for="Longitude" class="form-control" placeholder="VD: 106.6951" />
+                            <span asp-validation-for="Longitude" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group mb-3">
+                            <label asp-for="TriggerRadius" class="control-label fw-bold">Bán kính kích hoạt (m)</label>
+                            <input asp-for="TriggerRadius" class="form-control" placeholder="VD: 50" value="50" />
+                            <span asp-validation-for="TriggerRadius" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group mb-3">
+                            <label asp-for="Priority" class="control-label fw-bold">Độ ưu tiên</label>
+                            <input asp-for="Priority" class="form-control" placeholder="VD: 1" value="1" />
+                            <span asp-validation-for="Priority" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-check mb-3 mt-2">
+                        <label class="form-check-label fw-bold text-danger">
+                            <input class="form-check-input" asp-for="IsFavorite" /> ❤️ Đánh dấu là Địa điểm Nổi bật
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="control-label fw-bold">Hình ảnh minh họa</label>
+                        <input type="file" name="fileHinhAnh" class="form-control" accept="image/*" />
+                        <small class="text-muted">Chọn tấm hình đẹp nhất cho Địa điểm này nhé!</small>
+                    </div>
+
+                    <div class="form-group mb-3 h-100">
+                        <label asp-for="Description_VI" class="control-label fw-bold">Thuyết minh (Tiếng Việt)</label>
+                        <textarea asp-for="Description_VI" class="form-control" rows="10" placeholder="Nhập lời thuyết minh hoặc câu chuyện lịch sử cho địa điểm này..."></textarea>
+                        <span asp-validation-for="Description_VI" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Name_EN" class="control-label"></label>
-                <input asp-for="Name_EN" class="form-control" />
-                <span asp-validation-for="Name_EN" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Name_ZH" class="control-label"></label>
-                <input asp-for="Name_ZH" class="form-control" />
-                <span asp-validation-for="Name_ZH" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Name_KO" class="control-label"></label>
-                <input asp-for="Name_KO" class="form-control" />
-                <span asp-validation-for="Name_KO" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Name_JA" class="control-label"></label>
-                <input asp-for="Name_JA" class="form-control" />
-                <span asp-validation-for="Name_JA" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Latitude" class="control-label"></label>
-                <input asp-for="Latitude" class="form-control" />
-                <span asp-validation-for="Latitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Longitude" class="control-label"></label>
-                <input asp-for="Longitude" class="form-control" />
-                <span asp-validation-for="Longitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TriggerRadius" class="control-label"></label>
-                <input asp-for="TriggerRadius" class="form-control" />
-                <span asp-validation-for="TriggerRadius" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Priority" class="control-label"></label>
-                <input asp-for="Priority" class="form-control" />
-                <span asp-validation-for="Priority" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description_VI" class="control-label"></label>
-                <input asp-for="Description_VI" class="form-control" />
-                <span asp-validation-for="Description_VI" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description_EN" class="control-label"></label>
-                <input asp-for="Description_EN" class="form-control" />
-                <span asp-validation-for="Description_EN" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description_ZH" class="control-label"></label>
-                <input asp-for="Description_ZH" class="form-control" />
-                <span asp-validation-for="Description_ZH" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description_KO" class="control-label"></label>
-                <input asp-for="Description_KO" class="form-control" />
-                <span asp-validation-for="Description_KO" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description_JA" class="control-label"></label>
-                <input asp-for="Description_JA" class="form-control" />
-                <span asp-validation-for="Description_JA" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsFavorite" /> @Html.DisplayNameFor(model => model.IsFavorite)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastPlayedTime" class="control-label"></label>
-                <input asp-for="LastPlayedTime" class="form-control" />
-                <span asp-validation-for="LastPlayedTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <hr class="my-4 text-muted" />
+            <div class="form-group text-end">
+                <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold">💾 Lưu & Tự Động Dịch</button>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

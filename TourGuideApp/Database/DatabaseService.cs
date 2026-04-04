@@ -13,7 +13,7 @@ namespace TourGuideApp.Services
             if (_db != null) return;
 
             // Đổi hẳn lên v10 để ép nó quên sạch tình cũ!
-            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "TourGuide_v12.db");
+            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "TourGuide_v13.db");
 
             _db = new SQLiteAsyncConnection(databasePath);
 
@@ -76,12 +76,54 @@ namespace TourGuideApp.Services
             await InitAsync();
             return await _db.UpdateAsync(poi);
         }
-
-        // Lấy toàn bộ danh sách Lộ trình (Tours)
+        // Lấy toàn bộ danh sách Lộ trình (Tours) (ĐÃ CÓ TRONG CODE CỦA SẾP)
         public async Task<List<Tour>> GetAllToursAsync()
         {
             await InitAsync();
             return await _db.Table<Tour>().ToListAsync();
+        }
+
+        // ==========================================================
+        // 👇 DÁN THÊM 2 HÀM NÀY VÀO ĐỂ LÀM TÍNH NĂNG OFFLINE-FIRST 👇
+        // ==========================================================
+
+        // 7. Nhận hàng loạt Tour từ Web và cất vào kho
+        public async Task SaveToursFromWebAsync(List<Tour> tours)
+        {
+            await InitAsync();
+            foreach (var tour in tours)
+            {
+                var existing = await _db.Table<Tour>().Where(t => t.Id == tour.Id).FirstOrDefaultAsync();
+                if (existing != null)
+                {
+                    await _db.UpdateAsync(tour); // Có rồi thì cập nhật
+                }
+                else
+                {
+                    await _db.InsertAsync(tour); // Chưa có thì thêm mới
+                }
+            }
+        }
+
+        // 8. Nhận hàng loạt Địa điểm (POI) từ Web và cất vào kho
+        public async Task SavePOIsFromWebAsync(List<POI> pois)
+        {
+            await InitAsync();
+            foreach (var poi in pois)
+            {
+                var existing = await _db.Table<POI>().Where(p => p.Id == poi.Id).FirstOrDefaultAsync();
+                if (existing != null)
+                {
+                    // CỰC KỲ QUAN TRỌNG: Giữ lại trái tim (IsFavorite) và Lịch sử nghe của khách
+                    poi.IsFavorite = existing.IsFavorite;
+                    poi.LastPlayedTime = existing.LastPlayedTime;
+                    await _db.UpdateAsync(poi);
+                }
+                else
+                {
+                    await _db.InsertAsync(poi);
+                }
+            }
         }
     }
 }

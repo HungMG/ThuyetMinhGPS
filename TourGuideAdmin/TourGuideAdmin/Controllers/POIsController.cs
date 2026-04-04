@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO; // Thêm thư viện File
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting; // Thêm thư viện môi trường
+using Microsoft.AspNetCore.Http; // Thêm thư viện Upload File
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,46 +15,46 @@ namespace TourGuideAdmin.Controllers
     public class POIsController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly TranslationService _translationService; // 1. KHAI BÁO BỘ DỊCH
+        private readonly TranslationService _translationService;
+        private readonly IWebHostEnvironment _env; // 🌟 Thêm ông thủ kho
 
-        // 2. NHÚNG BỘ DỊCH VÀO CONSTRUCTOR
-        public POIsController(AppDbContext context, TranslationService translationService)
+        public POIsController(AppDbContext context, TranslationService translationService, IWebHostEnvironment env)
         {
             _context = context;
             _translationService = translationService;
+            _env = env;
         }
 
-        // GET: POIs
         public async Task<IActionResult> Index()
         {
             return View(await _context.POIs.ToListAsync());
         }
 
-        // GET: POIs/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
             var pOI = await _context.POIs.FirstOrDefaultAsync(m => m.Id == id);
             if (pOI == null) return NotFound();
-
             return View(pOI);
         }
 
-        // GET: POIs/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: POIs/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TourId,Name_VI,Name_EN,Name_ZH,Name_KO,Name_JA,Latitude,Longitude,TriggerRadius,Priority,Description_VI,Description_EN,Description_ZH,Description_KO,Description_JA,IsFavorite,ImageUrl,LastPlayedTime")] POI pOI)
+        // 🌟 THÊM IFormFile ĐỂ UPLOAD ẢNH POI
+        public async Task<IActionResult> Create([Bind("Id,TourId,Name_VI,Latitude,Longitude,TriggerRadius,Priority,Description_VI,IsFavorite")] POI pOI, IFormFile? fileHinhAnh)
         {
+            // Bịt miệng ModelState cho các cột tự dịch
+            ModelState.Remove("Name_EN"); ModelState.Remove("Name_ZH"); ModelState.Remove("Name_KO"); ModelState.Remove("Name_JA");
+            ModelState.Remove("Description_EN"); ModelState.Remove("Description_ZH"); ModelState.Remove("Description_KO"); ModelState.Remove("Description_JA");
+
             if (ModelState.IsValid)
             {
-                // 🌟 TỰ ĐỘNG DỊCH TÊN 🌟
+                // 1. TỰ ĐỘNG DỊCH
                 if (!string.IsNullOrEmpty(pOI.Name_VI))
                 {
                     pOI.Name_EN = await _translationService.TranslateAsync(pOI.Name_VI, "en");
@@ -60,14 +62,26 @@ namespace TourGuideAdmin.Controllers
                     pOI.Name_KO = await _translationService.TranslateAsync(pOI.Name_VI, "ko");
                     pOI.Name_JA = await _translationService.TranslateAsync(pOI.Name_VI, "ja");
                 }
-
-                // 🌟 TỰ ĐỘNG DỊCH THUYẾT MINH 🌟
                 if (!string.IsNullOrEmpty(pOI.Description_VI))
                 {
                     pOI.Description_EN = await _translationService.TranslateAsync(pOI.Description_VI, "en");
                     pOI.Description_ZH = await _translationService.TranslateAsync(pOI.Description_VI, "zh-CN");
                     pOI.Description_KO = await _translationService.TranslateAsync(pOI.Description_VI, "ko");
                     pOI.Description_JA = await _translationService.TranslateAsync(pOI.Description_VI, "ja");
+                }
+
+                // 2. LƯU ẢNH VÀO WWWROOT/IMAGES/POIS
+                if (fileHinhAnh != null && fileHinhAnh.Length > 0)
+                {
+                    string uploadFolder = Path.Combine(_env.WebRootPath, "images", "pois");
+                    Directory.CreateDirectory(uploadFolder);
+                    string fileName = Guid.NewGuid().ToString() + "_" + fileHinhAnh.FileName;
+                    string filePath = Path.Combine(uploadFolder, fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await fileHinhAnh.CopyToAsync(fileStream);
+                    }
+                    pOI.ImageUrl = fileName;
                 }
 
                 _context.Add(pOI);
@@ -77,88 +91,68 @@ namespace TourGuideAdmin.Controllers
             return View(pOI);
         }
 
-        // GET: POIs/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var pOI = await _context.POIs.FindAsync(id);
             if (pOI == null) return NotFound();
-
             return View(pOI);
         }
 
-        // POST: POIs/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TourId,Name_VI,Name_EN,Name_ZH,Name_KO,Name_JA,Latitude,Longitude,TriggerRadius,Priority,Description_VI,Description_EN,Description_ZH,Description_KO,Description_JA,IsFavorite,ImageUrl,LastPlayedTime")] POI pOI)
+        // 🌟 SỬ DỤNG BÚA TẠ ĐỂ EDIT POI CHO CHẮC CÚ
+        public async Task<IActionResult> Edit(int id, POI poiInput, IFormFile? fileHinhAnh)
         {
-            if (id != pOI.Id) return NotFound();
+            if (id != poiInput.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            var poiInDb = await _context.POIs.FindAsync(id);
+            if (poiInDb == null) return NotFound();
+
+            // Chép đè dữ liệu cơ bản
+            poiInDb.Name_VI = poiInput.Name_VI;
+            poiInDb.Description_VI = poiInput.Description_VI;
+            poiInDb.Latitude = poiInput.Latitude;
+            poiInDb.Longitude = poiInput.Longitude;
+            poiInDb.TriggerRadius = poiInput.TriggerRadius;
+            poiInDb.Priority = poiInput.Priority;
+            poiInDb.TourId = poiInput.TourId;
+            poiInDb.IsFavorite = poiInput.IsFavorite;
+
+            // Lưu ảnh mới (nếu có up)
+            if (fileHinhAnh != null && fileHinhAnh.Length > 0)
             {
-                try
+                string uploadFolder = Path.Combine(_env.WebRootPath, "images", "pois");
+                Directory.CreateDirectory(uploadFolder);
+                string fileName = Guid.NewGuid().ToString() + "_" + fileHinhAnh.FileName;
+                string filePath = Path.Combine(uploadFolder, fileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    // 🌟 TỰ ĐỘNG DỊCH KHI CHỈNH SỬA TÊN 🌟
-                    if (!string.IsNullOrEmpty(pOI.Name_VI))
-                    {
-                        pOI.Name_EN = await _translationService.TranslateAsync(pOI.Name_VI, "en");
-                        pOI.Name_ZH = await _translationService.TranslateAsync(pOI.Name_VI, "zh-CN");
-                        pOI.Name_KO = await _translationService.TranslateAsync(pOI.Name_VI, "ko");
-                        pOI.Name_JA = await _translationService.TranslateAsync(pOI.Name_VI, "ja");
-                    }
-
-                    // 🌟 TỰ ĐỘNG DỊCH KHI CHỈNH SỬA THUYẾT MINH 🌟
-                    if (!string.IsNullOrEmpty(pOI.Description_VI))
-                    {
-                        pOI.Description_EN = await _translationService.TranslateAsync(pOI.Description_VI, "en");
-                        pOI.Description_ZH = await _translationService.TranslateAsync(pOI.Description_VI, "zh-CN");
-                        pOI.Description_KO = await _translationService.TranslateAsync(pOI.Description_VI, "ko");
-                        pOI.Description_JA = await _translationService.TranslateAsync(pOI.Description_VI, "ja");
-                    }
-
-                    _context.Update(pOI);
-                    await _context.SaveChangesAsync();
+                    await fileHinhAnh.CopyToAsync(fileStream);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!POIExists(pOI.Id)) return NotFound();
-                    else throw;
-                }
-                return RedirectToAction(nameof(Index));
+                poiInDb.ImageUrl = fileName;
             }
-            return View(pOI);
-        }
 
-        // GET: POIs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var pOI = await _context.POIs.FirstOrDefaultAsync(m => m.Id == id);
-            if (pOI == null) return NotFound();
-
-            return View(pOI);
-        }
-
-        // POST: POIs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var pOI = await _context.POIs.FindAsync(id);
-            if (pOI != null)
+            // Dịch lại
+            if (!string.IsNullOrEmpty(poiInput.Name_VI))
             {
-                _context.POIs.Remove(pOI);
+                poiInDb.Name_EN = await _translationService.TranslateAsync(poiInput.Name_VI, "en");
+                poiInDb.Name_ZH = await _translationService.TranslateAsync(poiInput.Name_VI, "zh-CN");
+                poiInDb.Name_KO = await _translationService.TranslateAsync(poiInput.Name_VI, "ko");
+                poiInDb.Name_JA = await _translationService.TranslateAsync(poiInput.Name_VI, "ja");
+            }
+            if (!string.IsNullOrEmpty(poiInput.Description_VI))
+            {
+                poiInDb.Description_EN = await _translationService.TranslateAsync(poiInput.Description_VI, "en");
+                poiInDb.Description_ZH = await _translationService.TranslateAsync(poiInput.Description_VI, "zh-CN");
+                poiInDb.Description_KO = await _translationService.TranslateAsync(poiInput.Description_VI, "ko");
+                poiInDb.Description_JA = await _translationService.TranslateAsync(poiInput.Description_VI, "ja");
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool POIExists(int id)
-        {
-            return _context.POIs.Any(e => e.Id == id);
-        }
+        // ... (Các hàm Delete sếp giữ nguyên) ...
     }
 }

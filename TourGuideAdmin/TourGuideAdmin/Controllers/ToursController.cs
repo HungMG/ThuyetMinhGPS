@@ -109,48 +109,73 @@ namespace TourGuideAdmin.Controllers
 
             return View(tour);
         }
-
-        // POST: Tours/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // 🌟 NHỚ THÊM EstimatedTime VÀO ĐÂY CHO HÀM EDIT NỮA NHA
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name_VI,Name_EN,Name_ZH,Name_KO,Name_JA,Description_VI,Description_EN,Description_ZH,Description_KO,Description_JA,EstimatedTime,ImageUrl")] Tour tour)
+        // 🌟 THÊM IFormFile fileHinhAnh VÀO ĐÂY ĐỂ CHO PHÉP UPLOAD
+        public async Task<IActionResult> Edit(int id, Tour tourInput, IFormFile? fileHinhAnh)
         {
-            if (id != tour.Id) return NotFound();
+            if (id != tourInput.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            // 1. DÙNG BÚA TẠ: Lôi Tour cũ ra
+            var tourInDb = await _context.Tours.FindAsync(id);
+            if (tourInDb == null) return NotFound();
+
+            // 2. CHÉP ĐÈ DỮ LIỆU CƠ BẢN
+            tourInDb.Name_VI = tourInput.Name_VI;
+            tourInDb.Description_VI = tourInput.Description_VI;
+            tourInDb.EstimatedTime = tourInput.EstimatedTime;
+
+            // 🌟 3. BĂNG CHUYỀN LƯU HÌNH ẢNH MỚI (Xịn như hàm Create)
+            if (fileHinhAnh != null && fileHinhAnh.Length > 0)
             {
-                try
-                {
-                    // 1. TỰ ĐỘNG DỊCH TÊN
-                    if (!string.IsNullOrEmpty(tour.Name_VI))
-                    {
-                        tour.Name_EN = await _translationService.TranslateAsync(tour.Name_VI, "en");
-                        tour.Name_ZH = await _translationService.TranslateAsync(tour.Name_VI, "zh-CN");
-                        tour.Name_KO = await _translationService.TranslateAsync(tour.Name_VI, "ko");
-                        tour.Name_JA = await _translationService.TranslateAsync(tour.Name_VI, "ja");
-                    }
+                string uploadFolder = Path.Combine(_env.WebRootPath, "images", "tours");
+                Directory.CreateDirectory(uploadFolder);
 
-                    // 2. TỰ ĐỘNG DỊCH THUYẾT MINH
-                    if (!string.IsNullOrEmpty(tour.Description_VI))
-                    {
-                        tour.Description_EN = await _translationService.TranslateAsync(tour.Description_VI, "en");
-                        tour.Description_ZH = await _translationService.TranslateAsync(tour.Description_VI, "zh-CN");
-                        tour.Description_KO = await _translationService.TranslateAsync(tour.Description_VI, "ko");
-                        tour.Description_JA = await _translationService.TranslateAsync(tour.Description_VI, "ja");
-                    }
+                string fileName = Guid.NewGuid().ToString() + "_" + fileHinhAnh.FileName;
+                string filePath = Path.Combine(uploadFolder, fileName);
 
-                    _context.Update(tour);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    if (!TourExists(tour.Id)) return NotFound();
-                    else throw;
+                    await fileHinhAnh.CopyToAsync(fileStream);
                 }
-                return RedirectToAction(nameof(Index));
+                // Có up file mới thì đè tên file mới vào DB
+                tourInDb.ImageUrl = fileName;
             }
-            return View(tour);
+            else if (!string.IsNullOrEmpty(tourInput.ImageUrl))
+            {
+                // Nếu không up file, nhưng sếp có gõ tay tên ảnh thì lấy tên gõ tay
+                tourInDb.ImageUrl = tourInput.ImageUrl;
+            }
+
+            // 4. TỰ ĐỘNG DỊCH (Giữ nguyên của sếp)
+            if (!string.IsNullOrEmpty(tourInput.Name_VI))
+            {
+                tourInDb.Name_EN = await _translationService.TranslateAsync(tourInput.Name_VI, "en");
+                tourInDb.Name_ZH = await _translationService.TranslateAsync(tourInput.Name_VI, "zh-CN");
+                tourInDb.Name_KO = await _translationService.TranslateAsync(tourInput.Name_VI, "ko");
+                tourInDb.Name_JA = await _translationService.TranslateAsync(tourInput.Name_VI, "ja");
+            }
+
+            if (!string.IsNullOrEmpty(tourInput.Description_VI))
+            {
+                tourInDb.Description_EN = await _translationService.TranslateAsync(tourInput.Description_VI, "en");
+                tourInDb.Description_ZH = await _translationService.TranslateAsync(tourInput.Description_VI, "zh-CN");
+                tourInDb.Description_KO = await _translationService.TranslateAsync(tourInput.Description_VI, "ko");
+                tourInDb.Description_JA = await _translationService.TranslateAsync(tourInput.Description_VI, "ja");
+            }
+
+            // 5. LƯU VÀO DATABASE
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TourExists(tourInput.Id)) return NotFound();
+                else throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Tours/Delete/5
