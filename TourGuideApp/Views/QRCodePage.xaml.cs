@@ -4,7 +4,9 @@ namespace TourGuideApp.Views;
 
 public partial class QRCodePage : ContentPage
 {
-	public QRCodePage()
+    private bool _isScanning = false;
+
+    public QRCodePage()
 	{
 		InitializeComponent();
 
@@ -35,8 +37,26 @@ public partial class QRCodePage : ContentPage
             }
 
             var result = args.Result[0];
+
+            // 🔥 Dừng animation khi quét được
+            _isScanning = false;
+
             barcodeResult.Text = $"ĐÃ QUÉT: {result.Text}";
         });
+    }
+
+    // 🔥 ANIMATION SCAN LINE
+    private async void StartScanAnimation()
+    {
+        if (scanLine == null) return;
+
+        _isScanning = true;
+
+        while (_isScanning)
+        {
+            await scanLine.TranslateTo(0, 230, 1500, Easing.Linear);
+            scanLine.TranslationY = 0;
+        }
     }
 
     protected override async void OnAppearing()
@@ -53,11 +73,16 @@ public partial class QRCodePage : ContentPage
                 await cameraView.StartCameraAsync();
             });
         }
+
+        // 🔥 Start animation
+        StartScanAnimation();
     }
 
     protected override async void OnDisappearing()
     {
         base.OnDisappearing();
+
+        _isScanning = false;
 
         if (cameraView != null)
         {
