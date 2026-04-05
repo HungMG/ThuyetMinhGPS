@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             
              xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
-             
              x:Class="TourGuideApp.Views.FavoritePage"
              BackgroundColor="#FAF7F2"
              Shell.NavBarIsVisible="False">
 
     <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
+
         <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
             <Label Text="{x:Static lang:AppLang.FavTitle}" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
             <Label Text="{x:Static lang:AppLang.FavSubtitle}" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
         </VerticalStackLayout>
 
-        <CollectionView Grid.Row="1" x:Name="favoriteListView">
-
+        <CollectionView Grid.Row="1" x:Name="favoriteListView" VerticalScrollBarVisibility="Never">
             <CollectionView.EmptyView>
                 <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Margin="0,100,0,0">
-                    <Label Text="📭" FontSize="50" HorizontalOptions="Center"/>
-                    <Label Text="{x:Static lang:AppLang.FavEmpty}" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold"/>
+                    <Label Text="📭" FontSize="60" HorizontalOptions="Center" Opacity="0.8"/>
+                    <Label Text="{x:Static lang:AppLang.FavEmpty}" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                    <Label Text="Hãy dạo quanh bản đồ và thả tim nhé!" TextColor="#B0A398" FontSize="14" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="0,0,0,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
-                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                            <Frame Grid.Column="0" WidthRequest="60" HeightRequest="60" CornerRadius="12" BackgroundColor="#F4EDE4" HasShadow="False" Padding="0">
-                                <Label Text="⭐" FontSize="30" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Frame Margin="0,0,0,15" Padding="12" CornerRadius="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                        <Grid ColumnDefinitions="75, *, 40" ColumnSpacing="15">
+
+                            <Frame Grid.Column="0" WidthRequest="75" HeightRequest="75" CornerRadius="12" Padding="0" IsClippedToBounds="True" HasShadow="False" BorderColor="#E8E0D5">
+                                <Image Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}" 
+                                       Aspect="AspectFill" 
+                                       BackgroundColor="#F4EDE4"/>
                             </Frame>
 
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
-                                <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#7F8C8D" MaxLines="2" LineBreakMode="TailTruncation"/>
                             </VerticalStackLayout>
 
                             <ImageButton Grid.Column="2" 
                                          Source="icon_trash.png" 
                                          WidthRequest="24" HeightRequest="24" 
-                                         VerticalOptions="Center"
+                                         VerticalOptions="Center" HorizontalOptions="Center"
+                                         BackgroundColor="Transparent"
                                          CommandParameter="{Binding .}"
                                          Clicked="OnRemoveFavoriteClicked"/>
                         </Grid>

@@ -71,38 +71,36 @@ public partial class MapPage : ContentPage
     {
         e.Handled = true;
 
-        string tenDiaDiem = e.Pin.Label;
-
-        Task.Run(async () => {
-            var allPOIs = await _dbService.GetAllPOIsAsync();
-            if (allPOIs == null) return;
-
-            var currentPoi = allPOIs.FirstOrDefault(p => p.CurrentName == tenDiaDiem);
-
-            if (currentPoi != null)
+        // 🌟 Móc cái POI từ trong "balo" (Tag) của cục Pin ra xài luôn
+        if (e.Pin.Tag is POI currentPoi)
+        {
+            // Bắt buộc phải chạy trên MainThread vì đang thay đổi Giao Diện (UI)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                MainThread.BeginInvokeOnMainThread(() =>
+                lblPoiName.Text = currentPoi.CurrentName;
+                lblPoiDescription.Text = currentPoi.CurrentDescription;
+                lblPoiAddress.Text = $"Tọa độ: {currentPoi.Latitude:F5}, {currentPoi.Longitude:F5}";
+                lblFavoriteIcon.Text = currentPoi.IsFavorite ? "❤️" : "🤍";
+
+                // 🌟 QUAN TRỌNG: Dùng FullImageUrl để App lấy hình từ Web Admin về
+                if (!string.IsNullOrWhiteSpace(currentPoi.ImageUrl))
                 {
-                    lblPoiName.Text = currentPoi.CurrentName;
-                    lblPoiDescription.Text = currentPoi.CurrentDescription;
-                    lblPoiAddress.Text = $"{currentPoi.Latitude:F5}, {currentPoi.Longitude:F5}";
+                    // Phải bọc trong Uri thì Image.Source mới tải hình từ Link mạng được
+                    imgPoiImage.Source = ImageSource.FromUri(new Uri(currentPoi.FullImageUrl));
+                }
+                else
+                {
+                    imgPoiImage.Source = "img_default_poi.png";
+                }
 
-                    if (!string.IsNullOrWhiteSpace(currentPoi.ImageUrl))
-                    {
-                        imgPoiImage.Source = currentPoi.ImageUrl;
-                    }
-                    else
-                    {
-                        imgPoiImage.Source = "img_default_poi.png";
-                    }
+                // Lưu tạm để xài cho nút Chỉ đường (Google Maps)
+                _temporaryPoi = currentPoi;
 
-                    _temporaryPoi = currentPoi;
-
-                    poiDetailPopup.PeekHeight = 1500;
-                    poiDetailPopup.IsOpen = true;
-                });
-            }
-        });
+                // 🌟 Bật BottomSheet (Popup) lên
+                poiDetailPopup.PeekHeight = 450; // Chỉnh 450 là vuốt lên vừa đẹp nửa màn hình
+                poiDetailPopup.IsOpen = true;
+            });
+        }
     }
 
     private async void OnNavigationClicked(object sender, EventArgs e)
@@ -121,6 +119,39 @@ public partial class MapPage : ContentPage
         {
             await DisplayAlert("Lỗi", "Không thể mở ứng dụng bản đồ.", "OK");
         }
+    }
+
+    // =========================================================
+    // 👇 HÀM XỬ LÝ NÚT NGHE THUYẾT MINH TRÊN POPUP 👇
+    // =========================================================
+    private async void OnReadDescriptionClicked(object sender, EventArgs e)
+    {
+        if (_temporaryPoi == null) return;
+
+        // Bắt đầu đọc thì đổi màu nút hoặc báo hiệu cho khách biết
+        var btn = sender as Button;
+        if (btn != null) btn.Text = "🔊 Đang đọc...";
+
+        // Lấy ngôn ngữ hiện tại của máy để đọc cho đúng tiếng
+        string langCode = Preferences.Get("AppLanguage", "vi");
+
+        string textToRead = langCode switch
+        {
+            "en" => _temporaryPoi.Description_EN,
+            "zh" => _temporaryPoi.Description_ZH,
+            "ko" => _temporaryPoi.Description_KO,
+            "ja" => _temporaryPoi.Description_JA,
+            _ => _temporaryPoi.Description_VI
+        };
+
+        // Ghép Tên địa điểm và Mô tả lại để đọc 1 lèo
+        string fullSpeech = $"{_temporaryPoi.CurrentName}. {textToRead}";
+
+        // Ra lệnh cho động cơ TTS (Text-To-Speech) phát âm thanh
+        await _narrationEngine.SpeakAsync(fullSpeech, langCode);
+
+        // Đọc xong thì trả lại tên nút cũ
+        if (btn != null) btn.Text = "🎧 Nghe Audio";
     }
 
     private async Task FilterAndShowPins(string keyword)
@@ -156,7 +187,11 @@ public partial class MapPage : ContentPage
                 Type = PinType.Pin,
                 Label = poi.CurrentName,
                 Address = poi.CurrentDescription,
-                Color = Colors.Red
+                Color = Colors.Red,
+
+                // 🌟 TUYỆT CHIÊU BÍ MẬT: Nhét nguyên cái POI vào balo (Tag) của cục Pin luôn!
+                // Lát nữa bấm vào Pin chỉ cần móc trong balo ra xài, khỏi đi tìm Database nữa.
+                Tag = poi
             };
             tourMap.Pins.Add(pin);
         }
@@ -343,5 +378,33 @@ public partial class MapPage : ContentPage
             };
             DisplayAlert(langCode == "en" ? "Info" : "Thông báo", msg, "OK");
         }
+    }
+        // =========================================================
+        // 👇 HÀM XỬ LÝ NÚT THẢ TIM (YÊU THÍCH) 👇
+        // =========================================================
+    private async void OnFavoriteTapped(object sender, TappedEventArgs e)
+    {
+        if (_temporaryPoi == null) return;
+
+        // Đảo ngược trạng thái: Đang Yêu thích thì hủy, chưa Yêu thích thì thêm
+        _temporaryPoi.IsFavorite = !_temporaryPoi.IsFavorite;
+
+        // 1. Cập nhật Giao diện ngay lập tức cho mượt
+        lblFavoriteIcon.Text = _temporaryPoi.IsFavorite ? "❤️" : "🤍";
+
+        // Hiệu ứng "Giật giật" trái tim cho giống mấy App xịn (Tùy chọn)
+        var label = sender as Frame;
+        if (label != null)
+        {
+            await label.ScaleTo(1.2, 100);
+            await label.ScaleTo(1.0, 100);
+        }
+
+        // 2. Lưu xuống Database
+        await _dbService.UpdatePOIAsync(_temporaryPoi);
+
+        // 3. (Tùy chọn) Báo cho sếp biết
+        // string tb = _temporaryPoi.IsFavorite ? "Đã thêm vào danh sách Yêu thích ❤️" : "Đã gỡ khỏi Yêu thích 🤍";
+        // await DisplayAlert("Thông báo", tb, "OK");
     }
 }

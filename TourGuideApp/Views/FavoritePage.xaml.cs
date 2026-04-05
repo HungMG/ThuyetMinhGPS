@@ -1,8 +1,5 @@
-﻿using Mapsui.UI.Maui;
-using Mapsui.Projections;
-using TourGuideApp.Services;
-using System.Linq;
-using TourGuideApp.Models; // 👇 ĐÃ DỜI LÊN ĐÂY
+﻿using TourGuideApp.Services;
+using TourGuideApp.Models;
 
 namespace TourGuideApp.Views;
 
@@ -25,10 +22,12 @@ public partial class FavoritePage : ContentPage
 
     private async Task LoadFavoritesAsync()
     {
+        // 🌟 Lấy danh sách tim đỏ từ Database của sếp (Hàm số 5)
         var danhSachYeuThich = await _dbService.GetFavoritePOIsAsync();
+
+        // Nạp vào giao diện
         favoriteListView.ItemsSource = danhSachYeuThich;
     }
-
 
     // Sự kiện khi bấm nút Xóa (Thùng rác)
     private async void OnRemoveFavoriteClicked(object sender, EventArgs e)
@@ -38,13 +37,16 @@ public partial class FavoritePage : ContentPage
 
         if (poiBiXoa != null)
         {
-            // 👇 ĐÃ SỬA: Đổi poiBiXoa.Name thành poiBiXoa.CurrentName 👇
             bool xacNhan = await DisplayAlert("Xác nhận", $"Bạn có chắc muốn bỏ '{poiBiXoa.CurrentName}' khỏi danh sách yêu thích?", "Đồng ý", "Hủy");
 
             if (xacNhan)
             {
                 poiBiXoa.IsFavorite = false;
+
+                // 🌟 Gọi hàm cập nhật của sếp (Hàm số 6)
                 await _dbService.UpdatePOIAsync(poiBiXoa);
+
+                // Load lại danh sách sau khi xóa
                 await LoadFavoritesAsync();
             }
         }
