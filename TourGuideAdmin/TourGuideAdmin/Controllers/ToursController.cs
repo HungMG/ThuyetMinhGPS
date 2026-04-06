@@ -226,13 +226,35 @@ namespace TourGuideAdmin.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var tour = await _context.Tours.FindAsync(id);
-            if (tour != null)
+
+            if (tour == null)
+                return NotFound();
+
+            // 🔥 CHECK: Có POI thuộc Tour không?
+            bool hasPOIs = await _context.POIs.AnyAsync(p => p.TourId == id);
+
+            if (hasPOIs)
             {
-                // Code nâng cao (tùy chọn): Bạn có thể thêm code xóa file hình trong wwwroot ở đây để đỡ nặng server
-                _context.Tours.Remove(tour);
+                // ❌ Không cho xóa
+                TempData["Error"] = "❌ Không thể xóa tour vì vẫn còn địa điểm (POI) bên trong!";
+                return RedirectToAction(nameof(Index));
             }
 
+            // 🔥 (optional) XÓA ẢNH TOUR
+            if (!string.IsNullOrEmpty(tour.ImageUrl))
+            {
+                string filePath = Path.Combine(_env.WebRootPath, "images", "tours", tour.ImageUrl);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            _context.Tours.Remove(tour);
             await _context.SaveChangesAsync();
+
+            TempData["Success"] = "✅ Xóa tour thành công!";
             return RedirectToAction(nameof(Index));
         }
 

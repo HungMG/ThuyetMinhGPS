@@ -183,6 +183,47 @@ namespace TourGuideAdmin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ... (Các hàm Delete sếp giữ nguyên) ...
+         public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var pois = await _context.POIs.FirstOrDefaultAsync(m => m.Id == id);
+            if (pois == null) return NotFound();
+
+            return View(pois);
+        }
+
+        // POST: Tours/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var poi = await _context.POIs.FindAsync(id);
+
+            if (poi != null)
+            {
+                // 🔥 XÓA FILE ẢNH 
+                if (!string.IsNullOrEmpty(poi.ImageUrl))
+                {
+                    string filePath = Path.Combine(_env.WebRootPath, "images", "pois", poi.ImageUrl);
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+
+                // 🔥 XÓA DB
+                _context.POIs.Remove(poi);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool POIExists(int id)
+        {
+            return _context.POIs.Any(e => e.Id == id);
+        }
     }
 }
