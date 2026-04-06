@@ -27,6 +27,23 @@
                         </Picker>
                     </Grid>
 
+                    <Frame Margin="20,10"
+                           Padding="0"
+                           CornerRadius="20"
+                           BackgroundColor="White"
+                           HasShadow="False">
+
+                           <SearchBar
+                                    Placeholder="Tìm lộ trình, địa điểm..."
+                                    BackgroundColor="Transparent"
+                                    TextColor="#4A3A31"
+                                    PlaceholderColor="#8D7A6D"
+                                    CancelButtonColor="#C0502E"
+                                    TextChanged="OnSearchTextChanged"
+                                    SearchButtonPressed="OnSearchButtonPressed"/>
+
+                    </Frame>
+
                     <Label Text="{x:Static lang:AppLang.FeaturedTours}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,0"/>
 
                     <CollectionView x:Name="tourListView" SelectionMode="Single" SelectionChanged="OnTourSelected" HeightRequest="260" HorizontalScrollBarVisibility="Never">

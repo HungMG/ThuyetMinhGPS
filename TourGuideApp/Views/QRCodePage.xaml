@@ -21,11 +21,103 @@
                HorizontalOptions="Center"/>
         <Label x:Name="barcodeResult"
                FontSize="20"/>
-        <cv:CameraView x:Name="cameraView"
-                       WidthRequest="300"
-                       HeightRequest="300"
-            CamerasLoaded="cameraView_CamerasLoaded"
-            BarCodeDetectionEnabled="True"
-            BarcodeDetected="cameraView_BarcodeDetected"/>
+
+        <Grid HorizontalOptions="Center" VerticalOptions="Center">
+
+            <!-- Camera -->
+            <Frame
+    WidthRequest="265"
+    HeightRequest="265"
+    CornerRadius="20"
+    Padding="0"
+    HasShadow="True"
+    BorderColor="#4A3A31">
+
+                <Grid>
+
+                    <!-- Camera -->
+                    <cv:CameraView x:Name="cameraView"
+                       CamerasLoaded="cameraView_CamerasLoaded"
+                       BarCodeDetectionEnabled="True"
+                       BarcodeDetected="cameraView_BarcodeDetected"/>
+
+                    <!-- Scan line (nằm trên camera) -->
+                    <BoxView x:Name="scanLine"
+                             HeightRequest="4"
+                             VerticalOptions="Start"
+                             HorizontalOptions="Fill"
+                             TranslationY="0"
+                             ZIndex="1">
+                        
+                        <BoxView.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="Transparent" Offset="0"/>
+                                <GradientStop Color="#E6C07B" Offset="0.5"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </LinearGradientBrush>
+                        </BoxView.Background>
+                    </BoxView>
+
+                </Grid>
+
+            </Frame>
+
+            <!-- Khung scan -->
+            <Grid WidthRequest="300"
+                  HeightRequest="300"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center"
+                  InputTransparent="True">
+
+                <!-- Border (khung giữa) -->
+                <Border Stroke="#FFFFFF"
+                StrokeThickness="1"
+                BackgroundColor="Transparent"/>
+
+                <!-- ===== 4 GÓC QR ===== -->
+
+                <!-- Góc trên trái -->
+                <BoxView WidthRequest="30" HeightRequest="4"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"/>
+                <BoxView WidthRequest="4" HeightRequest="30"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"/>
+
+                <!-- Góc trên phải -->
+                <BoxView WidthRequest="30" HeightRequest="4"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"/>
+                <BoxView WidthRequest="4" HeightRequest="30"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"/>
+
+                <!-- Góc dưới trái -->
+                <BoxView WidthRequest="30" HeightRequest="4"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"/>
+                <BoxView WidthRequest="4" HeightRequest="30"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"/>
+
+                <!-- Góc dưới phải -->
+                <BoxView WidthRequest="30" HeightRequest="4"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"/>
+                <BoxView WidthRequest="4" HeightRequest="30"
+                 BackgroundColor="#4A3A31"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"/>
+
+            </Grid>
+
+        </Grid>
     </VerticalStackLayout>
 </ContentPage>

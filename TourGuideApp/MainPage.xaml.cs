@@ -15,6 +15,8 @@ public partial class MainPage : ContentPage
     private NarrationEngine _narrationEngine = new NarrationEngine();
     private Location _userLocation;
     private List<POI> _allPOIsCache = new List<POI>();
+    private List<POI> _allPois = new List<POI>();
+    private List<Tour> _allTours = new List<Tour>();
 
     public MainPage()
     {
@@ -35,6 +37,8 @@ public partial class MainPage : ContentPage
         var danhSachTour = await _dbService.GetAllToursAsync();
         if (danhSachTour != null)
         {
+            _allTours = danhSachTour;
+
             tourListView.ItemsSource = null;
             tourListView.ItemsSource = danhSachTour;
         }
@@ -51,6 +55,12 @@ public partial class MainPage : ContentPage
             }
             _allPOIsCache = _allPOIsCache.OrderBy(p => p.DistanceFromUser).ToList();
         }
+            _allPois = tatCaPoi; // 🌟 LƯU LẠI DANH SÁCH GỐC
+
+            poiListView.ItemsSource = null;
+            poiListView.ItemsSource = tatCaPoi;
+        }
+    }
 
         // 🌟 Bơm dữ liệu vào BindableLayout thay vì CollectionView
         BindableLayout.SetItemsSource(poiStackLayout, _allPOIsCache);
@@ -222,5 +232,42 @@ public partial class MainPage : ContentPage
         {
             await DisplayAlert("Lỗi", "Không thể mở bản đồ chỉ đường: " + ex.Message, "OK");
         }
+    }
+
+    // HÀM TÌM KIẾM
+    private void FilterData(string keyword)
+    {
+        keyword = keyword?.ToLower();
+
+        // ===== POI =====
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            poiListView.ItemsSource = _allPois;
+            tourListView.ItemsSource = _allTours;
+            return;
+        }
+
+        var filteredPois = _allPois.Where(p =>
+            (!string.IsNullOrEmpty(p.Name_VI) && p.Name_VI.ToLower().Contains(keyword)) ||
+            (!string.IsNullOrEmpty(p.Description_VI) && p.Description_VI.ToLower().Contains(keyword))
+        ).ToList();
+
+        var filteredTours = _allTours.Where(t =>
+            (!string.IsNullOrEmpty(t.Name_VI) && t.Name_VI.ToLower().Contains(keyword)) ||
+            (!string.IsNullOrEmpty(t.Description_VI) && t.Description_VI.ToLower().Contains(keyword))
+        ).ToList();
+
+        poiListView.ItemsSource = filteredPois;
+        tourListView.ItemsSource = filteredTours;
+    }
+
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        FilterData(e.NewTextValue);
+    }
+
+    private void OnSearchButtonPressed(object sender, EventArgs e)
+    {
+        FilterData((sender as SearchBar)?.Text);
     }
 }
