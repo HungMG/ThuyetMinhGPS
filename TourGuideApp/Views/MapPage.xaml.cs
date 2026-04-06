@@ -12,7 +12,12 @@ public partial class MapPage : ContentPage
     private List<int> _daDocThuyetMinh = new List<int>();
     private POI _temporaryPoi;
     private NarrationEngine _narrationEngine = new NarrationEngine();
-    private int _currentTourId = -1; // -1 nghĩa là hiển thị tất cả
+
+    private int _currentTourId = -1;
+    // 🌟 THÊM 2 BIẾN HỨNG TỌA ĐỘ
+    private double _targetLat = 0;
+    private double _targetLon = 0;
+
     public MapPage(int tourId = -1)
     {
         InitializeComponent();
@@ -22,16 +27,23 @@ public partial class MapPage : ContentPage
         tourMap.Map?.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
         tourMap.IsZoomButtonVisible = false;
         tourMap.IsNorthingButtonVisible = false;
-
-        // 🌟 ĐÃ BẬT LẠI: Nút bấm định vị vị trí hiện tại của Mapsui 🌟
         tourMap.IsMyLocationButtonVisible = true;
-
-        tourMap.MapClicked += TourMap_MapClicked;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // 🌟 MÓC DỮ LIỆU TỪ MAIN PAGE GỬI QUA
+        _currentTourId = Preferences.Get("TargetTourId", -1);
+        _targetLat = Preferences.Get("TargetPoiLat", 0.0);
+        _targetLon = Preferences.Get("TargetPoiLon", 0.0);
+
+        // Đọc xong xóa luôn cho sạch bộ nhớ
+        Preferences.Remove("TargetTourId");
+        Preferences.Remove("TargetPoiLat");
+        Preferences.Remove("TargetPoiLon");
+
         await FilterAndShowPins("");
         await GetCurrentLocationAsync();
     }
@@ -42,7 +54,6 @@ public partial class MapPage : ContentPage
         Geolocation.LocationChanged -= Geolocation_LocationChanged;
         Geolocation.StopListeningForeground();
     }
-
 
     // =========================================================
     // 👇 PHẦN 1: SỰ KIỆN TÌM KIẾM 👇
@@ -71,10 +82,8 @@ public partial class MapPage : ContentPage
     {
         e.Handled = true;
 
-        // 🌟 Móc cái POI từ trong "balo" (Tag) của cục Pin ra xài luôn
         if (e.Pin.Tag is POI currentPoi)
         {
-            // Bắt buộc phải chạy trên MainThread vì đang thay đổi Giao Diện (UI)
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 lblPoiName.Text = currentPoi.CurrentName;
@@ -82,22 +91,13 @@ public partial class MapPage : ContentPage
                 lblPoiAddress.Text = $"Tọa độ: {currentPoi.Latitude:F5}, {currentPoi.Longitude:F5}";
                 lblFavoriteIcon.Text = currentPoi.IsFavorite ? "❤️" : "🤍";
 
-                // 🌟 QUAN TRỌNG: Dùng FullImageUrl để App lấy hình từ Web Admin về
                 if (!string.IsNullOrWhiteSpace(currentPoi.ImageUrl))
-                {
-                    // Phải bọc trong Uri thì Image.Source mới tải hình từ Link mạng được
                     imgPoiImage.Source = ImageSource.FromUri(new Uri(currentPoi.FullImageUrl));
-                }
                 else
-                {
                     imgPoiImage.Source = "img_default_poi.png";
-                }
 
-                // Lưu tạm để xài cho nút Chỉ đường (Google Maps)
                 _temporaryPoi = currentPoi;
-
-                // 🌟 Bật BottomSheet (Popup) lên
-                poiDetailPopup.PeekHeight = 450; // Chỉnh 450 là vuốt lên vừa đẹp nửa màn hình
+                poiDetailPopup.PeekHeight = 450;
                 poiDetailPopup.IsOpen = true;
             });
         }
@@ -121,18 +121,13 @@ public partial class MapPage : ContentPage
         }
     }
 
-    // =========================================================
-    // 👇 HÀM XỬ LÝ NÚT NGHE THUYẾT MINH TRÊN POPUP 👇
-    // =========================================================
     private async void OnReadDescriptionClicked(object sender, EventArgs e)
     {
         if (_temporaryPoi == null) return;
 
-        // Bắt đầu đọc thì đổi màu nút hoặc báo hiệu cho khách biết
         var btn = sender as Button;
         if (btn != null) btn.Text = "🔊 Đang đọc...";
 
-        // Lấy ngôn ngữ hiện tại của máy để đọc cho đúng tiếng
         string langCode = Preferences.Get("AppLanguage", "vi");
 
         string textToRead = langCode switch
@@ -144,13 +139,9 @@ public partial class MapPage : ContentPage
             _ => _temporaryPoi.Description_VI
         };
 
-        // Ghép Tên địa điểm và Mô tả lại để đọc 1 lèo
         string fullSpeech = $"{_temporaryPoi.CurrentName}. {textToRead}";
-
-        // Ra lệnh cho động cơ TTS (Text-To-Speech) phát âm thanh
         await _narrationEngine.SpeakAsync(fullSpeech, langCode);
 
-        // Đọc xong thì trả lại tên nút cũ
         if (btn != null) btn.Text = "🎧 Nghe Audio";
     }
 
@@ -159,14 +150,11 @@ public partial class MapPage : ContentPage
         var danhSachPOI = await _dbService.GetAllPOIsAsync();
         if (danhSachPOI == null) return;
 
-        // 🌟 KHÚC BẠN BỎ QUÊN LÀ Ở ĐÂY NÈ 🌟
-        // Lọc ra đúng những địa điểm thuộc cái Tour khách vừa bấm
         if (_currentTourId != -1)
         {
             danhSachPOI = danhSachPOI.Where(p => p.TourId == _currentTourId).ToList();
         }
 
-        // Lọc tiếp theo từ khóa tìm kiếm (nếu khách có gõ vào ô Search)
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             danhSachPOI = danhSachPOI.Where(p =>
@@ -188,9 +176,6 @@ public partial class MapPage : ContentPage
                 Label = poi.CurrentName,
                 Address = poi.CurrentDescription,
                 Color = Colors.Red,
-
-                // 🌟 TUYỆT CHIÊU BÍ MẬT: Nhét nguyên cái POI vào balo (Tag) của cục Pin luôn!
-                // Lát nữa bấm vào Pin chỉ cần móc trong balo ra xài, khỏi đi tìm Database nữa.
                 Tag = poi
             };
             tourMap.Pins.Add(pin);
@@ -198,10 +183,43 @@ public partial class MapPage : ContentPage
 
         if (danhSachPOI.Any())
         {
-            var firstPoi = danhSachPOI.First();
-            var toaDoZoom = SphericalMercator.FromLonLat(firstPoi.Longitude, firstPoi.Latitude);
-            tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoZoom.x, toaDoZoom.y));
-            tourMap.Map?.Navigator?.ZoomTo(2); // Zoom lại gần
+            // 🌟 1. NẾU CÓ TỌA ĐỘ MỤC TIÊU -> TRƯỢT CAMERA VÀ BẬT POPUP
+            if (_targetLat != 0 && _targetLon != 0)
+            {
+                var toaDoZoom = SphericalMercator.FromLonLat(_targetLon, _targetLat);
+                tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoZoom.x, toaDoZoom.y));
+                tourMap.Map?.Navigator?.ZoomTo(2);
+
+                // Tự động bật Popup của điểm đó lên luôn
+                var targetPoi = danhSachPOI.FirstOrDefault(p => p.Latitude == _targetLat && p.Longitude == _targetLon);
+                if (targetPoi != null)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        lblPoiName.Text = targetPoi.CurrentName;
+                        lblPoiDescription.Text = targetPoi.CurrentDescription;
+                        lblPoiAddress.Text = $"Tọa độ: {targetPoi.Latitude:F5}, {targetPoi.Longitude:F5}";
+                        lblFavoriteIcon.Text = targetPoi.IsFavorite ? "❤️" : "🤍";
+
+                        if (!string.IsNullOrWhiteSpace(targetPoi.ImageUrl))
+                            imgPoiImage.Source = ImageSource.FromUri(new Uri(targetPoi.FullImageUrl));
+                        else
+                            imgPoiImage.Source = "img_default_poi.png";
+
+                        _temporaryPoi = targetPoi;
+                        poiDetailPopup.PeekHeight = 450;
+                        poiDetailPopup.IsOpen = true;
+                    });
+                }
+            }
+            // 🌟 2. NẾU CHỈ XEM TOUR -> TRƯỢT ĐẾN ĐIỂM ĐẦU TIÊN CỦA TOUR
+            else if (_currentTourId != -1)
+            {
+                var firstPoi = danhSachPOI.First();
+                var toaDoZoom = SphericalMercator.FromLonLat(firstPoi.Longitude, firstPoi.Latitude);
+                tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoZoom.x, toaDoZoom.y));
+                tourMap.Map?.Navigator?.ZoomTo(2);
+            }
         }
     }
 
@@ -222,6 +240,22 @@ public partial class MapPage : ContentPage
             if (status == PermissionStatus.Granted)
             {
                 tourMap.MyLocationEnabled = true;
+
+                var location = await Geolocation.GetLastKnownLocationAsync();
+                if (location == null)
+                {
+                    location = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(3)));
+                }
+
+                // 🌟 ĐÃ SỬA: Ép máy ảnh trượt về chỗ sếp CHỈ KHI sếp không truyền mục tiêu (POI) nào qua
+                if (location != null && _currentTourId == -1 && _targetLat == 0 && _targetLon == 0)
+                {
+                    var toaDoHienTai = Mapsui.Projections.SphericalMercator.FromLonLat(location.Longitude, location.Latitude);
+                    tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoHienTai.x, toaDoHienTai.y));
+                    tourMap.Map?.Navigator?.ZoomTo(2);
+                }
+
+                Geolocation.LocationChanged -= Geolocation_LocationChanged;
                 Geolocation.LocationChanged += Geolocation_LocationChanged;
                 var request = new GeolocationListeningRequest(GeolocationAccuracy.High, TimeSpan.FromSeconds(5));
                 await Geolocation.StartListeningForegroundAsync(request);
@@ -237,24 +271,20 @@ public partial class MapPage : ContentPage
     {
         if (e.Location == null) return;
 
-        // 1. Cập nhật vị trí của mình trên bản đồ
         tourMap.MyLocationLayer.UpdateMyLocation(new Position(e.Location.Latitude, e.Location.Longitude));
 
-        // 2. Lấy danh sách địa điểm và lọc ra những điểm người dùng ĐANG ĐỨNG TRONG BÁN KÍNH
+        HighlightClosestPin(e.Location);
+
         var allPOIs = await _dbService.GetAllPOIsAsync();
 
         var poisInRange = allPOIs.Where(poi => {
             var poiLoc = new Location(poi.Latitude, poi.Longitude);
             double distanceMet = Location.CalculateDistance(e.Location, poiLoc, DistanceUnits.Kilometers) * 1000;
-
-            // Kiểm tra: Khoảng cách < Bán kính thiết lập của POI đó
             return distanceMet <= poi.TriggerRadius;
         }).ToList();
 
         if (!poisInRange.Any()) return;
 
-        // 3. Chọn ra điểm có ĐỘ ƯU TIÊN (Priority) cao nhất và ĐÃ HẾT THỜI GIAN CHỜ (Cooldown)
-        // Ở đây tui để thời gian chờ là 30 phút (có thể chỉnh lại tùy ý)
         var bestPOI = poisInRange
             .Where(p => !p.LastPlayedTime.HasValue || (DateTime.Now - p.LastPlayedTime.Value).TotalMinutes >= 30)
             .OrderByDescending(p => p.Priority)
@@ -262,11 +292,9 @@ public partial class MapPage : ContentPage
 
         if (bestPOI != null)
         {
-            // 4. Cập nhật thời gian vừa đọc để chống spam
             bestPOI.LastPlayedTime = DateTime.Now;
-            await _dbService.UpdatePOIAsync(bestPOI); // Lưu lại vào DB để lần sau mở app vẫn nhớ
+            await _dbService.UpdatePOIAsync(bestPOI);
 
-            // 5. Phát thuyết minh đa ngôn ngữ (Dùng đúng logic NarrationEngine)
             string langCode = Preferences.Get("AppLanguage", "vi");
             string textToRead = langCode switch
             {
@@ -277,96 +305,25 @@ public partial class MapPage : ContentPage
                 _ => bestPOI.Description_VI
             };
 
-            // Gửi lệnh đọc cho loa
             await _narrationEngine.SpeakAsync($"{bestPOI.CurrentName}. {textToRead}", langCode);
-
-            // Hiện thông báo cho đẹp
             await DisplayAlert(bestPOI.CurrentName, "Tự động thuyết minh đang phát...", "OK");
         }
     }
 
     // =========================================================
-    // 👇 PHẦN 4: SỰ KIỆN CHẠM BẢN ĐỒ ĐỂ THÊM ĐIỂM ĐA NGÔN NGỮ 👇
-    // =========================================================
-
-    private async void TourMap_MapClicked(object sender, MapClickedEventArgs e)
-    {
-        double viDo = e.Point.Latitude;
-        double kinhDo = e.Point.Longitude;
-
-        string langCode = Preferences.Get("AppLanguage", "vi");
-
-        // 1. Dịch thuật các nút bấm ActionSheet
-        string title = langCode switch { "en" => "New Location", "zh" => "新位置", "ko" => "새 위치", "ja" => "新しい場所", _ => "Tọa độ mới" };
-        string cancel = langCode switch { "en" => "Cancel", "zh" => "取消", "ko" => "취소", "ja" => "キャンセル", _ => "Hủy" };
-        string addAction = langCode switch { "en" => "Add location here", "zh" => "在此处添加", "ko" => "여기에 추가", "ja" => "ここに追加", _ => "Thêm địa điểm vào đây" };
-
-        string hanhDong = await DisplayActionSheet(title, cancel, null, addAction);
-
-        if (hanhDong == addAction)
-        {
-            // 2. Dịch thuật bảng nhập liệu Prompt
-            string promptTitle = langCode switch { "en" => "New POI", "zh" => "新景点", "ko" => "새 장소", "ja" => "新しいスポット", _ => "Tạo POI mới" };
-            string promptMsg = langCode switch { "en" => "Enter name:", "zh" => "输入名称:", "ko" => "이름 입력:", "ja" => "名前を入力:", _ => "Nhập tên địa điểm:" };
-            string saveBtn = langCode switch { "en" => "Save", "zh" => "保存", "ko" => "저장", "ja" => "保存", _ => "Lưu" };
-
-            string tenDiaDiem = await DisplayPromptAsync(promptTitle, promptMsg, saveBtn, cancel);
-            if (string.IsNullOrWhiteSpace(tenDiaDiem)) return;
-
-            string descMsg = langCode switch { "en" => "Enter description:", "zh" => "输入描述:", "ko" => "설명 입력:", "ja" => "説明を入力:", _ => "Nhập mô tả:" };
-            string moTa = await DisplayPromptAsync(promptTitle, descMsg, saveBtn, cancel);
-            moTa ??= "Không có mô tả";
-
-            // 3. 🌟 TUYỆT CHIÊU: Ghi đè chữ người dùng nhập vào TẤT CẢ các cột ngôn ngữ
-            // Tránh trường hợp nhập bên Tiếng Anh xong chuyển qua Tiếng Nhật bị mất chữ
-            var diemMoi = new POI
-            {
-                Name_VI = tenDiaDiem,
-                Name_EN = tenDiaDiem,
-                Name_ZH = tenDiaDiem,
-                Name_KO = tenDiaDiem,
-                Name_JA = tenDiaDiem,
-                Description_VI = moTa,
-                Description_EN = moTa,
-                Description_ZH = moTa,
-                Description_KO = moTa,
-                Description_JA = moTa,
-                Latitude = viDo,
-                Longitude = kinhDo
-            };
-
-            await _dbService.AddPOIAsync(diemMoi);
-
-            // 4. Dịch thuật thông báo thành công
-            string successTitle = langCode switch { "en" => "Success", "zh" => "成功", "ko" => "성공", "ja" => "成功", _ => "Thành công" };
-            string successMsg = langCode switch { "en" => $"Added '{tenDiaDiem}'!", "zh" => $"已添加 '{tenDiaDiem}'!", "ko" => $"'{tenDiaDiem}' 추가됨!", "ja" => $"'{tenDiaDiem}' を追加しました!", _ => $"Đã thêm '{tenDiaDiem}'!" };
-
-            await DisplayAlert(successTitle, successMsg, "OK");
-            await FilterAndShowPins("");
-        }
-
-    }
-    // =========================================================
     // 👇 HÀM XỬ LÝ NÚT TỰ ĐỊNH VỊ VỊ TRÍ 👇
     // =========================================================
     private void OnCenterLocationTapped(object sender, TappedEventArgs e)
     {
-        // Kiểm tra xem máy đã bắt được GPS của người dùng chưa
         if (tourMap.MyLocationLayer != null && tourMap.MyLocationLayer.MyLocation != null)
         {
-            // Lấy tọa độ hiện tại
             var loc = tourMap.MyLocationLayer.MyLocation;
             var toaDoHienTai = SphericalMercator.FromLonLat(loc.Longitude, loc.Latitude);
-
-            // Trượt camera bản đồ về đúng chỗ đó
             tourMap.Map?.Navigator?.CenterOn(new Mapsui.MPoint(toaDoHienTai.x, toaDoHienTai.y));
-
-            // Zoom lại gần cho dễ nhìn (Mức 2 là vừa đẹp)
             tourMap.Map?.Navigator?.ZoomTo(2);
         }
         else
         {
-            // Lỡ như mạng lag chưa load kịp GPS
             string langCode = Preferences.Get("AppLanguage", "vi");
             string msg = langCode switch
             {
@@ -379,20 +336,17 @@ public partial class MapPage : ContentPage
             DisplayAlert(langCode == "en" ? "Info" : "Thông báo", msg, "OK");
         }
     }
-        // =========================================================
-        // 👇 HÀM XỬ LÝ NÚT THẢ TIM (YÊU THÍCH) 👇
-        // =========================================================
+
+    // =========================================================
+    // 👇 HÀM XỬ LÝ NÚT THẢ TIM (YÊU THÍCH) 👇
+    // =========================================================
     private async void OnFavoriteTapped(object sender, TappedEventArgs e)
     {
         if (_temporaryPoi == null) return;
 
-        // Đảo ngược trạng thái: Đang Yêu thích thì hủy, chưa Yêu thích thì thêm
         _temporaryPoi.IsFavorite = !_temporaryPoi.IsFavorite;
-
-        // 1. Cập nhật Giao diện ngay lập tức cho mượt
         lblFavoriteIcon.Text = _temporaryPoi.IsFavorite ? "❤️" : "🤍";
 
-        // Hiệu ứng "Giật giật" trái tim cho giống mấy App xịn (Tùy chọn)
         var label = sender as Frame;
         if (label != null)
         {
@@ -400,11 +354,41 @@ public partial class MapPage : ContentPage
             await label.ScaleTo(1.0, 100);
         }
 
-        // 2. Lưu xuống Database
         await _dbService.UpdatePOIAsync(_temporaryPoi);
+    }
 
-        // 3. (Tùy chọn) Báo cho sếp biết
-        // string tb = _temporaryPoi.IsFavorite ? "Đã thêm vào danh sách Yêu thích ❤️" : "Đã gỡ khỏi Yêu thích 🤍";
-        // await DisplayAlert("Thông báo", tb, "OK");
+    // =========================================================
+    // 👇 HÀM TÌM VÀ ĐỔI MÀU CỜ (PIN) GẦN NHẤT 👇
+    // =========================================================
+    private void HighlightClosestPin(Location userLocation)
+    {
+        if (tourMap.Pins == null || !tourMap.Pins.Any()) return;
+
+        Mapsui.UI.Maui.Pin closestPin = null;
+        double minDistance = double.MaxValue;
+
+        foreach (var pin in tourMap.Pins)
+        {
+            pin.Color = Colors.Red;
+            pin.Scale = 1.0f;
+
+            if (pin.Tag is POI poi)
+            {
+                var poiLoc = new Location(poi.Latitude, poi.Longitude);
+                double distance = Location.CalculateDistance(userLocation, poiLoc, DistanceUnits.Kilometers);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestPin = pin;
+                }
+            }
+        }
+
+        if (closestPin != null)
+        {
+            closestPin.Color = Colors.Green;
+            closestPin.Scale = 1.3f;
+        }
     }
 }

@@ -75,5 +75,12 @@ namespace TourGuideApp.Models
         public string FullImageUrl => string.IsNullOrEmpty(ImageUrl)
             ? "img_poi_default.jpg"
             : $"http://192.168.1.231:5136/images/pois/{ImageUrl}";
+
+        // 👇 THÊM 2 BIẾN NÀY ĐỂ TÍNH KHOẢNG CÁCH KM (KHÔNG LƯU VÀO DB) 👇
+        [Ignore]
+        public double DistanceFromUser { get; set; }
+
+        [Ignore]
+        public string DistanceDisplay => DistanceFromUser > 0 ? $"{DistanceFromUser:F1} km" : "";
     }
 }

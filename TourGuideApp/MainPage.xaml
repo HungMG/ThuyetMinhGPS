@@ -5,42 +5,43 @@
              x:Class="TourGuideApp.MainPage"
              BackgroundColor="#FAF7F2"
              Shell.NavBarIsVisible="False">
-    <Grid RowDefinitions="Auto, *">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Padding="20,50,20,20" BackgroundColor="White">
-            <VerticalStackLayout>
-                <Label Text="{x:Static lang:AppLang.ExploreTitle}" FontSize="30" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
-                <Label Text="{x:Static lang:AppLang.ExploreSubtitle}" FontSize="15" TextColor="#8D7A6D"/>
-            </VerticalStackLayout>
-            <Picker x:Name="NarrationLangPicker" Grid.Column="1" WidthRequest="140" TextColor="#C0502E" TitleColor="#8D7A6D" FontAttributes="Bold" Title="Giọng đọc">
-                <Picker.Items>
-                    <x:String>🇻🇳 Tiếng Việt</x:String>
-                    <x:String>🇬🇧 English</x:String>
-                    <x:String>🇨🇳 中文</x:String>
-                    <x:String>🇰🇷 한국어</x:String>
-                    <x:String>🇯🇵 日本語</x:String>
-                </Picker.Items>
-            </Picker>
-        </Grid>
-
-        <RefreshView x:Name="mainRefreshView" Grid.Row="1" Refreshing="OnRefreshing" RefreshColor="#C0502E">
-
+    <Grid>
+        <RefreshView x:Name="mainRefreshView" Refreshing="OnRefreshing" RefreshColor="#C0502E">
             <ScrollView>
-                <VerticalStackLayout Spacing="20" Padding="0,20,0,40">
+                <VerticalStackLayout Spacing="20" Padding="0,0,0,40">
+
+                    <Grid ColumnDefinitions="*, Auto" Padding="20,50,20,20" BackgroundColor="White">
+                        <VerticalStackLayout>
+                            <Label Text="{x:Static lang:AppLang.ExploreTitle}" FontSize="30" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+                            <Label Text="{x:Static lang:AppLang.ExploreSubtitle}" FontSize="15" TextColor="#8D7A6D"/>
+                        </VerticalStackLayout>
+                        <Picker x:Name="NarrationLangPicker" Grid.Column="1" WidthRequest="140" TextColor="#C0502E" TitleColor="#8D7A6D" FontAttributes="Bold" Title="Giọng đọc">
+                            <Picker.Items>
+                                <x:String>🇻🇳 Tiếng Việt</x:String>
+                                <x:String>🇬🇧 English</x:String>
+                                <x:String>🇨🇳 中文</x:String>
+                                <x:String>🇰🇷 한국어</x:String>
+                                <x:String>🇯🇵 日本語</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Grid>
 
                     <Label Text="{x:Static lang:AppLang.FeaturedTours}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,0"/>
 
-                    <CollectionView x:Name="tourListView" SelectionMode="Single" SelectionChanged="OnTourSelected">
+                    <CollectionView x:Name="tourListView" SelectionMode="Single" SelectionChanged="OnTourSelected" HeightRequest="260" HorizontalScrollBarVisibility="Never">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout Orientation="Horizontal" ItemSpacing="15" />
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame WidthRequest="280" Margin="20,0,0,0" Padding="0" CornerRadius="16" HasShadow="True" BorderColor="Transparent" IsClippedToBounds="True">
+                                <Frame WidthRequest="280" Margin="20,0,0,10" Padding="0" CornerRadius="16" HasShadow="True" BorderColor="Transparent" IsClippedToBounds="True">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnTourCardTapped" CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
                                     <Grid RowDefinitions="140, Auto">
-
                                         <Image Grid.Row="0" Source="{Binding FullImageUrl, TargetNullValue='img_tour_default.jpg', FallbackValue='img_tour_default.jpg'}" Aspect="AspectFill" BackgroundColor="#D3C9C1"/>
-
                                         <Frame Grid.Row="0" HorizontalOptions="End" VerticalOptions="Start" Margin="15" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0">
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnTourPlayAudioTapped" CommandParameter="{Binding .}"/>
@@ -48,10 +49,10 @@
                                             <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
                                         </Frame>
                                         <VerticalStackLayout Grid.Row="1" Padding="20">
-                                            <Label Text="{Binding Name_VI}" FontSize="18" FontAttributes="Bold" TextColor="#4A3A31"/>
-                                            <HorizontalStackLayout Margin="0,5,0,0" Spacing="5">
-                                                <Label Text="⏱️" FontSize="14"/>
-                                                <Label Text="{Binding EstimatedTime}" FontSize="14" FontAttributes="Bold" TextColor="#C0502E"/>
+                                            <Label Text="{Binding CurrentName}" FontSize="18" FontAttributes="Bold" TextColor="#4A3A31" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <HorizontalStackLayout Margin="0,8,0,0" Spacing="5">
+                                                <Label Text="⏱️" FontSize="14" VerticalOptions="Center"/>
+                                                <Label Text="{Binding EstimatedTime}" FontSize="14" FontAttributes="Bold" TextColor="#C0502E" VerticalOptions="Center"/>
                                             </HorizontalStackLayout>
                                         </VerticalStackLayout>
                                     </Grid>
@@ -60,22 +61,30 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <Label Text="{x:Static lang:AppLang.FreeExploration}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,20,20,0"/>
+                    <Label Text="{x:Static lang:AppLang.FreeExploration}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,10,20,0"/>
 
-                    <CollectionView x:Name="poiListView" SelectionMode="Single" SelectionChanged="OnPoiSelected">
-                        <CollectionView.ItemTemplate>
+                    <VerticalStackLayout x:Name="poiStackLayout">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <Frame Margin="20,0,20,15" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnPoiCardTapped" CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
                                     <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                        <Image Grid.Column="0" WidthRequest="70" HeightRequest="70" Aspect="AspectFill" 
-       Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
+                                        <Image Grid.Column="0" WidthRequest="70" HeightRequest="70" Aspect="AspectFill" Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
                                             <Image.Clip>
                                                 <RoundRectangleGeometry CornerRadius="12" Rect="0,0,70,70"/>
                                             </Image.Clip>
                                         </Image>
                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                            <Label Text="{Binding Name_VI}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31"/>
-                                            <Label Text="{Binding Description_VI}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+                                            <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,4,0,0"/>
+                                            <HorizontalStackLayout Spacing="5" Margin="0,6,0,0">
+                                                <Frame BackgroundColor="#FDEBD0" CornerRadius="4" Padding="6,2" HasShadow="False">
+                                                    <Label Text="{Binding DistanceDisplay}" FontSize="12" FontAttributes="Bold" TextColor="#D35400"/>
+                                                </Frame>
+                                            </HorizontalStackLayout>
                                         </VerticalStackLayout>
                                         <Frame Grid.Column="2" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0" VerticalOptions="Center">
                                             <Frame.GestureRecognizers>
@@ -86,11 +95,83 @@
                                     </Grid>
                                 </Frame>
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
 
                 </VerticalStackLayout>
             </ScrollView>
         </RefreshView>
+
+        <BoxView x:Name="blackOverlay" Color="Black" Opacity="0" IsVisible="False">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnClosePopupTapped"/>
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <Frame x:Name="tourPoiPopup" VerticalOptions="End" HeightRequest="600" TranslationY="1200" CornerRadius="32" Margin="0" Padding="0" HasShadow="True" BorderColor="Transparent" BackgroundColor="#F8F9FA">
+            <VerticalStackLayout Padding="0,15,0,0">
+
+                <BoxView WidthRequest="50" HeightRequest="5" CornerRadius="2.5" BackgroundColor="#D5CDC4" HorizontalOptions="Center" Margin="0,5,0,15"/>
+
+                <Grid ColumnDefinitions="*, Auto" Padding="25,0,25,15">
+                    <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                        <Label Text="LỘ TRÌNH CHI TIẾT" FontSize="13" TextColor="#C0502E" FontAttributes="Bold"/>
+                        <Label x:Name="lblPopupTourName" Text="Tên Tour..." FontSize="22" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif" Margin="0,2,0,0" MaxLines="1" LineBreakMode="TailTruncation"/>
+                    </VerticalStackLayout>
+
+                    <Frame Grid.Column="1" WidthRequest="36" HeightRequest="36" CornerRadius="18" BackgroundColor="#E8E0D5" Padding="0" HasShadow="False" VerticalOptions="Center">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnClosePopupTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Label Text="✖" FontSize="14" TextColor="#4A3A31" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Frame>
+                </Grid>
+
+                <Button Text="🗺️ Dẫn đường lộ trình này"
+                        BackgroundColor="#27AE60" TextColor="White" FontAttributes="Bold" CornerRadius="25"
+                        Margin="20,0,20,15" HeightRequest="50"
+                        Clicked="OnNavigateTourClicked"/>
+
+                <ScrollView BackgroundColor="#FAF7F2">
+                    <VerticalStackLayout x:Name="popupPoiStackLayout" Padding="0,20,0,60">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Margin="20,0,20,12" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnPoiCardTapped" CommandParameter="{Binding .}"/>
+                                    </Frame.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
+                                        <Image Grid.Column="0" WidthRequest="60" HeightRequest="60" Aspect="AspectFill" Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
+                                            <Image.Clip>
+                                                <RoundRectangleGeometry CornerRadius="12" Rect="0,0,60,60"/>
+                                            </Image.Clip>
+                                        </Image>
+
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                            <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <HorizontalStackLayout Spacing="5" Margin="0,6,0,0">
+                                                <Frame BackgroundColor="#FDEBD0" CornerRadius="4" Padding="4,2" HasShadow="False">
+                                                    <Label Text="{Binding DistanceDisplay}" FontSize="11" FontAttributes="Bold" TextColor="#D35400"/>
+                                                </Frame>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+
+                                        <Frame Grid.Column="2" WidthRequest="36" HeightRequest="36" CornerRadius="18" BackgroundColor="#C0502E" Padding="0" VerticalOptions="Center">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnPoiPlayAudioTapped" CommandParameter="{Binding .}"/>
+                                            </Frame.GestureRecognizers>
+                                            <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                                        </Frame>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </ScrollView>
+
+            </VerticalStackLayout>
+        </Frame>
+
     </Grid>
 </ContentPage>
