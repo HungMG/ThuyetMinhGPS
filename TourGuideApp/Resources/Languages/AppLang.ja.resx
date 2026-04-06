@@ -144,6 +144,9 @@
   <data name="FreeExploration" xml:space="preserve">
     <value>自由散策</value>
   </data>
+  <data name="ListenAudio" xml:space="preserve">
+    <value>🎧 音声を聞く</value>
+  </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>計算中...</value>
   </data>
@@ -152,6 +155,12 @@
   </data>
   <data name="MainTitle" xml:space="preserve">
     <value>音声ガイド</value>
+  </data>
+  <data name="MapsExternal" xml:space="preserve">
+    <value>📍 外部マップで案内</value>
+  </data>
+  <data name="MapsThisRoute" xml:space="preserve">
+    <value>🗺️ このルートをナビゲート</value>
   </data>
   <data name="MapTabTitle" xml:space="preserve">
     <value>マップ</value>
@@ -162,8 +171,17 @@
   <data name="QRTitle" xml:space="preserve">
     <value>QRコードをスキャン</value>
   </data>
+  <data name="ReadLanguage" xml:space="preserve">
+    <value>音声言語：</value>
+  </data>
+  <data name="RouteDetails" xml:space="preserve">
+    <value>詳細ルート</value>
+  </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>場所を検索...</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>言語を選択</value>
   </data>
   <data name="SetAppInfo" xml:space="preserve">
     <value>アプリ情報</value>
@@ -180,6 +198,9 @@
   <data name="SetVersion" xml:space="preserve">
     <value>バージョン 1.0</value>
   </data>
+  <data name="StopAudio" xml:space="preserve">
+    <value>🛑 音声を停止</value>
+  </data>
   <data name="TabFavorite" xml:space="preserve">
     <value>お気に入り</value>
   </data>
@@ -194,6 +215,9 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>設定</value>
+  </data>
+  <data name="ViewOnAppMap" xml:space="preserve">
+    <value>🗺️ アプリの地図で見る</value>
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>ツアーへようこそ：{0}。 所要時間：{1}。</value>

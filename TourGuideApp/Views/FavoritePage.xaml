@@ -2,54 +2,118 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
+             xmlns:bs="http://pluginmauibottomsheet.com"
              x:Class="TourGuideApp.Views.FavoritePage"
              BackgroundColor="#FAF7F2"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
+    <Grid>
 
-        <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
-            <Label Text="{x:Static lang:AppLang.FavTitle}" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
-            <Label Text="{x:Static lang:AppLang.FavSubtitle}" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
-        </VerticalStackLayout>
+        <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
 
-        <CollectionView Grid.Row="1" x:Name="favoriteListView" VerticalScrollBarVisibility="Never">
-            <CollectionView.EmptyView>
-                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Margin="0,100,0,0">
-                    <Label Text="📭" FontSize="60" HorizontalOptions="Center" Opacity="0.8"/>
-                    <Label Text="{x:Static lang:AppLang.FavEmpty}" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
-                    <Label Text="Hãy dạo quanh bản đồ và thả tim nhé!" TextColor="#B0A398" FontSize="14" HorizontalOptions="Center"/>
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
+            <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
+                <Label Text="{x:Static lang:AppLang.FavTitle}" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
+                <Label Text="{x:Static lang:AppLang.FavSubtitle}" FontSize="14" TextColor="#8D7A6D" Margin="0,5,0,0"/>
+            </VerticalStackLayout>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="0,0,0,15" Padding="12" CornerRadius="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
-                        <Grid ColumnDefinitions="75, *, 40" ColumnSpacing="15">
+            <CollectionView Grid.Row="1" x:Name="favoriteListView" VerticalScrollBarVisibility="Never">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Margin="0,100,0,0">
+                        <Label Text="📭" FontSize="60" HorizontalOptions="Center" Opacity="0.8"/>
+                        <Label Text="{x:Static lang:AppLang.FavEmpty}" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="Hãy dạo quanh bản đồ và thả tim nhé!" TextColor="#B0A398" FontSize="14" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
 
-                            <Frame Grid.Column="0" WidthRequest="75" HeightRequest="75" CornerRadius="12" Padding="0" IsClippedToBounds="True" HasShadow="False" BorderColor="#E8E0D5">
-                                <Image Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}" 
-                                       Aspect="AspectFill" 
-                                       BackgroundColor="#F4EDE4"/>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,0,0,15" Padding="12" CornerRadius="16" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnFavoriteItemTapped" CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="75, *, 40" ColumnSpacing="15">
+
+                                <Frame Grid.Column="0" WidthRequest="75" HeightRequest="75" CornerRadius="12" Padding="0" IsClippedToBounds="True" HasShadow="False" BorderColor="#E8E0D5">
+                                    <Image Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}" 
+                                           Aspect="AspectFill" 
+                                           BackgroundColor="#F4EDE4"/>
+                                </Frame>
+
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                    <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#7F8C8D" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                </VerticalStackLayout>
+
+                                <ImageButton Grid.Column="2" 
+                                             Source="icon_trash.png" 
+                                             WidthRequest="24" HeightRequest="24" 
+                                             VerticalOptions="Center" HorizontalOptions="Center"
+                                             BackgroundColor="Transparent"
+                                             CommandParameter="{Binding .}"
+                                             Clicked="OnRemoveFavoriteClicked"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <bs:BottomSheet x:Name="favoriteDetailPopup" IsOpen="False" HasHandle="True" IsModal="True" CornerRadius="24">
+            <bs:BottomSheetContent>
+                <bs:BottomSheetContent.Content>
+                    <Grid RowDefinitions="Auto, *, Auto" Padding="20" BackgroundColor="White" HeightRequest="600">
+
+                        <VerticalStackLayout Grid.Row="0" Spacing="10">
+                            <BoxView WidthRequest="40" HeightRequest="4" CornerRadius="2" BackgroundColor="#E8E0D5" HorizontalOptions="Center" Margin="0,0,0,10"/>
+                            <Frame HeightRequest="150" CornerRadius="16" HasShadow="False" Padding="0" BorderColor="#E8E0D5">
+                                <Image x:Name="imgPopupImage" Aspect="AspectFill" Source="img_default_poi.png"/>
                             </Frame>
+                            <Label x:Name="lblPopupName" Text="Tên địa điểm..." FontSize="20" FontAttributes="Bold" TextColor="#2C3E50"/>
 
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
-                                <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#2C3E50" MaxLines="1" LineBreakMode="TailTruncation"/>
-                                <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#7F8C8D" MaxLines="2" LineBreakMode="TailTruncation"/>
-                            </VerticalStackLayout>
+                            <Grid ColumnDefinitions="Auto, *" Margin="0,5">
+                                <Label Text="{x:Static lang:AppLang.ReadLanguage}" VerticalOptions="Center" FontSize="13" TextColor="#8D7A6D"/>
+                                <Picker x:Name="PopupLangPicker" Grid.Column="1" Margin="10,0,0,0" 
+                                        Title="{x:Static lang:AppLang.SelectLanguage}" 
+                                        TextColor="#C0502E" FontAttributes="Bold"
+                                        SelectedIndexChanged="OnPopupLangChanged">
+                                    <Picker.Items>
+                                        <x:String>🇻🇳 Tiếng Việt</x:String>
+                                        <x:String>🇬🇧 English</x:String>
+                                        <x:String>🇨🇳 中文</x:String>
+                                        <x:String>🇰🇷 한국어</x:String>
+                                        <x:String>🇯🇵 日本語</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="#F0F0F0"/>
+                        </VerticalStackLayout>
 
-                            <ImageButton Grid.Column="2" 
-                                         Source="icon_trash.png" 
-                                         WidthRequest="24" HeightRequest="24" 
-                                         VerticalOptions="Center" HorizontalOptions="Center"
-                                         BackgroundColor="Transparent"
-                                         CommandParameter="{Binding .}"
-                                         Clicked="OnRemoveFavoriteClicked"/>
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                        <ScrollView Grid.Row="1" Margin="0,10">
+                            <Label x:Name="lblPopupDescription" Text="Mô tả..." FontSize="14" TextColor="#34495E" LineHeight="1.4"/>
+                        </ScrollView>
+
+                        <VerticalStackLayout Grid.Row="2" Spacing="12" Padding="0,10,0,0">
+                            <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+                                <Button Grid.Column="0" x:Name="btnReadAudio" Text="{x:Static lang:AppLang.ListenAudio}" 
+                BackgroundColor="#F39C12" TextColor="White" FontAttributes="Bold"
+                CornerRadius="25" Clicked="OnReadDescriptionClicked" />
+                                <Button Grid.Column="1" Text="{x:Static lang:AppLang.MapsExternal}" 
+                BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold"
+                CornerRadius="25" Clicked="OnNavigationClicked" />
+                            </Grid>
+
+                            <Button Text="{x:Static lang:AppLang.ViewOnAppMap}" 
+            BackgroundColor="#2980B9" TextColor="White" FontAttributes="Bold"
+            CornerRadius="25" HeightRequest="50"
+            Clicked="OnViewOnMapClicked" />
+                        </VerticalStackLayout>
+
+                    </Grid>
+                </bs:BottomSheetContent.Content>
+            </bs:BottomSheetContent>
+        </bs:BottomSheet>
+
     </Grid>
-
 </ContentPage>

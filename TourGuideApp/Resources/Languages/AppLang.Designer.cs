@@ -142,6 +142,15 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 🎧 Nghe Audio.
+        /// </summary>
+        public static string ListenAudio {
+            get {
+                return ResourceManager.GetString("ListenAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đang tính....
         /// </summary>
         public static string MainCalculating {
@@ -165,6 +174,24 @@ namespace TourGuideApp.Resources.Languages {
         public static string MainTitle {
             get {
                 return ResourceManager.GetString("MainTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📍 Chỉ đường ngoài.
+        /// </summary>
+        public static string MapsExternal {
+            get {
+                return ResourceManager.GetString("MapsExternal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🗺️ Dẫn đường lộ trình này.
+        /// </summary>
+        public static string MapsThisRoute {
+            get {
+                return ResourceManager.GetString("MapsThisRoute", resourceCulture);
             }
         }
         
@@ -196,11 +223,38 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ngôn ngữ đọc:.
+        /// </summary>
+        public static string ReadLanguage {
+            get {
+                return ResourceManager.GetString("ReadLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LỘ TRÌNH CHI TIẾT.
+        /// </summary>
+        public static string RouteDetails {
+            get {
+                return ResourceManager.GetString("RouteDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tìm kiếm địa điểm....
         /// </summary>
         public static string SearchPlaceholder {
             get {
                 return ResourceManager.GetString("SearchPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chọn ngôn ngữ.
+        /// </summary>
+        public static string SelectLanguage {
+            get {
+                return ResourceManager.GetString("SelectLanguage", resourceCulture);
             }
         }
         
@@ -250,6 +304,15 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 🛑 Dừng thuyết minh.
+        /// </summary>
+        public static string StopAudio {
+            get {
+                return ResourceManager.GetString("StopAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yêu thích.
         /// </summary>
         public static string TabFavorite {
@@ -291,6 +354,15 @@ namespace TourGuideApp.Resources.Languages {
         public static string TabSettings {
             get {
                 return ResourceManager.GetString("TabSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🗺️ Xem trên Bản đồ App.
+        /// </summary>
+        public static string ViewOnAppMap {
+            get {
+                return ResourceManager.GetString("ViewOnAppMap", resourceCulture);
             }
         }
         

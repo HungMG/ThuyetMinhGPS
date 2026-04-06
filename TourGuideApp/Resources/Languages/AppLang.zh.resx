@@ -144,6 +144,9 @@
   <data name="FreeExploration" xml:space="preserve">
     <value>自由探索</value>
   </data>
+  <data name="ListenAudio" xml:space="preserve">
+    <value>🎧 收听语音</value>
+  </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>计算中...</value>
   </data>
@@ -152,6 +155,12 @@
   </data>
   <data name="MainTitle" xml:space="preserve">
     <value>语音导览</value>
+  </data>
+  <data name="MapsExternal" xml:space="preserve">
+    <value>📍 外部导航</value>
+  </data>
+  <data name="MapsThisRoute" xml:space="preserve">
+    <value>&#x8;🗺️ 导航此路线</value>
   </data>
   <data name="MapTabTitle" xml:space="preserve">
     <value>地图</value>
@@ -162,8 +171,17 @@
   <data name="QRTitle" xml:space="preserve">
     <value>扫描二维码</value>
   </data>
+  <data name="ReadLanguage" xml:space="preserve">
+    <value>语音语言:</value>
+  </data>
+  <data name="RouteDetails" xml:space="preserve">
+    <value>详细路线</value>
+  </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>搜索地点...</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>选择语言</value>
   </data>
   <data name="SetAppInfo" xml:space="preserve">
     <value>应用信息</value>
@@ -180,6 +198,9 @@
   <data name="SetVersion" xml:space="preserve">
     <value>版本 1.0</value>
   </data>
+  <data name="StopAudio" xml:space="preserve">
+    <value>🛑 停止语音</value>
+  </data>
   <data name="TabFavorite" xml:space="preserve">
     <value>收藏</value>
   </data>
@@ -194,6 +215,9 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>设置</value>
+  </data>
+  <data name="ViewOnAppMap" xml:space="preserve">
+    <value>🗺️ 在应用地图上查看</value>
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>欢迎参加：{0} 路线。 预计时间：{1}。</value>

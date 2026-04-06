@@ -16,7 +16,7 @@
                             <Label Text="{x:Static lang:AppLang.ExploreTitle}" FontSize="30" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
                             <Label Text="{x:Static lang:AppLang.ExploreSubtitle}" FontSize="15" TextColor="#8D7A6D"/>
                         </VerticalStackLayout>
-                        <Picker x:Name="NarrationLangPicker" Grid.Column="1" WidthRequest="140" TextColor="#C0502E" TitleColor="#8D7A6D" FontAttributes="Bold" Title="Giọng đọc">
+                        <Picker x:Name="NarrationLangPicker" Grid.Column="1" WidthRequest="140" TextColor="#C0502E" TitleColor="#8D7A6D" FontAttributes="Bold" Title="Giọng đọc" SelectedIndexChanged="OnNarrationLangChanged">
                             <Picker.Items>
                                 <x:String>🇻🇳 Tiếng Việt</x:String>
                                 <x:String>🇬🇧 English</x:String>
@@ -27,19 +27,8 @@
                         </Picker>
                     </Grid>
 
-                    <Frame Margin="20,10"
-                           Padding="0"
-                           CornerRadius="20"
-                           BackgroundColor="White"
-                           HasShadow="False">
-                        <SearchBar
-                                    Placeholder="Tìm lộ trình, địa điểm..."
-                                    BackgroundColor="Transparent"
-                                    TextColor="#4A3A31"
-                                    PlaceholderColor="#8D7A6D"
-                                    CancelButtonColor="#C0502E"
-                                    TextChanged="OnSearchTextChanged"
-                                    SearchButtonPressed="OnSearchButtonPressed"/>
+                    <Frame Margin="20,10" Padding="0" CornerRadius="20" BackgroundColor="White" HasShadow="False">
+                        <SearchBar Placeholder="{x:Static lang:AppLang.SearchPlaceholder}" BackgroundColor="Transparent" TextColor="#4A3A31" PlaceholderColor="#8D7A6D" CancelButtonColor="#C0502E" TextChanged="OnSearchTextChanged" SearchButtonPressed="OnSearchButtonPressed"/>
                     </Frame>
 
                     <Label Text="{x:Static lang:AppLang.FeaturedTours}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" Margin="20,0"/>
@@ -57,12 +46,14 @@
 
                                     <Grid RowDefinitions="140, Auto">
                                         <Image Grid.Row="0" Source="{Binding FullImageUrl, TargetNullValue='img_tour_default.jpg', FallbackValue='img_tour_default.jpg'}" Aspect="AspectFill" BackgroundColor="#D3C9C1"/>
+
                                         <Frame Grid.Row="0" HorizontalOptions="End" VerticalOptions="Start" Margin="15" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0">
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnTourPlayAudioTapped" CommandParameter="{Binding .}"/>
                                             </Frame.GestureRecognizers>
-                                            <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                                            <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                                         </Frame>
+
                                         <VerticalStackLayout Grid.Row="1" Padding="20">
                                             <Label Text="{Binding CurrentName}" FontSize="18" FontAttributes="Bold" TextColor="#4A3A31" MaxLines="1" LineBreakMode="TailTruncation"/>
                                             <HorizontalStackLayout Margin="0,8,0,0" Spacing="5">
@@ -101,11 +92,12 @@
                                                 </Frame>
                                             </HorizontalStackLayout>
                                         </VerticalStackLayout>
+
                                         <Frame Grid.Column="2" WidthRequest="40" HeightRequest="40" CornerRadius="20" BackgroundColor="#C0502E" Padding="0" VerticalOptions="Center">
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnPoiPlayAudioTapped" CommandParameter="{Binding .}"/>
                                             </Frame.GestureRecognizers>
-                                            <Label Text="▶" FontSize="18" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                                            <Label Text="▶" FontSize="18" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                                         </Frame>
                                     </Grid>
                                 </Frame>
@@ -130,7 +122,7 @@
 
                 <Grid ColumnDefinitions="*, Auto" Padding="25,0,25,15">
                     <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                        <Label Text="LỘ TRÌNH CHI TIẾT" FontSize="13" TextColor="#C0502E" FontAttributes="Bold"/>
+                        <Label Text="{x:Static lang:AppLang.RouteDetails}" FontSize="13" TextColor="#C0502E" FontAttributes="Bold"/>
                         <Label x:Name="lblPopupTourName" Text="Tên Tour..." FontSize="22" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif" Margin="0,2,0,0" MaxLines="1" LineBreakMode="TailTruncation"/>
                     </VerticalStackLayout>
 
@@ -142,7 +134,7 @@
                     </Frame>
                 </Grid>
 
-                <Button Text="🗺️ Dẫn đường lộ trình này"
+                <Button Text="{x:Static lang:AppLang.MapsThisRoute}"
                         BackgroundColor="#27AE60" TextColor="White" FontAttributes="Bold" CornerRadius="25"
                         Margin="20,0,20,15" HeightRequest="50"
                         Clicked="OnNavigateTourClicked"/>
@@ -176,7 +168,7 @@
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnPoiPlayAudioTapped" CommandParameter="{Binding .}"/>
                                             </Frame.GestureRecognizers>
-                                            <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="2,0,0,0"/>
+                                            <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                                         </Frame>
                                     </Grid>
                                 </Frame>

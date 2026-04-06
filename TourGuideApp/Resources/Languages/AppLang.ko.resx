@@ -144,6 +144,9 @@
   <data name="FreeExploration" xml:space="preserve">
     <value>자유 탐험</value>
   </data>
+  <data name="ListenAudio" xml:space="preserve">
+    <value>🎧 오디오 듣기</value>
+  </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>계산 중...</value>
   </data>
@@ -152,6 +155,12 @@
   </data>
   <data name="MainTitle" xml:space="preserve">
     <value>오디오 가이드</value>
+  </data>
+  <data name="MapsExternal" xml:space="preserve">
+    <value>📍 외부 길찾기</value>
+  </data>
+  <data name="MapsThisRoute" xml:space="preserve">
+    <value>🗺️ 이 경로 안내</value>
   </data>
   <data name="MapTabTitle" xml:space="preserve">
     <value>지도</value>
@@ -162,8 +171,17 @@
   <data name="QRTitle" xml:space="preserve">
     <value>QR 코드 스캔</value>
   </data>
+  <data name="ReadLanguage" xml:space="preserve">
+    <value>음성 언어:</value>
+  </data>
+  <data name="RouteDetails" xml:space="preserve">
+    <value>상세 경로</value>
+  </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>장소 검색...</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>언어 선택</value>
   </data>
   <data name="SetAppInfo" xml:space="preserve">
     <value>앱 정보</value>
@@ -180,6 +198,9 @@
   <data name="SetVersion" xml:space="preserve">
     <value>버전 1.0</value>
   </data>
+  <data name="StopAudio" xml:space="preserve">
+    <value>🛑 오디오 중지</value>
+  </data>
   <data name="TabFavorite" xml:space="preserve">
     <value>즐겨찾기</value>
   </data>
@@ -194,6 +215,9 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>설정</value>
+  </data>
+  <data name="ViewOnAppMap" xml:space="preserve">
+    <value>🗺️ 앱 지도에서 보기</value>
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>투어에 오신 것을 환영합니다: {0}. 예상 시간: {1}.</value>

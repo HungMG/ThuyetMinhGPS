@@ -9,7 +9,10 @@
              Shell.NavBarIsVisible="False">
 
     <Grid>
-        <mapsui:MapView x:Name="tourMap" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+        <mapsui:MapView x:Name="tourMap" 
+                        VerticalOptions="Fill" 
+                        HorizontalOptions="Fill"
+                        PinClicked="TourMap_PinClicked"/>
 
         <Frame WidthRequest="55" HeightRequest="55" CornerRadius="27.5" BackgroundColor="White" 
                HorizontalOptions="End" VerticalOptions="End" Margin="0, 0, 20, 20" 
@@ -20,75 +23,73 @@
             <Label Text="🎯" FontSize="26" HorizontalOptions="Center" VerticalOptions="Center"/>
         </Frame>
 
-        <Frame Margin="15,20,15,0" Padding="0" CornerRadius="25" HasShadow="True"
-               VerticalOptions="Start" HorizontalOptions="Fill" BackgroundColor="White"
-               BorderColor="#E8E0D5">
+        <Grid ColumnDefinitions="*, Auto" Margin="15,20,15,0" VerticalOptions="Start">
+            <Frame Padding="0" CornerRadius="25" HasShadow="True" BackgroundColor="White" BorderColor="#E8E0D5">
+                <SearchBar x:Name="mapSearchBar"
+                           Placeholder="{x:Static lang:AppLang.SearchPlaceholder}"
+                           TextColor="#4A3A31" PlaceholderColor="Gray" 
+                           BackgroundColor="Transparent" CancelButtonColor="#C0502E"
+                           SearchButtonPressed="OnSearchButtonPressed"
+                           TextChanged="OnSearchBarTextChanged"/>
+            </Frame>
+        </Grid>
 
-            <SearchBar x:Name="mapSearchBar"
-                       Placeholder="{x:Static lang:AppLang.SearchPlaceholder}"
-                       TextColor="#4A3A31" 
-                       PlaceholderColor="Gray" 
-                       BackgroundColor="Transparent"
-                       CancelButtonColor="#C0502E"
-                       SearchButtonPressed="OnSearchButtonPressed"
-                       TextChanged="OnSearchBarTextChanged"/>
-        </Frame>
-
-        <bs:BottomSheet x:Name="poiDetailPopup"
-                        IsOpen="False" 
-                        HasHandle="True"
-                        IsModal="True"
-                        CornerRadius="24">
-
+        <bs:BottomSheet x:Name="poiDetailPopup" IsOpen="False" HasHandle="True" IsModal="True" CornerRadius="24">
             <bs:BottomSheetContent>
                 <bs:BottomSheetContent.Content>
-                    <VerticalStackLayout Padding="20" Spacing="15" Margin="0,15,0,0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, *, Auto" Padding="20" BackgroundColor="White" HeightRequest="550">
 
-                        <BoxView WidthRequest="40" HeightRequest="4" CornerRadius="2" BackgroundColor="#E8E0D5" HorizontalOptions="Center"/>
-
-                        <Frame HeightRequest="180" CornerRadius="16" HasShadow="False" Padding="0" BorderColor="#E8E0D5">
-                            <Image x:Name="imgPoiImage" Aspect="AspectFill" Source="img_default_poi.png"/>
-                        </Frame>
-
-                        <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
-                            <Label Grid.Column="0" x:Name="lblPoiName" Text="Tên địa điểm..." FontSize="22" FontAttributes="Bold" TextColor="#2C3E50" FontFamily="Serif" VerticalOptions="Center" MaxLines="2" LineBreakMode="TailTruncation"/>
-
-                            <Frame Grid.Column="1" WidthRequest="40" HeightRequest="40" CornerRadius="20" Padding="0" HasShadow="False" BackgroundColor="#F8F9FA" BorderColor="#E8E0D5" VerticalOptions="Center">
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnFavoriteTapped"/>
-                                </Frame.GestureRecognizers>
-                                <Label x:Name="lblFavoriteIcon" Text="🤍" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Row="0" Spacing="10">
+                            <BoxView WidthRequest="40" HeightRequest="4" CornerRadius="2" BackgroundColor="#E8E0D5" HorizontalOptions="Center" Margin="0,0,0,10"/>
+                            <Frame HeightRequest="150" CornerRadius="16" HasShadow="False" Padding="0" BorderColor="#E8E0D5">
+                                <Image x:Name="imgPoiImage" Aspect="AspectFill" Source="img_default_poi.png"/>
                             </Frame>
-                        </Grid>
-                        <HorizontalStackLayout Spacing="5">
-                            <Label Text="📍" FontSize="14" VerticalOptions="Center"/>
-                            <Label x:Name="lblPoiAddress" Text="..." FontSize="14" TextColor="#7F8C8D"/>
-                        </HorizontalStackLayout>
 
-                        <BoxView HeightRequest="1" BackgroundColor="#E8E0D5" Margin="0,5"/>
+                            <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center">
+                                <Label Grid.Column="0" x:Name="lblPoiName" Text="Tên địa điểm..." FontSize="20" FontAttributes="Bold" TextColor="#2C3E50" MaxLines="2" LineBreakMode="TailTruncation"/>
+                                <Frame Grid.Column="1" WidthRequest="40" HeightRequest="40" CornerRadius="20" Padding="0" HasShadow="False" BackgroundColor="#F8F9FA" BorderColor="#E8E0D5" VerticalOptions="Center">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnFavoriteTapped"/>
+                                    </Frame.GestureRecognizers>
+                                    <Label x:Name="lblFavoriteIcon" Text="🤍" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Frame>
+                            </Grid>
 
-                        <Label x:Name="lblPoiDescription" Text="Mô tả chi tiết..." FontSize="14" TextColor="#34495E" LineHeight="1.3" MaxLines="10" LineBreakMode="WordWrap"/>
+                            <Label x:Name="lblPoiAddress" Text="..." FontSize="13" TextColor="#7F8C8D"/>
 
-                        <Grid ColumnDefinitions="*, *" ColumnSpacing="15" Margin="0,10,0,10">
+                            <Grid ColumnDefinitions="Auto, *" Margin="0,5">
+                                <Label Text="{x:Static lang:AppLang.ReadLanguage}" VerticalOptions="Center" FontSize="13" TextColor="#8D7A6D"/>
+                                <Picker x:Name="PopupLangPicker" Grid.Column="1" Margin="10,0,0,0" 
+                                        Title="{x:Static lang:AppLang.SelectLanguage}" 
+                                        TextColor="#C0502E" FontAttributes="Bold"
+                                        SelectedIndexChanged="OnPopupLangChanged">
+                                    <Picker.Items>
+                                        <x:String>🇻🇳 Tiếng Việt</x:String>
+                                        <x:String>🇬🇧 English</x:String>
+                                        <x:String>🇨🇳 中文</x:String>
+                                        <x:String>🇰🇷 한국어</x:String>
+                                        <x:String>🇯🇵 日本語</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </Grid>
+                            <BoxView HeightRequest="1" BackgroundColor="#F0F0F0"/>
+                        </VerticalStackLayout>
 
-                            <Button Grid.Column="0" 
-                                    Text="🎧 Nghe Audio" 
+                        <ScrollView Grid.Row="1" Margin="0,10">
+                            <Label x:Name="lblPoiDescription" Text="Mô tả..." FontSize="14" TextColor="#34495E" LineHeight="1.4"/>
+                        </ScrollView>
+
+                        <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="15" Padding="0,10,0,0">
+                            <Button Grid.Column="0" x:Name="btnReadAudio" Text="{x:Static lang:AppLang.ListenAudio}" 
                                     BackgroundColor="#F39C12" TextColor="White" FontAttributes="Bold"
-                                    CornerRadius="25"
-                                    Clicked="OnReadDescriptionClicked" />
-
-                            <Button Grid.Column="1"
-                                    Text="📍 Chỉ đường" 
+                                    CornerRadius="25" Clicked="OnReadDescriptionClicked" />
+                            <Button Grid.Column="1" Text="{x:Static lang:AppLang.MapsExternal}" 
                                     BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold"
-                                    CornerRadius="25"
-                                    Clicked="OnNavigationClicked" />
+                                    CornerRadius="25" Clicked="OnNavigationClicked" />
                         </Grid>
-
-                    </VerticalStackLayout>
+                    </Grid>
                 </bs:BottomSheetContent.Content>
             </bs:BottomSheetContent>
         </bs:BottomSheet>
-
     </Grid>
-
 </ContentPage>

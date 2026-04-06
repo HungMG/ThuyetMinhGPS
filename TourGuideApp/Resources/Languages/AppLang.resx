@@ -144,6 +144,9 @@
   <data name="FreeExploration" xml:space="preserve">
     <value>Khám phá tự do</value>
   </data>
+  <data name="ListenAudio" xml:space="preserve">
+    <value>🎧 Nghe Audio</value>
+  </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>Đang tính...</value>
   </data>
@@ -152,6 +155,12 @@
   </data>
   <data name="MainTitle" xml:space="preserve">
     <value>Điểm Thuyết Minh</value>
+  </data>
+  <data name="MapsExternal" xml:space="preserve">
+    <value>📍 Chỉ đường ngoài</value>
+  </data>
+  <data name="MapsThisRoute" xml:space="preserve">
+    <value>🗺️ Dẫn đường lộ trình này</value>
   </data>
   <data name="MapTabTitle" xml:space="preserve">
     <value>Bản đồ</value>
@@ -162,8 +171,17 @@
   <data name="QRTitle" xml:space="preserve">
     <value>Quét mã QR</value>
   </data>
+  <data name="ReadLanguage" xml:space="preserve">
+    <value>Ngôn ngữ đọc:</value>
+  </data>
+  <data name="RouteDetails" xml:space="preserve">
+    <value>LỘ TRÌNH CHI TIẾT</value>
+  </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Tìm kiếm địa điểm...</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Chọn ngôn ngữ</value>
   </data>
   <data name="SetAppInfo" xml:space="preserve">
     <value>Thông tin ứng dụng</value>
@@ -180,6 +198,9 @@
   <data name="SetVersion" xml:space="preserve">
     <value>Phiên bản 1.0</value>
   </data>
+  <data name="StopAudio" xml:space="preserve">
+    <value>🛑 Dừng thuyết minh</value>
+  </data>
   <data name="TabFavorite" xml:space="preserve">
     <value>Yêu thích</value>
   </data>
@@ -194,6 +215,9 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Cài đặt</value>
+  </data>
+  <data name="ViewOnAppMap" xml:space="preserve">
+    <value>🗺️ Xem trên Bản đồ App</value>
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>Chào mừng bạn đến với lộ trình {0}. Thời gian dự kiến là {1}.</value>

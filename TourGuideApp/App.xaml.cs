@@ -10,17 +10,27 @@ public partial class App : Application
     {
         InitializeComponent();
 
+        // =========================================================
+        // 🌟 BƯỚC 1: KHÓA CHẶT ĐỊNH DẠNG SỐ LÀ DẤU CHẤM (CỨU TINH CỦA GPS)
+        // =========================================================
+        // Khóa cho luồng mặc định (các luồng đẻ ra sau này cũng bị khóa)
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        // Khóa cho luồng chạy giao diện hiện tại
+        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+
         string savedLang = Preferences.Get("AppLanguage", "");
 
         if (string.IsNullOrEmpty(savedLang))
         {
-            // 🌟 CỦA BẠN: MainPage = new StartPage();
-            // 🌟 SỬA THÀNH: Bao bọc trong NavigationPage để có thể dùng PushAsync
+            // Chưa chọn ngôn ngữ -> Mở trang StartPage
             MainPage = new NavigationPage(new StartPage());
         }
         else
         {
-            // 🌟 Đã chọn rồi -> Nạp ngôn ngữ đó lên
+            // =========================================================
+            // 🌟 BƯỚC 2: CÀI ĐẶT NGÔN NGỮ HIỂN THỊ (CHỮ)
+            // =========================================================
             string cultureCode = savedLang switch
             {
                 "en" => "en-US",
@@ -30,13 +40,18 @@ public partial class App : Application
                 _ => "vi-VN"
             };
 
-            var culture = new CultureInfo(cultureCode);
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
-            AppLang.Culture = culture;
+            var uiCulture = new CultureInfo(cultureCode);
 
-            // 🌟 VÀ QUAN TRỌNG NHẤT: Bỏ qua trang chọn ngôn ngữ, nhảy thẳng vô App chính!
-            // 👇 Đã sửa StartPage thành AppShell (Trang chứa các Tab)
+    
+            CultureInfo.DefaultThreadCurrentUICulture = uiCulture;
+
+      
+            Thread.CurrentThread.CurrentUICulture = uiCulture;
+
+        
+            AppLang.Culture = uiCulture;
+
+            // Nhảy thẳng vào App chính
             MainPage = new AppShell();
         }
     }

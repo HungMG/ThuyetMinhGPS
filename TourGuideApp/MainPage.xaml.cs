@@ -18,6 +18,13 @@ public partial class MainPage : ContentPage
     private List<POI> _allPois = new List<POI>();
     private List<Tour> _allTours = new List<Tour>();
 
+    private bool _isDataLoaded = false;
+
+    // 🌟 BIẾN QUẢN LÝ TRẠNG THÁI NÚT AUDIO
+    private Frame _currentPlayingFrame;
+    private Label _currentPlayingLabel;
+    private bool _isAudioPlaying = false;
+
     public MainPage()
     {
         InitializeComponent();
@@ -25,29 +32,78 @@ public partial class MainPage : ContentPage
         _dbService = new DatabaseService();
     }
 
-    // 🌟 1. SỬA LẠI: Thêm async và await để App kiên nhẫn chờ lấy Database xong mới chạy tiếp
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (NarrationLangPicker.SelectedIndex == -1) NarrationLangPicker.SelectedIndex = 0;
-        await LoadDataAsync();
+
+        if (NarrationLangPicker.SelectedIndex == -1)
+        {
+            string systemLang = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLower();
+            string currentLang = Preferences.Get("AppLanguage", systemLang);
+            NarrationLangPicker.SelectedIndex = currentLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
+        }
+
+        if (!_isDataLoaded)
+        {
+            await LoadDataAsync();
+            _isDataLoaded = true;
+        }
     }
 
-    // ==========================================================
-    // 🌟 TẢI DỮ LIỆU & TÍNH KHOẢNG CÁCH
-    // ==========================================================
-    // ==========================================================
-    // 🌟 TẢI DỮ LIỆU (ĐÃ FIX LỖI KẸT GPS GÂY TRẮNG MÀN HÌNH)
-    // ==========================================================
+    // 🌟 HÀM RESET NÚT AUDIO VỀ TRẠNG THÁI BAN ĐẦU
+    private void ResetAudioButton()
+    {
+        if (_currentPlayingFrame != null && _currentPlayingLabel != null)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                _currentPlayingLabel.Text = "▶";
+                _currentPlayingFrame.BackgroundColor = Color.FromArgb("#C0502E");
+            });
+        }
+    }
+
+    // Tắt tiếng khi chuyển sang tab khác
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        if (_isAudioPlaying)
+        {
+            _narrationEngine.Stop();
+            _isAudioPlaying = false;
+            ResetAudioButton();
+        }
+    }
+
+    private void OnNarrationLangChanged(object sender, EventArgs e)
+    {
+        string selectedLang = NarrationLangPicker.SelectedIndex switch
+        {
+            1 => "en",
+            2 => "zh",
+            3 => "ko",
+            4 => "ja",
+            _ => "vi"
+        };
+
+        Preferences.Set("AppLanguage", selectedLang);
+
+        // Nếu đổi ngôn ngữ lúc đang đọc thì ép nó nín
+        if (_isAudioPlaying)
+        {
+            _narrationEngine.Stop();
+            _isAudioPlaying = false;
+            ResetAudioButton();
+        }
+    }
+
     private async Task LoadDataAsync()
     {
-        // 1. TẢI NHANH TỪ DATABASE
         var danhSachTour = await _dbService.GetAllToursAsync();
         if (danhSachTour != null) _allTours = danhSachTour;
 
         _allPois = await _dbService.GetAllPOIsAsync() ?? new List<POI>();
 
-        // 2. ÉP ĐỔ DỮ LIỆU LÊN MÀN HÌNH NGAY LẬP TỨC CHO KHÁCH THẤY
         MainThread.BeginInvokeOnMainThread(() =>
         {
             tourListView.ItemsSource = null;
@@ -55,10 +111,8 @@ public partial class MainPage : ContentPage
             BindableLayout.SetItemsSource(poiStackLayout, _allPois);
         });
 
-        // 3. RẢNH RỖI MỚI ĐI XIN QUYỀN VÀ DÒ GPS (Chạy ngầm không làm đơ App)
         await GetUserLocationAsync();
 
-        // 4. CÓ GPS RỒI THÌ TÍNH SỐ KM VÀ SẮP XẾP LẠI (Cập nhật lần 2)
         if (_userLocation != null && _allPois.Any())
         {
             foreach (var poi in _allPois)
@@ -75,6 +129,7 @@ public partial class MainPage : ContentPage
             });
         }
     }
+
     private async Task GetUserLocationAsync()
     {
         try
@@ -91,9 +146,6 @@ public partial class MainPage : ContentPage
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
     }
 
-    // ==========================================================
-    // 🌟 THANH TÌM KIẾM
-    // ==========================================================
     private void FilterData(string keyword)
     {
         keyword = keyword?.ToLower();
@@ -131,9 +183,6 @@ public partial class MainPage : ContentPage
         FilterData((sender as SearchBar)?.Text);
     }
 
-    // ==========================================================
-    // 🌟 SỰ KIỆN CHẠM TRỰC TIẾP VÀO THẺ TOUR
-    // ==========================================================
     private void OnTourCardTapped(object sender, TappedEventArgs e)
     {
         if (e.Parameter is Tour selectedTour)
@@ -166,9 +215,6 @@ public partial class MainPage : ContentPage
         blackOverlay.IsVisible = false;
     }
 
-    // ==========================================================
-    // SỰ KIỆN: KHI BẤM VÀO THẺ POI (NHẢY SANG BẢN ĐỒ)
-    // ==========================================================
     private async void OnPoiCardTapped(object sender, TappedEventArgs e)
     {
         if (e.Parameter is POI selectedPoi)
@@ -190,36 +236,118 @@ public partial class MainPage : ContentPage
         {
             bool isTourSuccess = await _apiService.SyncToursAsync(_dbService);
             bool isPoiSuccess = await _apiService.SyncPOIsAsync(_dbService);
-            // 🌟 3. SỬA LẠI: Chờ LoadDataAsync xong mới tắt vòng xoay
             if (isTourSuccess || isPoiSuccess) await LoadDataAsync();
         }
         catch { }
         finally { mainRefreshView.IsRefreshing = false; }
     }
 
+    // ==========================================================
+    // 🌟 XỬ LÝ AUDIO CHO TOUR BẤM ĐỂ DỪNG/PHÁT
+    // ==========================================================
     private async void OnTourPlayAudioTapped(object sender, TappedEventArgs e)
     {
-        if (e.Parameter is Tour tour)
+        var frame = sender as Frame;
+        var label = frame?.Content as Label;
+        if (e.Parameter is not Tour tour) return;
+
+        // 1. Đang phát chính nó -> Bấm để DỪNG
+        if (_isAudioPlaying && _currentPlayingFrame == frame)
         {
-            string lang = NarrationLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
-            string introText = lang switch { "en" => $"{tour.Name_EN}. {tour.Description_EN}", _ => $"{tour.Name_VI}. {tour.Description_VI}" };
-            await _narrationEngine.SpeakAsync(introText, lang);
+            _narrationEngine.Stop();
+            _isAudioPlaying = false;
+            ResetAudioButton();
+            return;
         }
+
+        // 2. Dừng audio cũ (nếu có bài khác đang hát)
+        if (_isAudioPlaying)
+        {
+            _narrationEngine.Stop();
+            ResetAudioButton();
+        }
+
+        // 3. Đổi giao diện nút thành 🛑
+        _currentPlayingFrame = frame;
+        _currentPlayingLabel = label;
+        _isAudioPlaying = true;
+
+        if (label != null) label.Text = "🛑";
+        if (frame != null) frame.BackgroundColor = Colors.Black;
+
+        // 4. Lấy ngôn ngữ và phát Audio
+        string lang = NarrationLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
+
+        // Cập nhật lấy full đa ngôn ngữ cho Tour
+        string textToRead = lang switch
+        {
+            "en" => $"{tour.Name_EN}. {tour.Description_EN}",
+            "zh" => $"{tour.Name_ZH}. {tour.Description_ZH}",
+            "ko" => $"{tour.Name_KO}. {tour.Description_KO}",
+            "ja" => $"{tour.Name_JA}. {tour.Description_JA}",
+            _ => $"{tour.Name_VI}. {tour.Description_VI}"
+        };
+
+        await _narrationEngine.SpeakAsync(textToRead, lang);
+
+        // 5. Đọc xong tự Reset
+        _isAudioPlaying = false;
+        ResetAudioButton();
     }
 
+    // ==========================================================
+    // 🌟 XỬ LÝ AUDIO CHO POI BẤM ĐỂ DỪNG/PHÁT
+    // ==========================================================
     private async void OnPoiPlayAudioTapped(object sender, TappedEventArgs e)
     {
-        if (e.Parameter is POI poi)
+        var frame = sender as Frame;
+        var label = frame?.Content as Label;
+        if (e.Parameter is not POI poi) return;
+
+        // 1. Đang phát chính nó -> Bấm để DỪNG
+        if (_isAudioPlaying && _currentPlayingFrame == frame)
         {
-            string lang = NarrationLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
-            string textToRead = lang switch { "en" => $"{poi.Name_EN}. {poi.Description_EN}", _ => $"{poi.Name_VI}. {poi.Description_VI}" };
-            await _narrationEngine.SpeakAsync(textToRead, lang);
+            _narrationEngine.Stop();
+            _isAudioPlaying = false;
+            ResetAudioButton();
+            return;
         }
+
+        // 2. Dừng audio cũ
+        if (_isAudioPlaying)
+        {
+            _narrationEngine.Stop();
+            ResetAudioButton();
+        }
+
+        // 3. Đổi giao diện nút thành 🛑
+        _currentPlayingFrame = frame;
+        _currentPlayingLabel = label;
+        _isAudioPlaying = true;
+
+        if (label != null) label.Text = "🛑";
+        if (frame != null) frame.BackgroundColor = Colors.Black;
+
+        // 4. Lấy ngôn ngữ và phát Audio
+        string lang = NarrationLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
+
+        // Cập nhật lấy full đa ngôn ngữ cho POI
+        string textToRead = lang switch
+        {
+            "en" => $"{poi.Name_EN}. {poi.Description_EN}",
+            "zh" => $"{poi.Name_ZH}. {poi.Description_ZH}",
+            "ko" => $"{poi.Name_KO}. {poi.Description_KO}",
+            "ja" => $"{poi.Name_JA}. {poi.Description_JA}",
+            _ => $"{poi.Name_VI}. {poi.Description_VI}"
+        };
+
+        await _narrationEngine.SpeakAsync(textToRead, lang);
+
+        // 5. Đọc xong tự Reset
+        _isAudioPlaying = false;
+        ResetAudioButton();
     }
 
-    // ==========================================================
-    // 🌟 DẪN ĐƯỜNG ĐI TOUR BẰNG GOOGLE MAPS
-    // ==========================================================
     private async void OnNavigateTourClicked(object sender, EventArgs e)
     {
         var poisInTour = BindableLayout.GetItemsSource(popupPoiStackLayout) as List<POI>;

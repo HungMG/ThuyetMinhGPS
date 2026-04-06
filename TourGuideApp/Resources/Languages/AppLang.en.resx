@@ -144,6 +144,9 @@
   <data name="FreeExploration" xml:space="preserve">
     <value>Free Exploration</value>
   </data>
+  <data name="ListenAudio" xml:space="preserve">
+    <value>🎧 Listen to Audio</value>
+  </data>
   <data name="MainCalculating" xml:space="preserve">
     <value>Calculating...</value>
   </data>
@@ -152,6 +155,12 @@
   </data>
   <data name="MainTitle" xml:space="preserve">
     <value>Audio Guides</value>
+  </data>
+  <data name="MapsExternal" xml:space="preserve">
+    <value>📍 External Navigation</value>
+  </data>
+  <data name="MapsThisRoute" xml:space="preserve">
+    <value>🗺️ Navigate this route</value>
   </data>
   <data name="MapTabTitle" xml:space="preserve">
     <value>Map</value>
@@ -162,8 +171,17 @@
   <data name="QRTitle" xml:space="preserve">
     <value>Scan QR Code</value>
   </data>
+  <data name="ReadLanguage" xml:space="preserve">
+    <value>Voice language:</value>
+  </data>
+  <data name="RouteDetails" xml:space="preserve">
+    <value>ROUTE DETAILS</value>
+  </data>
   <data name="SearchPlaceholder" xml:space="preserve">
     <value>Search places...</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select language</value>
   </data>
   <data name="SetAppInfo" xml:space="preserve">
     <value>App Information</value>
@@ -180,6 +198,9 @@
   <data name="SetVersion" xml:space="preserve">
     <value>Version 1.0</value>
   </data>
+  <data name="StopAudio" xml:space="preserve">
+    <value>🛑 Stop Audio</value>
+  </data>
   <data name="TabFavorite" xml:space="preserve">
     <value>Favorites</value>
   </data>
@@ -194,6 +215,9 @@
   </data>
   <data name="TabSettings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="ViewOnAppMap" xml:space="preserve">
+    <value>🗺️ View on App Map</value>
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>Welcome to the {0} tour. Estimated time: {1}.</value>
