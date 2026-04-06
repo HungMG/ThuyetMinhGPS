@@ -12,7 +12,7 @@ namespace TourGuideApp.Services
         {
             _httpClient = new HttpClient();
             // ⚠️ Nhớ đổi cái IP này thành IP máy tính của sếp hiện tại nhé!
-            _httpClient.BaseAddress = new Uri("http://10.193.30.181:5136/");
+            _httpClient.BaseAddress = new Uri("http://192.168.1.40:5136/");
         }
 
         // 1. Chạy lên mạng gom Tour về giao cho Thủ kho

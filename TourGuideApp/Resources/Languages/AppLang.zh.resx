@@ -165,6 +165,27 @@
   <data name="MapTabTitle" xml:space="preserve">
     <value>地图</value>
   </data>
+  <data name="SetLanguage" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="OfflineBtnDownload" xml:space="preserve">
+    <value>立即下载</value>
+  </data>
+  <data name="OfflineCity" xml:space="preserve">
+    <value>胡志明市</value>
+  </data>
+  <data name="OfflineDesc" xml:space="preserve">
+    <value>下载地图数据和语音解说，以便在无网络连接时离线使用。</value>
+  </data>
+  <data name="OfflineSize" xml:space="preserve">
+    <value>预计大小：~50MB</value>
+  </data>
+  <data name="OfflineStatusPending" xml:space="preserve">
+    <value>未下载</value>
+  </data>
+  <data name="OfflineTitle" xml:space="preserve">
+    <value>离线地图包</value>
+  </data>
   <data name="QRSubtitle" xml:space="preserve">
     <value>将二维码放入框内</value>
   </data>
@@ -221,5 +242,11 @@
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>欢迎参加：{0} 路线。 预计时间：{1}。</value>
+  </data>
+  <data name="FavEmptySub" xml:space="preserve">
+    <value>探索地图并点赞吧！</value>
+  </data>
+  <data name="RemoveFav" xml:space="preserve">
+    <value>💔 取消收藏</value>
   </data>
 </root>

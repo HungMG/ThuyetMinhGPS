@@ -6,6 +6,10 @@ using TourGuideApp.Models;
 using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
+using BruTile.Cache;
+using BruTile.Predefined;
+using Mapsui.Tiling.Layers;
+using System.IO;
 
 namespace TourGuideApp.Views;
 
@@ -19,6 +23,9 @@ public partial class MapPage : ContentPage
     private double _targetLat = 0;
     private double _targetLon = 0;
     private bool _isAudioPlaying = false;
+    private GeofenceEngine _geofenceEngine = new GeofenceEngine();
+    private IDispatcherTimer _geofenceTimer;
+
 
     // 🌟 VŨ KHÍ MỚI: Tự tạo một cây cờ riêng làm GPS thay cho cái chấm mặc định bị lỗi
     private Pin _myLocationPin;
@@ -30,7 +37,27 @@ public partial class MapPage : ContentPage
         _currentTourId = tourId;
 
         if (tourMap.Map == null) tourMap.Map = new Mapsui.Map();
-        tourMap.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
+
+        // =======================================================
+        // 🌟 BÍ THUẬT BẢN ĐỒ OFFLINE: TỰ ĐỘNG LƯU VÀO CACHE 🌟
+        // =======================================================
+        // 1. Tạo thư mục giấu ảnh bản đồ vào sâu trong máy
+        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "MapCache");
+        if (!Directory.Exists(cacheDir))
+        {
+            Directory.CreateDirectory(cacheDir);
+        }
+
+        // 2. Cài đặt bộ nhớ: Lưu file ảnh với thời hạn 1 năm (365 ngày)
+        var fileCache = new FileCache(cacheDir, "tile", new TimeSpan(365, 0, 0, 0));
+
+        // 3. Khởi tạo bản đồ có gắn màng lọc Cache
+        var tileSource = KnownTileSources.Create(KnownTileSource.OpenStreetMap, persistentCache: fileCache);
+        var tileLayer = new TileLayer(tileSource) { Name = "OfflineOSM" };
+
+        // 4. Thêm vào giao diện (Thay thế cho dòng CreateTileLayer cũ)
+        tourMap.Map.Layers.Add(tileLayer);
+        // =======================================================
 
         tourMap.IsZoomButtonVisible = false;
         tourMap.IsNorthingButtonVisible = false;
@@ -39,6 +66,9 @@ public partial class MapPage : ContentPage
         tourMap.MyLocationLayer.Enabled = false;
         tourMap.MyLocationEnabled = false;
     }
+
+    // Nhớ khai báo cái biến Timer này ở trên cùng của class MapPage nha sếp:
+    // private IDispatcherTimer _geofenceTimer;
 
     protected override async void OnAppearing()
     {
@@ -67,6 +97,11 @@ public partial class MapPage : ContentPage
             await FilterAndShowPins("");
             await GetCurrentLocationAsync();
         });
+
+        // ==========================================
+        // 🌟 CẮM ĐIỆN CHO RADAR GEOFENCE CHẠY 🌟
+        // ==========================================
+        StartGeofenceTracker();
     }
 
     protected override void OnDisappearing()
@@ -77,6 +112,48 @@ public partial class MapPage : ContentPage
             _narrationEngine.Stop();
             _isAudioPlaying = false;
         }
+
+        // ==========================================
+        // 🌟 RÚT ĐIỆN RADAR KHI THOÁT RA ĐỂ ĐỠ HAO PIN 🌟
+        // ==========================================
+        _geofenceTimer?.Stop();
+    }
+
+    private void StartGeofenceTracker()
+    {
+        // Nếu radar đang chạy rồi thì thôi, không bật chồng lên nhau
+        if (_geofenceTimer != null && _geofenceTimer.IsRunning) return;
+
+        _geofenceTimer = Application.Current.Dispatcher.CreateTimer();
+        _geofenceTimer.Interval = TimeSpan.FromSeconds(5); // Cứ 5 giây quét GPS 1 lần
+        _geofenceTimer.Tick += async (s, e) =>
+        {
+            try
+            {
+                // Lấy vị trí hiện tại của khách
+                var request = new GeolocationRequest(GeolocationAccuracy.High, TimeSpan.FromSeconds(2));
+                var location = await Geolocation.GetLocationAsync(request);
+
+                // GỌI CỖ MÁY CỦA SẾP RA HOẠT ĐỘNG
+                // LƯU Ý: Chữ "_allPOIs" là tui ví dụ cái danh sách các điểm trên bản đồ của sếp. 
+                // Nếu biến của sếp tên khác (như _danhSachPoi) thì sếp đổi lại cho đúng nha!
+                if (location != null)
+                {
+                    // Gọi hàm kiểm tra sếp đã viết lúc nãy
+                    // Giả sử sếp lấy danh sách POI từ Database
+                    var danhSachPoi = await _dbService.GetAllPOIsAsync();
+                    await CheckGeofenceAndPlayAudio(location, danhSachPoi);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Khách chưa bật GPS hoặc lỗi mạng thì im lặng bỏ qua, không làm văng App
+                Console.WriteLine($"[Lỗi Radar Geofence]: {ex.Message}");
+            }
+        };
+
+        // Bắt đầu đếm nhịp!
+        _geofenceTimer.Start();
     }
 
     // =========================================================
@@ -210,6 +287,42 @@ public partial class MapPage : ContentPage
     private void Geolocation_LocationChanged(object sender, GeolocationLocationChangedEventArgs e)
     {
         UpdateGPSPin(e.Location);
+    }
+    private async Task CheckGeofenceAndPlayAudio(Location userLocation, List<POI> danhSachPoi)
+    {
+        // 1. Kiểm tra công tắc "Tự động đọc" trong Cài đặt
+        bool isAutoAudio = Preferences.Get("AutoAudioEnabled", true);
+        if (!isAutoAudio || _isAudioPlaying) return;
+
+        // 2. DÙNG CỖ MÁY CỦA SẾP ĐỂ TÌM ĐIỂM CHUẨN NHẤT
+        // Nó tự lo hết vụ khoảng cách, bán kính, chống lặp và độ ưu tiên!
+        POI closestPoi = _geofenceEngine.GetBestPOIToTrigger(userLocation.Latitude, userLocation.Longitude, danhSachPoi);
+
+        // 3. Nếu tìm được điểm -> ĐỌC THUYẾT MINH
+        if (closestPoi != null)
+        {
+            _isAudioPlaying = true;
+
+            // Cập nhật lại thời gian vừa phát cho cỗ máy nó nhớ (Để lần sau nó tính Cooldown)
+            closestPoi.LastPlayedTime = DateTime.Now;
+            await _dbService.UpdatePOIAsync(closestPoi); // Lưu vào Database luôn cho chắc
+
+            // Lấy ngôn ngữ hiện tại của App
+            string currentLang = Preferences.Get("AppLanguage", "vi");
+            string textToRead = currentLang switch
+            {
+                "en" => closestPoi.Description_EN,
+                "zh" => closestPoi.Description_ZH,
+                "ko" => closestPoi.Description_KO,
+                "ja" => closestPoi.Description_JA,
+                _ => closestPoi.Description_VI
+            };
+
+            // Đọc tên địa điểm + Mô tả
+            await _narrationEngine.SpeakAsync($"{closestPoi.CurrentName}. {textToRead}", currentLang);
+
+            _isAudioPlaying = false;
+        }
     }
 
     // 🌟 HÀM CẬP NHẬT TỌA ĐỘ CHO CÂY CỜ GPS XANH DƯƠNG

@@ -106,6 +106,15 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hãy dạo quanh bản đồ và thả tim nhé!.
+        /// </summary>
+        public static string FavEmptySub {
+            get {
+                return ResourceManager.GetString("FavEmptySub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Những địa điểm bạn đã lưu lại.
         /// </summary>
         public static string FavSubtitle {
@@ -205,6 +214,60 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TẢI XUỐNG NGAY.
+        /// </summary>
+        public static string OfflineBtnDownload {
+            get {
+                return ResourceManager.GetString("OfflineBtnDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TP. Hồ Chí Minh.
+        /// </summary>
+        public static string OfflineCity {
+            get {
+                return ResourceManager.GetString("OfflineCity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tải dữ liệu để sử dụng bản đồ và nghe thuyết minh không cần mạng Internet..
+        /// </summary>
+        public static string OfflineDesc {
+            get {
+                return ResourceManager.GetString("OfflineDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dung lượng dự kiến: ~50MB.
+        /// </summary>
+        public static string OfflineSize {
+            get {
+                return ResourceManager.GetString("OfflineSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chưa tải.
+        /// </summary>
+        public static string OfflineStatusPending {
+            get {
+                return ResourceManager.GetString("OfflineStatusPending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bản Đồ Ngoại Tuyến.
+        /// </summary>
+        public static string OfflineTitle {
+            get {
+                return ResourceManager.GetString("OfflineTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đưa mã QR vào khung.
         /// </summary>
         public static string QRSubtitle {
@@ -228,6 +291,15 @@ namespace TourGuideApp.Resources.Languages {
         public static string ReadLanguage {
             get {
                 return ResourceManager.GetString("ReadLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 💔 Bỏ yêu thích.
+        /// </summary>
+        public static string RemoveFav {
+            get {
+                return ResourceManager.GetString("RemoveFav", resourceCulture);
             }
         }
         
@@ -273,6 +345,15 @@ namespace TourGuideApp.Resources.Languages {
         public static string SetAutoAudio {
             get {
                 return ResourceManager.GetString("SetAutoAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ngôn ngữ.
+        /// </summary>
+        public static string SetLanguage {
+            get {
+                return ResourceManager.GetString("SetLanguage", resourceCulture);
             }
         }
         

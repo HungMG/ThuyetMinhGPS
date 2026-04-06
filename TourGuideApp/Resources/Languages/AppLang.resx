@@ -165,6 +165,27 @@
   <data name="MapTabTitle" xml:space="preserve">
     <value>Bản đồ</value>
   </data>
+  <data name="SetLanguage" xml:space="preserve">
+    <value>Ngôn ngữ</value>
+  </data>
+  <data name="OfflineBtnDownload" xml:space="preserve">
+    <value>TẢI XUỐNG NGAY</value>
+  </data>
+  <data name="OfflineCity" xml:space="preserve">
+    <value>TP. Hồ Chí Minh</value>
+  </data>
+  <data name="OfflineDesc" xml:space="preserve">
+    <value>Tải dữ liệu để sử dụng bản đồ và nghe thuyết minh không cần mạng Internet.</value>
+  </data>
+  <data name="OfflineSize" xml:space="preserve">
+    <value>Dung lượng dự kiến: ~50MB</value>
+  </data>
+  <data name="OfflineStatusPending" xml:space="preserve">
+    <value>Chưa tải</value>
+  </data>
+  <data name="OfflineTitle" xml:space="preserve">
+    <value>Bản Đồ Ngoại Tuyến</value>
+  </data>
   <data name="QRSubtitle" xml:space="preserve">
     <value>Đưa mã QR vào khung</value>
   </data>
@@ -221,5 +242,11 @@
   </data>
   <data name="WelcomeTourAudio" xml:space="preserve">
     <value>Chào mừng bạn đến với lộ trình {0}. Thời gian dự kiến là {1}.</value>
+  </data>
+  <data name="FavEmptySub" xml:space="preserve">
+    <value>Hãy dạo quanh bản đồ và thả tim nhé!</value>
+  </data>
+  <data name="RemoveFav" xml:space="preserve">
+    <value>💔 Bỏ yêu thích</value>
   </data>
 </root>

@@ -35,17 +35,31 @@ namespace TourGuideApp.Models
             }
         }
 
+        [Ignore]
         [JsonIgnore]
-        [Ignore] // Thêm cái này để SQLite không cố lưu nó vào bảng nhé
         public string FullImageUrl
         {
             get
             {
+                // 0. KHÔNG CÓ ẢNH -> Dùng ảnh mặc định
                 if (string.IsNullOrEmpty(ImageUrl))
-                    return "img_tour_default.jpg";
+                    return "img_poi_default.jpg";
 
-                // ✅ SỬA LẠI ĐÚNG SỐ IP .217 CỦA SẾP NÈ
-                return $"http://192.168.1.231:5136/images/tours/{ImageUrl}";
+                // 1. NẾU LÀ FILE OFFLINE (Đã tải về nằm trong máy)
+                // Đường dẫn trong máy Android/iOS thường bắt đầu bằng "/" hoặc "file://" hoặc "C:\" (Windows)
+                if (ImageUrl.StartsWith("/") || ImageUrl.StartsWith("file://") || ImageUrl.StartsWith("C:\\") || ImageUrl.StartsWith("D:\\"))
+                {
+                    return ImageUrl;
+                }
+
+                // 2. NẾU LÀ LINK WEB HOÀN CHỈNH (Có sẵn chữ http)
+                if (ImageUrl.StartsWith("http"))
+                {
+                    return ImageUrl;
+                }
+
+                // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG (Lấy từ Server của sếp)
+                return $"http://192.168.1.40:5136/images/tours/{ImageUrl}";
             }
         }
     }

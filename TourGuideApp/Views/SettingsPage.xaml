@@ -17,7 +17,7 @@
 
             <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
                 <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Ngôn ngữ / Language" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                    <Label Text="{x:Static lang:AppLang.SetLanguage}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
 
                     <Picker x:Name="LanguagePicker" Grid.Column="1" WidthRequest="140" HorizontalTextAlignment="End" SelectedIndexChanged="OnLanguageChanged">
                         <Picker.Items>
@@ -30,6 +30,7 @@
                     </Picker>
                 </Grid>
             </Frame>
+
             <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Text="{x:Static lang:AppLang.SetAutoAudio}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>

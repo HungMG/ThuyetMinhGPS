@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using TourGuideApp.Resources.Languages;
+using TourGuideApp.Services;
 
 namespace TourGuideApp.Views;
 
@@ -29,7 +30,7 @@ public partial class SettingsPage : ContentPage
     }
 
     // Sự kiện khi người dùng chọn một ngôn ngữ khác trong hộp thoại
-    private async void OnLanguageChanged(object sender, EventArgs e) // 👈 Nhớ thêm chữ 'async' ở đây nha
+    private async void OnLanguageChanged(object sender, EventArgs e)
     {
         // Chặn sự kiện lúc vừa mở trang lên
         if (!_isInitialized) return;
@@ -67,8 +68,7 @@ public partial class SettingsPage : ContentPage
         Thread.CurrentThread.CurrentUICulture = culture;
         AppLang.Culture = culture;
 
-        // 🌟 BÍ KÍP TRỊ VĂNG APP NẰM Ở ĐÂY 🌟
-        // Bắt hệ thống đợi 200 mili-giây cho cái Menu Picker đóng lại an toàn tuyệt đối
+        // 🌟 BÍ KÍP TRỊ VĂNG APP 🌟
         await Task.Delay(200);
 
         // Nhờ MainThread (Luồng chính) từ từ thay đổi giao diện để không bị sốc
@@ -78,9 +78,19 @@ public partial class SettingsPage : ContentPage
         });
     }
 
-    // Cái hàm của tính năng Offline (của bạn)
-    private async void OnOfflineTapped(object sender, EventArgs e)
+    // ==========================================================
+    // 🌟 SỰ KIỆN: BẤM VÀO MỤC "DỮ LIỆU NGOẠI TUYẾN"
+    // ==========================================================
+    private async void OnOfflineTapped(object sender, TappedEventArgs e)
     {
-        // await Navigation.PushAsync(new OfflinePage());
+        // Tạo hiệu ứng lún xuống cho cái thẻ Frame
+        if (sender is Frame frame)
+        {
+            await frame.ScaleTo(0.95, 100);
+            await frame.ScaleTo(1.0, 100);
+        }
+
+        // Chuyển hướng sang trang OfflinePage (Nơi chứa cái nút Tải file thực sự)
+        await Navigation.PushAsync(new OfflinePage());
     }
 }

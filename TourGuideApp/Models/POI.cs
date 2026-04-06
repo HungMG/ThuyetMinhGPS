@@ -14,8 +14,8 @@ namespace TourGuideApp.Models
         public string ImageUrl { get; set; }
 
         // 👇 ĐÃ TRẢ LẠI: Các biến cũ dùng để thiết lập Audio và Yêu thích 👇
-        public int TriggerRadius { get; set; }
-        public int Priority { get; set; }
+        public int TriggerRadius { get; set; } = 50; // Bán kính kích hoạt (mét)
+        public int Priority { get; set; }=1; // Độ ưu tiên (số nhỏ hơn = ưu tiên hơn)
         public DateTime? LastPlayedTime { get; set; }
         public bool IsFavorite { get; set; }
 
@@ -72,10 +72,31 @@ namespace TourGuideApp.Models
         // 🌟 ĐÃ CẬP NHẬT IP MỚI VÀ THÊM JSON IGNORE
         [Ignore]
         [JsonIgnore]
-        public string FullImageUrl => string.IsNullOrEmpty(ImageUrl)
-            ? "img_poi_default.jpg"
-            : $"http://192.168.1.231:5136/images/pois/{ImageUrl}";
+        public string FullImageUrl
+        {
+            get
+            {
+                // 0. KHÔNG CÓ ẢNH -> Dùng ảnh mặc định
+                if (string.IsNullOrEmpty(ImageUrl))
+                    return "img_poi_default.jpg";
 
+                // 1. NẾU LÀ FILE OFFLINE (Đã tải về nằm trong máy)
+                // Đường dẫn trong máy Android/iOS thường bắt đầu bằng "/" hoặc "file://" hoặc "C:\" (Windows)
+                if (ImageUrl.StartsWith("/") || ImageUrl.StartsWith("file://") || ImageUrl.StartsWith("C:\\") || ImageUrl.StartsWith("D:\\"))
+                {
+                    return ImageUrl;
+                }
+
+                // 2. NẾU LÀ LINK WEB HOÀN CHỈNH (Có sẵn chữ http)
+                if (ImageUrl.StartsWith("http"))
+                {
+                    return ImageUrl;
+                }
+
+                // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG (Lấy từ Server của sếp)
+                return $"http://192.168.1.40:5136/images/pois/{ImageUrl}";
+            }
+        }
         // 👇 THÊM 2 BIẾN NÀY ĐỂ TÍNH KHOẢNG CÁCH KM (KHÔNG LƯU VÀO DB) 👇
         [Ignore]
         public double DistanceFromUser { get; set; }

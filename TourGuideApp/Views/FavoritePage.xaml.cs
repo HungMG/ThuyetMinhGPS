@@ -48,7 +48,7 @@ public partial class FavoritePage : ContentPage
     }
 
     // =================================================================
-    // 🌟 1. SỰ KIỆN: XÓA KHỎI DANH SÁCH YÊU THÍCH
+    // 🌟 1. SỰ KIỆN: XÓA KHỎI DANH SÁCH YÊU THÍCH (Ở BÊN NGOÀI LIST)
     // =================================================================
     private async void OnRemoveFavoriteClicked(object sender, EventArgs e)
     {
@@ -156,7 +156,7 @@ public partial class FavoritePage : ContentPage
     }
 
     // =================================================================
-    // 🌟 5. SỰ KIỆN MỚI: CHUYỂN QUA BẢN ĐỒ CỦA APP
+    // 🌟 5. SỰ KIỆN: CHUYỂN QUA BẢN ĐỒ CỦA APP
     // =================================================================
     private async void OnViewOnMapClicked(object sender, EventArgs e)
     {
@@ -177,7 +177,40 @@ public partial class FavoritePage : ContentPage
         Preferences.Set("TargetPoiLon", _temporaryPoi.Longitude);
 
         // 4. Đá văng khách sang Tab Bản đồ (MapPage)
-        // Lưu ý: Đảm bảo trong AppShell.xaml của sếp, đường dẫn Route của Tab Bản đồ là "MapPage"
         await Shell.Current.GoToAsync("//MapPage");
+    }
+
+    // =================================================================
+    // 🌟 6. SỰ KIỆN MỚI: XÓA YÊU THÍCH NGAY TRONG POPUP 🌟
+    // =================================================================
+    private async void OnPopupRemoveFavClicked(object sender, EventArgs e)
+    {
+        if (_temporaryPoi == null) return;
+
+        // Xác nhận lại với khách hàng (Sử dụng song ngữ cho oai)
+        bool isConfirm = await DisplayAlert(
+            TourGuideApp.Resources.Languages.AppLang.SetTitle ?? "Xác nhận",
+            $"Bạn có chắc muốn bỏ '{_temporaryPoi.CurrentName}' khỏi danh sách?",
+            "OK", "Cancel");
+
+        if (isConfirm)
+        {
+            // 1. Tắt audio nếu đang đọc
+            if (_isAudioPlaying)
+            {
+                _narrationEngine.Stop();
+                _isAudioPlaying = false;
+            }
+
+            // 2. Xóa khỏi Database
+            _temporaryPoi.IsFavorite = false;
+            await _dbService.UpdatePOIAsync(_temporaryPoi);
+
+            // 3. Đóng popup
+            favoriteDetailPopup.IsOpen = false;
+
+            // 4. Tải lại danh sách bên ngoài để nó biến mất
+            await LoadFavoritesAsync();
+        }
     }
 }

@@ -21,7 +21,8 @@
                     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Margin="0,100,0,0">
                         <Label Text="📭" FontSize="60" HorizontalOptions="Center" Opacity="0.8"/>
                         <Label Text="{x:Static lang:AppLang.FavEmpty}" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
-                        <Label Text="Hãy dạo quanh bản đồ và thả tim nhé!" TextColor="#B0A398" FontSize="14" HorizontalOptions="Center"/>
+
+                        <Label Text="{x:Static lang:AppLang.FavEmptySub}" TextColor="#B0A398" FontSize="14" HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
@@ -63,7 +64,7 @@
         <bs:BottomSheet x:Name="favoriteDetailPopup" IsOpen="False" HasHandle="True" IsModal="True" CornerRadius="24">
             <bs:BottomSheetContent>
                 <bs:BottomSheetContent.Content>
-                    <Grid RowDefinitions="Auto, *, Auto" Padding="20" BackgroundColor="White" HeightRequest="600">
+                    <Grid RowDefinitions="Auto, *, Auto" Padding="20" BackgroundColor="White" HeightRequest="650">
 
                         <VerticalStackLayout Grid.Row="0" Spacing="10">
                             <BoxView WidthRequest="40" HeightRequest="4" CornerRadius="2" BackgroundColor="#E8E0D5" HorizontalOptions="Center" Margin="0,0,0,10"/>
@@ -97,17 +98,23 @@
                         <VerticalStackLayout Grid.Row="2" Spacing="12" Padding="0,10,0,0">
                             <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
                                 <Button Grid.Column="0" x:Name="btnReadAudio" Text="{x:Static lang:AppLang.ListenAudio}" 
-                BackgroundColor="#F39C12" TextColor="White" FontAttributes="Bold"
-                CornerRadius="25" Clicked="OnReadDescriptionClicked" />
+                                        BackgroundColor="#F39C12" TextColor="White" FontAttributes="Bold"
+                                        CornerRadius="25" Clicked="OnReadDescriptionClicked" />
                                 <Button Grid.Column="1" Text="{x:Static lang:AppLang.MapsExternal}" 
-                BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold"
-                CornerRadius="25" Clicked="OnNavigationClicked" />
+                                        BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold"
+                                        CornerRadius="25" Clicked="OnNavigationClicked" />
                             </Grid>
 
                             <Button Text="{x:Static lang:AppLang.ViewOnAppMap}" 
-            BackgroundColor="#2980B9" TextColor="White" FontAttributes="Bold"
-            CornerRadius="25" HeightRequest="50"
-            Clicked="OnViewOnMapClicked" />
+                                    BackgroundColor="#2980B9" TextColor="White" FontAttributes="Bold"
+                                    CornerRadius="25" HeightRequest="50"
+                                    Clicked="OnViewOnMapClicked" />
+
+                            <Button Text="{x:Static lang:AppLang.RemoveFav}" 
+                                    BackgroundColor="Transparent" BorderColor="#E74C3C" BorderWidth="1.5" 
+                                    TextColor="#E74C3C" FontAttributes="Bold"
+                                    CornerRadius="25" HeightRequest="50"
+                                    Clicked="OnPopupRemoveFavClicked" />
                         </VerticalStackLayout>
 
                     </Grid>
