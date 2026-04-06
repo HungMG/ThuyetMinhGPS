@@ -25,9 +25,39 @@ namespace TourGuideAdmin.Controllers
             _env = env;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.POIs.ToListAsync());
+            var pois = _context.POIs.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var keyword = RemoveDiacritics(searchString.ToLower());
+
+                pois = pois.Where(p =>
+                    !string.IsNullOrEmpty(p.Name_VI) &&
+                    RemoveDiacritics(p.Name_VI.ToLower()).Contains(keyword)
+                );
+            }
+
+            return View(pois.ToList());
+        }
+        public static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new System.Text.StringBuilder();
+
+            foreach (var c in normalized)
+            {
+                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)
+                    != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
 
         public async Task<IActionResult> Details(int? id)

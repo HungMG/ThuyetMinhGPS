@@ -28,9 +28,40 @@ namespace TourGuideAdmin.Controllers
         }
 
         // GET: Tours
-        public async Task<IActionResult> Index()
+        // tìm kiếm
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Tours.ToListAsync());
+            var tours = _context.Tours.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var keyword = RemoveDiacritics(searchString.ToLower());
+
+                tours = tours.Where(t =>
+                    !string.IsNullOrEmpty(t.Name_VI) &&
+                    RemoveDiacritics(t.Name_VI.ToLower()).Contains(keyword)
+                );
+            }
+
+            return View(tours.ToList());
+        }
+        public static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new System.Text.StringBuilder();
+
+            foreach (var c in normalized)
+            {
+                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)
+                    != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
 
         // GET: Tours/Details/5
