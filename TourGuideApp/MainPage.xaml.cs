@@ -14,7 +14,7 @@ public partial class MainPage : ContentPage
     private DatabaseService _dbService;
     private NarrationEngine _narrationEngine = new NarrationEngine();
     private Location _userLocation;
-    private List<POI> _allPOIsCache = new List<POI>();
+
     private List<POI> _allPois = new List<POI>();
     private List<Tour> _allTours = new List<Tour>();
 
@@ -25,47 +25,56 @@ public partial class MainPage : ContentPage
         _dbService = new DatabaseService();
     }
 
-    protected override void OnAppearing()
+    // 🌟 1. SỬA LẠI: Thêm async và await để App kiên nhẫn chờ lấy Database xong mới chạy tiếp
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         if (NarrationLangPicker.SelectedIndex == -1) NarrationLangPicker.SelectedIndex = 0;
-        LoadDataAsync();
+        await LoadDataAsync();
     }
 
+    // ==========================================================
+    // 🌟 TẢI DỮ LIỆU & TÍNH KHOẢNG CÁCH
+    // ==========================================================
+    // ==========================================================
+    // 🌟 TẢI DỮ LIỆU (ĐÃ FIX LỖI KẸT GPS GÂY TRẮNG MÀN HÌNH)
+    // ==========================================================
     private async Task LoadDataAsync()
     {
+        // 1. TẢI NHANH TỪ DATABASE
         var danhSachTour = await _dbService.GetAllToursAsync();
-        if (danhSachTour != null)
+        if (danhSachTour != null) _allTours = danhSachTour;
+
+        _allPois = await _dbService.GetAllPOIsAsync() ?? new List<POI>();
+
+        // 2. ÉP ĐỔ DỮ LIỆU LÊN MÀN HÌNH NGAY LẬP TỨC CHO KHÁCH THẤY
+        MainThread.BeginInvokeOnMainThread(() =>
         {
-            _allTours = danhSachTour;
-
             tourListView.ItemsSource = null;
-            tourListView.ItemsSource = danhSachTour;
-        }
+            tourListView.ItemsSource = _allTours;
+            BindableLayout.SetItemsSource(poiStackLayout, _allPois);
+        });
 
-        _allPOIsCache = await _dbService.GetAllPOIsAsync() ?? new List<POI>();
+        // 3. RẢNH RỖI MỚI ĐI XIN QUYỀN VÀ DÒ GPS (Chạy ngầm không làm đơ App)
         await GetUserLocationAsync();
 
-        if (_userLocation != null && _allPOIsCache.Any())
+        // 4. CÓ GPS RỒI THÌ TÍNH SỐ KM VÀ SẮP XẾP LẠI (Cập nhật lần 2)
+        if (_userLocation != null && _allPois.Any())
         {
-            foreach (var poi in _allPOIsCache)
+            foreach (var poi in _allPois)
             {
                 var poiLoc = new Location(poi.Latitude, poi.Longitude);
                 poi.DistanceFromUser = Location.CalculateDistance(_userLocation, poiLoc, DistanceUnits.Kilometers);
             }
-            _allPOIsCache = _allPOIsCache.OrderBy(p => p.DistanceFromUser).ToList();
-        }
-            _allPois = tatCaPoi; // 🌟 LƯU LẠI DANH SÁCH GỐC
 
-            poiListView.ItemsSource = null;
-            poiListView.ItemsSource = tatCaPoi;
+            _allPois = _allPois.OrderBy(p => p.DistanceFromUser).ToList();
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                BindableLayout.SetItemsSource(poiStackLayout, _allPois);
+            });
         }
     }
-
-        // 🌟 Bơm dữ liệu vào BindableLayout thay vì CollectionView
-        BindableLayout.SetItemsSource(poiStackLayout, _allPOIsCache);
-    }
-
     private async Task GetUserLocationAsync()
     {
         try
@@ -83,77 +92,82 @@ public partial class MainPage : ContentPage
     }
 
     // ==========================================================
-    // 🌟 HIỆU ỨNG TỰ CODE: MỞ POPUP MƯỢT MÀ
+    // 🌟 THANH TÌM KIẾM
     // ==========================================================
-    private void OnTourSelected(object sender, SelectionChangedEventArgs e)
+    private void FilterData(string keyword)
     {
-        if (e.CurrentSelection.FirstOrDefault() is Tour selectedTour)
+        keyword = keyword?.ToLower();
+
+        if (string.IsNullOrWhiteSpace(keyword))
         {
-            var poisInTour = _allPOIsCache.Where(p => p.TourId == selectedTour.Id).ToList();
-            if (_userLocation != null) poisInTour = poisInTour.OrderBy(p => p.DistanceFromUser).ToList();
-
-            // Đổ dữ liệu vào Popup
-            lblPopupTourName.Text = $"📍 {selectedTour.CurrentName}";
-            BindableLayout.SetItemsSource(popupPoiStackLayout, poisInTour);
-
-            // BẬT LỚP PHỦ ĐEN
-            blackOverlay.IsVisible = true;
-            blackOverlay.FadeTo(0.5, 250); // Mờ dần trong 0.25s
-
-            // TRƯỢT POPUP TỪ DƯỚI LÊN
-            tourPoiPopup.TranslateTo(0, 0, 350, Easing.SpringOut);
-
-            // Bỏ highlight thẻ Tour
-            ((CollectionView)sender).SelectedItem = null;
+            tourListView.ItemsSource = _allTours;
+            BindableLayout.SetItemsSource(poiStackLayout, _allPois);
+            return;
         }
+
+        var filteredPois = _allPois.Where(p =>
+            (!string.IsNullOrEmpty(p.CurrentName) && p.CurrentName.ToLower().Contains(keyword)) ||
+            (!string.IsNullOrEmpty(p.CurrentDescription) && p.CurrentDescription.ToLower().Contains(keyword))
+        ).ToList();
+
+        var filteredTours = _allTours.Where(t =>
+            (!string.IsNullOrEmpty(t.Name_VI) && t.Name_VI.ToLower().Contains(keyword)) ||
+            (!string.IsNullOrEmpty(t.Description_VI) && t.Description_VI.ToLower().Contains(keyword)) ||
+            (!string.IsNullOrEmpty(t.Name_EN) && t.Name_EN.ToLower().Contains(keyword)) ||
+            (!string.IsNullOrEmpty(t.Description_EN) && t.Description_EN.ToLower().Contains(keyword))
+        ).ToList();
+
+        tourListView.ItemsSource = filteredTours;
+        BindableLayout.SetItemsSource(poiStackLayout, filteredPois);
+    }
+
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        FilterData(e.NewTextValue);
+    }
+
+    private void OnSearchButtonPressed(object sender, EventArgs e)
+    {
+        FilterData((sender as SearchBar)?.Text);
     }
 
     // ==========================================================
-    // 🌟 ĐÃ SỬA: SỰ KIỆN CHẠM TRỰC TIẾP VÀO THẺ TOUR
+    // 🌟 SỰ KIỆN CHẠM TRỰC TIẾP VÀO THẺ TOUR
     // ==========================================================
     private void OnTourCardTapped(object sender, TappedEventArgs e)
     {
         if (e.Parameter is Tour selectedTour)
         {
-            // Ép hệ thống chạy trên luồng Giao diện chính (MainThread)
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                var poisInTour = _allPOIsCache.Where(p => p.TourId == selectedTour.Id).ToList();
+                var poisInTour = _allPois.Where(p => p.TourId == selectedTour.Id).ToList();
+
                 if (_userLocation != null)
                 {
                     poisInTour = poisInTour.OrderBy(p => p.DistanceFromUser).ToList();
                 }
 
-                // Đổ dữ liệu vào Popup
                 lblPopupTourName.Text = $"📍 {selectedTour.CurrentName}";
                 BindableLayout.SetItemsSource(popupPoiStackLayout, poisInTour);
 
-                // 1. BẬT LỚP PHỦ ĐEN MỜ DẦN
                 blackOverlay.IsVisible = true;
                 blackOverlay.FadeTo(0.5, 250);
 
-                // 2. ÉP POPUP HIỆN LÊN VÀ TRƯỢT TỪ DƯỚI LÊN
-                tourPoiPopup.IsVisible = true; // Chắc cú 100% hiển thị
+                tourPoiPopup.IsVisible = true;
                 tourPoiPopup.TranslateTo(0, 0, 350, Easing.SpringOut);
             });
         }
     }
 
-    // ==========================================================
-    // 🌟 HIỆU ỨNG TỰ CODE: ĐÓNG POPUP
-    // ==========================================================
     private async void OnClosePopupTapped(object sender, TappedEventArgs e)
     {
-        // TRƯỢT POPUP XUỐNG ĐÁY LẠI
         await tourPoiPopup.TranslateTo(0, 1000, 250, Easing.CubicIn);
-
-        // TẮT LỚP PHỦ ĐEN
         await blackOverlay.FadeTo(0, 250);
         blackOverlay.IsVisible = false;
     }
 
     // ==========================================================
-    // SỰ KIỆN: KHI BẤM VÀO THẺ POI (BÊN MAIN PAGE)
+    // SỰ KIỆN: KHI BẤM VÀO THẺ POI (NHẢY SANG BẢN ĐỒ)
     // ==========================================================
     private async void OnPoiCardTapped(object sender, TappedEventArgs e)
     {
@@ -163,20 +177,20 @@ public partial class MainPage : ContentPage
             blackOverlay.IsVisible = false;
 
             Preferences.Set("TargetTourId", selectedPoi.TourId);
-
-            // 🌟 THÊM 2 DÒNG NÀY ĐỂ GỬI TỌA ĐỘ CHÍNH XÁC QUA BẢN ĐỒ 🌟
             Preferences.Set("TargetPoiLat", selectedPoi.Latitude);
             Preferences.Set("TargetPoiLon", selectedPoi.Longitude);
 
             await Shell.Current.GoToAsync("//MapPage");
         }
     }
+
     private async void OnRefreshing(object sender, EventArgs e)
     {
         try
         {
             bool isTourSuccess = await _apiService.SyncToursAsync(_dbService);
             bool isPoiSuccess = await _apiService.SyncPOIsAsync(_dbService);
+            // 🌟 3. SỬA LẠI: Chờ LoadDataAsync xong mới tắt vòng xoay
             if (isTourSuccess || isPoiSuccess) await LoadDataAsync();
         }
         catch { }
@@ -202,12 +216,12 @@ public partial class MainPage : ContentPage
             await _narrationEngine.SpeakAsync(textToRead, lang);
         }
     }
+
     // ==========================================================
-    // 🌟 DẪN ĐƯỜNG ĐI TOUR BẰNG GOOGLE MAPS (ĐÃ FIX LỖI)
+    // 🌟 DẪN ĐƯỜNG ĐI TOUR BẰNG GOOGLE MAPS
     // ==========================================================
     private async void OnNavigateTourClicked(object sender, EventArgs e)
     {
-        // 🌟 Dùng BindableLayout.GetItemsSource để móc dữ liệu ra
         var poisInTour = BindableLayout.GetItemsSource(popupPoiStackLayout) as List<POI>;
 
         if (poisInTour == null || !poisInTour.Any()) return;
@@ -226,48 +240,11 @@ public partial class MainPage : ContentPage
                 url += $"&waypoints={waypointsStr}";
             }
 
-            await Launcher.OpenAsync(url);
+            await Launcher.OpenAsync(new Uri(url));
         }
         catch (Exception ex)
         {
             await DisplayAlert("Lỗi", "Không thể mở bản đồ chỉ đường: " + ex.Message, "OK");
         }
-    }
-
-    // HÀM TÌM KIẾM
-    private void FilterData(string keyword)
-    {
-        keyword = keyword?.ToLower();
-
-        // ===== POI =====
-        if (string.IsNullOrWhiteSpace(keyword))
-        {
-            poiListView.ItemsSource = _allPois;
-            tourListView.ItemsSource = _allTours;
-            return;
-        }
-
-        var filteredPois = _allPois.Where(p =>
-            (!string.IsNullOrEmpty(p.Name_VI) && p.Name_VI.ToLower().Contains(keyword)) ||
-            (!string.IsNullOrEmpty(p.Description_VI) && p.Description_VI.ToLower().Contains(keyword))
-        ).ToList();
-
-        var filteredTours = _allTours.Where(t =>
-            (!string.IsNullOrEmpty(t.Name_VI) && t.Name_VI.ToLower().Contains(keyword)) ||
-            (!string.IsNullOrEmpty(t.Description_VI) && t.Description_VI.ToLower().Contains(keyword))
-        ).ToList();
-
-        poiListView.ItemsSource = filteredPois;
-        tourListView.ItemsSource = filteredTours;
-    }
-
-    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
-    {
-        FilterData(e.NewTextValue);
-    }
-
-    private void OnSearchButtonPressed(object sender, EventArgs e)
-    {
-        FilterData((sender as SearchBar)?.Text);
     }
 }
