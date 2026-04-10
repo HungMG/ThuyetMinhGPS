@@ -14,7 +14,6 @@ public partial class SettingsPage : ContentPage
         LoadCurrentLanguage();
     }
 
-    // Nạp ngôn ngữ hiện tại đang dùng lên Picker
     private void LoadCurrentLanguage()
     {
         string currentLang = Preferences.Get("AppLanguage", "vi");
@@ -90,7 +89,7 @@ public partial class SettingsPage : ContentPage
             await frame.ScaleTo(1.0, 100);
         }
 
-        // Chuyển hướng sang trang OfflinePage (Nơi chứa cái nút Tải file thực sự)
+     
         await Navigation.PushAsync(new OfflinePage());
     }
 }

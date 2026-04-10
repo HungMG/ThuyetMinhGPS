@@ -1,17 +1,17 @@
 ﻿using Microsoft.Maui.Media;
-using Plugin.Maui.Audio; // Đã thêm thư viện phát MP3
+using Plugin.Maui.Audio;
 
 namespace TourGuideApp.Services;
 
 public class NarrationEngine
 {
     private CancellationTokenSource _cancelTokenSource;
-    private IAudioPlayer _audioPlayer; // Đầu đọc MP3
+    private IAudioPlayer _audioPlayer; 
 
-    // Thêm tham số audioFileName (Ví dụ: "dinhdoclap_vi.mp3")
+ 
     public async Task SpeakAsync(string text, string langCode, string audioFileName = "")
     {
-        // 1. Dừng mọi âm thanh (cả MP3 lẫn TTS) đang phát trước đó
+        
         Stop();
 
         // ----------------------------------------------------
