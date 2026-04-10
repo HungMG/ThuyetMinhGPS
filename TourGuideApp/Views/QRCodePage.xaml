@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             
              xmlns:lang="clr-namespace:TourGuideApp.Resources.Languages"
-             xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              x:Class="TourGuideApp.Views.QRCodePage"
              BackgroundColor="#FAF7F2"
              Shell.NavBarIsVisible="False">
@@ -24,40 +23,21 @@
 
         <Grid HorizontalOptions="Center" VerticalOptions="Center">
 
-            <!-- Camera -->
             <Frame
-    WidthRequest="265"
-    HeightRequest="265"
-    CornerRadius="20"
-    Padding="0"
-    HasShadow="True"
-    BorderColor="#4A3A31">
+                WidthRequest="265"
+                HeightRequest="265"
+                CornerRadius="20"
+                Padding="0"
+                IsClippedToBounds="True"
+                HasShadow="True"
+                BorderColor="#4A3A31">
 
                 <Grid>
-
-                    <!-- Camera -->
-                    <cv:CameraView x:Name="cameraView"
-                       CamerasLoaded="cameraView_CamerasLoaded"
-                       BarCodeDetectionEnabled="True"
-                       BarcodeDetected="cameraView_BarcodeDetected"/>
-
-                    <!-- Scan line (nằm trên camera) -->
-                    <BoxView x:Name="scanLine"
-                             HeightRequest="4"
-                             VerticalOptions="Start"
-                             HorizontalOptions="Fill"
-                             TranslationY="0"
-                             ZIndex="1">
-                        
-                        <BoxView.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="Transparent" Offset="0"/>
-                                <GradientStop Color="#E6C07B" Offset="0.5"/>
-                                <GradientStop Color="Transparent" Offset="1"/>
-                            </LinearGradientBrush>
-                        </BoxView.Background>
-                    </BoxView>
-
+                    <!-- ZXing CameraBarcodeReaderView -->
+                    <zxing:CameraBarcodeReaderView
+                        x:Name="barcodeReader"
+                        IsDetecting="True"
+                        BarcodesDetected="barcodeReader_BarcodesDetected"/>
                 </Grid>
 
             </Frame>
@@ -69,55 +49,30 @@
                   VerticalOptions="Center"
                   InputTransparent="True">
 
-                <!-- Border (khung giữa) -->
                 <Border Stroke="#FFFFFF"
-                StrokeThickness="1"
-                BackgroundColor="Transparent"/>
+                        StrokeThickness="1"
+                        BackgroundColor="Transparent"/>
 
-                <!-- ===== 4 GÓC QR ===== -->
+                <BoxView WidthRequest="30" HeightRequest="4" BackgroundColor="#4A3A31"
+                         HorizontalOptions="Start" VerticalOptions="Start"/>
+                <BoxView WidthRequest="4" HeightRequest="30" BackgroundColor="#4A3A31"
+                         HorizontalOptions="Start" VerticalOptions="Start"/>
 
-                <!-- Góc trên trái -->
-                <BoxView WidthRequest="30" HeightRequest="4"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="Start"
-                 VerticalOptions="Start"/>
-                <BoxView WidthRequest="4" HeightRequest="30"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="Start"
-                 VerticalOptions="Start"/>
+                <BoxView WidthRequest="30" HeightRequest="4" BackgroundColor="#4A3A31"
+                         HorizontalOptions="End" VerticalOptions="Start"/>
+                <BoxView WidthRequest="4" HeightRequest="30" BackgroundColor="#4A3A31"
+                         HorizontalOptions="End" VerticalOptions="Start"/>
 
-                <!-- Góc trên phải -->
-                <BoxView WidthRequest="30" HeightRequest="4"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="End"
-                 VerticalOptions="Start"/>
-                <BoxView WidthRequest="4" HeightRequest="30"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="End"
-                 VerticalOptions="Start"/>
+                <BoxView WidthRequest="30" HeightRequest="4" BackgroundColor="#4A3A31"
+                         HorizontalOptions="Start" VerticalOptions="End"/>
+                <BoxView WidthRequest="4" HeightRequest="30" BackgroundColor="#4A3A31"
+                         HorizontalOptions="Start" VerticalOptions="End"/>
 
-                <!-- Góc dưới trái -->
-                <BoxView WidthRequest="30" HeightRequest="4"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="Start"
-                 VerticalOptions="End"/>
-                <BoxView WidthRequest="4" HeightRequest="30"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="Start"
-                 VerticalOptions="End"/>
-
-                <!-- Góc dưới phải -->
-                <BoxView WidthRequest="30" HeightRequest="4"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="End"
-                 VerticalOptions="End"/>
-                <BoxView WidthRequest="4" HeightRequest="30"
-                 BackgroundColor="#4A3A31"
-                 HorizontalOptions="End"
-                 VerticalOptions="End"/>
-
+                <BoxView WidthRequest="30" HeightRequest="4" BackgroundColor="#4A3A31"
+                         HorizontalOptions="End" VerticalOptions="End"/>
+                <BoxView WidthRequest="4" HeightRequest="30" BackgroundColor="#4A3A31"
+                         HorizontalOptions="End" VerticalOptions="End"/>
             </Grid>
-
         </Grid>
     </VerticalStackLayout>
 </ContentPage>

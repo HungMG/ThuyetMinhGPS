@@ -79,15 +79,50 @@ public partial class MapPage : ContentPage
         _targetLat = Preferences.Get("TargetPoiLat", 0.0);
         _targetLon = Preferences.Get("TargetPoiLon", 0.0);
 
+        // Kiểm tra xem có được mở từ QR không
+        int qrPoiId = Preferences.Get("QRScannedPoiId", -1);
+
         Preferences.Remove("TargetTourId");
         Preferences.Remove("TargetPoiLat");
         Preferences.Remove("TargetPoiLon");
+        Preferences.Remove("QRScannedPoiId"); // Xóa luôn sau khi đọc
 
         _ = Task.Run(async () =>
         {
             await Task.Delay(300);
             await FilterAndShowPins("");
             await GetCurrentLocationAsync();
+
+            // =========================================================
+            // 🌟 XỬ LÝ KHI MỞ TỪ QR: TÌM POI VÀ MỞ BOTTOM SHEET
+            // =========================================================
+            // Ưu tiên QR trước (nếu quét QR thì bỏ qua TargetPoiLat/Lon)
+            if (qrPoiId != -1)
+            {
+                Console.WriteLine($"[MAPPAGE] Mở từ QR, POI Id = {qrPoiId}");
+                var allPois = await _dbService.GetAllPOIsAsync();
+                var targetPoi = allPois?.FirstOrDefault(p => p.Id == qrPoiId);
+
+                if (targetPoi != null)
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        // 1. Zoom bản đồ tới vị trí POI
+                        FocusOnLocation(targetPoi.Latitude, targetPoi.Longitude);
+                        // 2. Mở bottom sheet (popup)
+                        ShowPoiPopup(targetPoi);
+
+                        // 3. 🔊 TỰ ĐỘNG ĐỌC THUYẾT MINH NGAY SAU KHI QUÉT QR
+                        // Đợi 1 nhịp cho popup + picker render xong rồi mới phát.
+                        await Task.Delay(400);
+                        await AutoPlayNarrationAsync(targetPoi);
+                    });
+                }
+                else
+                {
+                    Console.WriteLine($"[MAPPAGE] Không tìm thấy POI Id={qrPoiId} trong database local.");
+                }
+            }
         });
 
         // ==========================================
@@ -433,6 +468,11 @@ public partial class MapPage : ContentPage
         });
     }
 
+    // =========================================================
+    // 🌟 HIỂN THỊ BOTTOM SHEET (POPUP) THÔNG TIN POI
+    // Được gọi bởi: nhấn pin trên bản đồ, nhấn POI trên MainPage,
+    //              và quét QR từ QRCodePage
+    // =========================================================
     private void ShowPoiPopup(POI poi)
     {
         _temporaryPoi = poi;
@@ -472,6 +512,48 @@ public partial class MapPage : ContentPage
         string text = langCode switch { "en" => _temporaryPoi.Description_EN, "zh" => _temporaryPoi.Description_ZH, "ko" => _temporaryPoi.Description_KO, "ja" => _temporaryPoi.Description_JA, _ => _temporaryPoi.Description_VI };
 
         await _narrationEngine.SpeakAsync($"{_temporaryPoi.CurrentName}. {text}", langCode);
+        _isAudioPlaying = false;
+        UpdateAudioButton(false);
+    }
+
+    // =========================================================
+    // 🔊 TỰ ĐỘNG PHÁT THUYẾT MINH (dùng khi mở từ QR)
+    // =========================================================
+    private async Task AutoPlayNarrationAsync(POI poi)
+    {
+        if (poi == null) return;
+
+        // Nếu đang phát thì dừng cái cũ
+        if (_isAudioPlaying)
+        {
+            _narrationEngine.Stop();
+            _isAudioPlaying = false;
+        }
+
+        string langCode = PopupLangPicker.SelectedIndex switch
+        {
+            1 => "en",
+            2 => "zh",
+            3 => "ko",
+            4 => "ja",
+            _ => "vi"
+        };
+        string text = langCode switch
+        {
+            "en" => poi.Description_EN,
+            "zh" => poi.Description_ZH,
+            "ko" => poi.Description_KO,
+            "ja" => poi.Description_JA,
+            _ => poi.Description_VI
+        };
+
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        _isAudioPlaying = true;
+        UpdateAudioButton(true);
+
+        await _narrationEngine.SpeakAsync($"{poi.CurrentName}. {text}", langCode);
+
         _isAudioPlaying = false;
         UpdateAudioButton(false);
     }

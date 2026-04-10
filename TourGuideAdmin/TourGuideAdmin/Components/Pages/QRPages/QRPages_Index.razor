@@ -1,0 +1,211 @@
+﻿@* File: TourGuideAdmin/TourGuideAdmin/Components/Pages/QRPages/QRPages_Index.razor *@
+@* Route: /qrcodes *@
+
+@page "/qrcodes"
+@using Microsoft.EntityFrameworkCore
+@using TourGuideAdmin.Models
+@using QRCoder
+@implements IAsyncDisposable
+@inject IDbContextFactory<TourGuideAdmin.Models.AppDbContext> DbFactory
+
+<PageTitle>Quản lý Mã QR</PageTitle>
+
+<h1>🔲 Quản lý Mã QR - POI</h1>
+<p class="text-muted">
+    Mỗi địa điểm (POI) có một mã QR duy nhất.<br />
+    Du khách quét mã QR → App tự động mở thuyết minh địa điểm đó trên bản đồ.
+</p>
+<div class="alert alert-info py-2">
+    <strong>📌 Quy tắc mã QR:</strong> Tên POI được chuẩn hóa thành dạng
+    <code>poi_ten_khong_dau</code> (viết thường, bỏ dấu, thay khoảng trắng bằng _).<br />
+    Ví dụ: <em>Chợ Bến Thành</em> → <code>poi_cho_ben_thanh</code>
+</div>
+
+<hr />
+
+@if (isLoading)
+{
+    <p><em>Đang tải danh sách địa điểm...</em></p>
+}
+else if (pois == null || !pois.Any())
+{
+    <div class="alert alert-warning">
+        Chưa có địa điểm nào. Hãy <a href="/pois/create">thêm POI</a> trước.
+    </div>
+}
+else
+{
+    <div class="mb-3">
+        <input type="text" class="form-control" placeholder="🔍 Tìm kiếm theo tên địa điểm..."
+               @bind="searchKeyword" @bind:event="oninput" />
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @foreach (var poi in FilteredPois)
+        {
+            @* ✅ FIX: QR phải encode chuỗi đã chuẩn hóa (poi_cho_ben_thanh),
+               không phải tên gốc (Chợ Bến Thành) để App giải mã đúng *@
+            string qrCode = GenerateQrCode(poi.Name_VI);
+            string qrImageBase64 = GenerateQrImageBase64(qrCode);
+
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+
+                        @* Ảnh QR *@
+                        <img src="data:image/png;base64,@qrImageBase64"
+                             alt="QR @poi.Name_VI"
+                             style="width:180px; height:180px; border:2px solid #dee2e6; border-radius:8px; padding:6px;" />
+
+                        <h5 class="card-title mt-3 mb-1">@poi.Name_VI</h5>
+                        <p class="text-muted small mb-1">Tour ID: @poi.TourId</p>
+
+                        @* Hiện mã QR dạng text để kiểm tra *@
+                        <div class="badge bg-secondary mb-3" style="font-size:0.75rem; word-break:break-all;">
+                            @qrCode
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer d-flex gap-2">
+                        @* Nút tải về *@
+                        <a href="data:image/png;base64,@qrImageBase64"
+                               download="@(qrCode).png"
+                               class="btn btn-sm btn-outline-primary flex-fill">
+                            ⬇️ Tải QR
+                        </a>
+
+                        @* Nút in *@
+                        <button class="btn btn-sm btn-outline-secondary flex-fill"
+                                onclick="printQR('@poi.Name_VI', '@qrImageBase64', '@qrCode')">
+                            🖨️ In
+                        </button>
+
+                        @* Nút xem POI *@
+                        <a href="/pois/details?id=@poi.Id"
+                               class="btn btn-sm btn-outline-info flex-fill">
+                            📍 Chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="mt-4">
+        <button class="btn btn-success" @onclick="DownloadAllQRsAsZip">
+            📦 Tải tất cả QR (.zip)
+        </button>
+    </div>
+}
+
+<style>
+    .card { transition: box-shadow 0.2s; }
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important; }
+    @@media print { .no-print { display: none; } }
+</style>
+
+@* Script in QR - hiện thêm mã code để kiểm tra *@
+<script>
+    function printQR(poiName, base64Image, qrCode) {
+        var win = window.open('', '_blank');
+        win.document.write(`
+            <html><head><title>QR - ${poiName}</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+                img { width: 250px; height: 250px; border: 2px solid #333; padding: 10px; }
+                h2 { margin-top: 20px; }
+                p.code { font-size: 0.85rem; color: #555; margin-top: 6px; }
+            </style></head>
+            <body onload="window.print(); window.close();">
+                <img src="data:image/png;base64,${base64Image}" />
+                <h2>${poiName}</h2>
+                <p class="code">${qrCode}</p>
+            </body></html>
+        `);
+        win.document.close();
+    }
+</script>
+
+@code {
+    private AppDbContext context = default!;
+    private List<POI>? pois;
+    private bool isLoading = true;
+    private string searchKeyword = "";
+
+    private IEnumerable<POI> FilteredPois =>
+        string.IsNullOrWhiteSpace(searchKeyword)
+            ? pois ?? Enumerable.Empty<POI>()
+            : (pois ?? Enumerable.Empty<POI>())
+                .Where(p => (p.Name_VI ?? "").Contains(searchKeyword, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        pois = await context.POIs.OrderBy(p => p.TourId).ThenBy(p => p.Name_VI).ToListAsync();
+        isLoading = false;
+    }
+
+    // =========================================================
+    // 🌟 TẠO MÃ QR TỪ TÊN POI
+    // =========================================================
+    // "Chợ Bến Thành" → "poi_cho_ben_thanh"
+    //
+    // ⚠️ QUAN TRỌNG: Hàm này PHẢI giống hệt GenerateQrCode() bên App (QRCodePage.xaml.cs).
+    // Nội dung QR được in ra sẽ là chuỗi đã chuẩn hóa (ví dụ: poi_cho_ben_thanh),
+    // và đó là thứ App quét về để tìm POI trong database local.
+    private static string GenerateQrCode(string? poiName)
+    {
+        if (string.IsNullOrWhiteSpace(poiName)) return "poi_unknown";
+
+        string result = poiName.ToLower().Trim();
+        result = RemoveDiacritics(result);
+        result = System.Text.RegularExpressions.Regex.Replace(result, @"\s+", "_");
+        result = System.Text.RegularExpressions.Regex.Replace(result, @"[^a-z0-9_]", "");
+        return $"poi_{result}";
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        var map = new Dictionary<string, string>
+        {
+            {"à","a"},{"á","a"},{"â","a"},{"ã","a"},{"ä","a"},{"å","a"},
+            {"ă","a"},{"ắ","a"},{"ặ","a"},{"ằ","a"},{"ẳ","a"},{"ẵ","a"},
+            {"ấ","a"},{"ầ","a"},{"ẩ","a"},{"ẫ","a"},{"ậ","a"},
+            {"è","e"},{"é","e"},{"ê","e"},{"ë","e"},
+            {"ế","e"},{"ề","e"},{"ể","e"},{"ễ","e"},{"ệ","e"},
+            {"ì","i"},{"í","i"},{"î","i"},{"ï","i"},{"ị","i"},{"ỉ","i"},{"ĩ","i"},
+            {"ò","o"},{"ó","o"},{"ô","o"},{"õ","o"},{"ö","o"},{"ø","o"},
+            {"ố","o"},{"ồ","o"},{"ổ","o"},{"ỗ","o"},{"ộ","o"},
+            {"ơ","o"},{"ớ","o"},{"ờ","o"},{"ở","o"},{"ỡ","o"},{"ợ","o"},
+            {"ù","u"},{"ú","u"},{"û","u"},{"ü","u"},
+            {"ư","u"},{"ứ","u"},{"ừ","u"},{"ử","u"},{"ữ","u"},{"ự","u"},{"ụ","u"},
+            {"ỳ","y"},{"ý","y"},{"ỷ","y"},{"ỹ","y"},{"ỵ","y"},
+            {"đ","d"},{"ñ","n"},{"ç","c"},
+        };
+        string r = text;
+        foreach (var kvp in map) r = r.Replace(kvp.Key, kvp.Value);
+        return r;
+    }
+
+    // =========================================================
+    // 🌟 TẠO ẢNH QR DẠNG BASE64
+    // =========================================================
+    // ⚠️ Encode qrCode (chuỗi đã chuẩn hóa) vào ảnh QR, KHÔNG phải tên gốc.
+    private static string GenerateQrImageBase64(string qrCode)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrData = qrGenerator.CreateQrCode(qrCode, QRCodeGenerator.ECCLevel.M);
+        using var qrImg = new PngByteQRCode(qrData);
+        byte[] pngBytes = qrImg.GetGraphic(10);
+        return Convert.ToBase64String(pngBytes);
+    }
+
+    private async Task DownloadAllQRsAsZip()
+    {
+        // TODO: Dùng JSRuntime để trigger download ZIP
+        await Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

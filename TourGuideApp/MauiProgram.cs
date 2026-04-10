@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using Plugin.Maui.BottomSheet.Hosting;
-using Camera.MAUI;
+using ZXing.Net.Maui.Controls;
 
 namespace TourGuideApp;
 
@@ -13,7 +13,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseSkiaSharp()
-            .UseMauiCameraView()// bật camera 
+            .UseBarcodeReader()// bật camera 
             .UseBottomSheet()// Cái công tắc bật cọ vẽ SkiaSharp bữa trước mình thêm vào
             .ConfigureFonts(fonts =>
             {
