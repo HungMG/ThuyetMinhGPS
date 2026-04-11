@@ -18,6 +18,8 @@ public partial class MapPage : ContentPage
     private DatabaseService _dbService;
     private NarrationEngine _narrationEngine = new NarrationEngine();
     private POI _temporaryPoi;
+    // Phanh chống giật cho thanh tìm kiếm bản đồ
+    private CancellationTokenSource _mapSearchCts;
 
     private int _currentTourId = -1;
     private double _targetLat = 0;
@@ -70,9 +72,11 @@ public partial class MapPage : ContentPage
 
         poiDetailPopup.IsOpen = false;
 
-        string savedLang = Preferences.Get("AppLanguage", "vi");
+        // Lấy ngôn ngữ Audio riêng biệt
+        string savedTTSLang = Preferences.Get("TTSLanguage", Preferences.Get("AppLanguage", "vi"));
+
         PopupLangPicker.SelectedIndexChanged -= OnPopupLangChanged;
-        PopupLangPicker.SelectedIndex = savedLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
+        PopupLangPicker.SelectedIndex = savedTTSLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
         PopupLangPicker.SelectedIndexChanged += OnPopupLangChanged;
 
         _currentTourId = Preferences.Get("TargetTourId", -1);
@@ -292,38 +296,50 @@ public partial class MapPage : ContentPage
             closestPoi.LastPlayedTime = DateTime.Now;
             await _dbService.UpdatePOIAsync(closestPoi);
 
-            string currentLang = Preferences.Get("AppLanguage", "vi");
-            string textToRead = currentLang switch
+            // 1. Lấy ngôn ngữ dành riêng cho Loa
+            string currentAudioLang = Preferences.Get("TTSLanguage", Preferences.Get("AppLanguage", "vi"));
+
+            // 2. Gom cả TÊN và MÔ TẢ dịch theo đúng ngôn ngữ của Loa
+            string textToRead = currentAudioLang switch
             {
-                "en" => closestPoi.Description_EN,
-                "zh" => closestPoi.Description_ZH,
-                "ko" => closestPoi.Description_KO,
-                "ja" => closestPoi.Description_JA,
-                _ => closestPoi.Description_VI
+                "en" => $"{closestPoi.Name_EN}. {closestPoi.Description_EN}",
+                "zh" => $"{closestPoi.Name_ZH}. {closestPoi.Description_ZH}",
+                "ko" => $"{closestPoi.Name_KO}. {closestPoi.Description_KO}",
+                "ja" => $"{closestPoi.Name_JA}. {closestPoi.Description_JA}",
+                _ => $"{closestPoi.Name_VI}. {closestPoi.Description_VI}"
             };
 
-            await _narrationEngine.SpeakAsync($"{closestPoi.CurrentName}. {textToRead}", currentLang);
+            // 3. Truyền đúng biến currentAudioLang vào cho chị Google đọc
+            await _narrationEngine.SpeakAsync(textToRead, currentAudioLang);
 
             _isAudioPlaying = false;
         }
     }
 
+    // 🌟 SỬA LẠI HÀM LỌC: Bao trọn gói Tên + Mô tả và chống văng App
     private async Task FilterAndShowPins(string keyword)
     {
         var allData = await _dbService.GetAllPOIsAsync();
         if (allData == null) return;
 
-        var filtered = allData.AsEnumerable();
+        var resultList = allData.AsEnumerable();
 
+        // Nếu có gõ chữ thì mới lọc, không thì lấy hết
         if (!string.IsNullOrWhiteSpace(keyword))
-            filtered = filtered.Where(p => p.CurrentName.ToLower().Contains(keyword.ToLower()));
+        {
+            keyword = keyword.ToLower();
+            resultList = resultList.Where(p =>
+                (!string.IsNullOrEmpty(p.CurrentName) && p.CurrentName.ToLower().Contains(keyword)) ||
+                (!string.IsNullOrEmpty(p.CurrentDescription) && p.CurrentDescription.ToLower().Contains(keyword))
+            );
+        }
 
-        var resultList = filtered.ToList();
+        var finalPins = resultList.ToList();
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
             tourMap.Pins.Clear();
-            foreach (var poi in resultList)
+            foreach (var poi in finalPins)
             {
                 var pin = new Pin(tourMap)
                 {
@@ -342,9 +358,10 @@ public partial class MapPage : ContentPage
 
             tourMap.Refresh();
 
+            // Xử lý zoom tới Pin như cũ
             if (_targetLat != 0 && _targetLon != 0)
             {
-                var targetPoi = resultList.FirstOrDefault(p => p.Latitude == _targetLat && p.Longitude == _targetLon);
+                var targetPoi = finalPins.FirstOrDefault(p => p.Latitude == _targetLat && p.Longitude == _targetLon);
                 if (targetPoi != null)
                 {
                     FocusOnLocation(_targetLat, _targetLon);
@@ -353,10 +370,42 @@ public partial class MapPage : ContentPage
             }
             else if (_currentTourId != -1)
             {
-                var firstPoiOfTour = resultList.FirstOrDefault(p => p.TourId == _currentTourId);
+                var firstPoiOfTour = finalPins.FirstOrDefault(p => p.TourId == _currentTourId);
                 if (firstPoiOfTour != null) FocusOnLocation(firstPoiOfTour.Latitude, firstPoiOfTour.Longitude);
             }
         });
+    }
+
+    // 🌟 SỬA LẠI SỰ KIỆN NÚT TÌM KIẾM
+    private async void OnSearchButtonPressed(object sender, EventArgs e)
+    {
+        mapSearchBar.Unfocus();
+        await FilterAndShowPins(mapSearchBar.Text ?? "");
+    }
+
+    // 🌟 SỬA LẠI SỰ KIỆN GÕ CHỮ (Xóa cái lệnh IF cản đường đi)
+    // 🌟 SỰ KIỆN GÕ CHỮ TRÊN BẢN ĐỒ (ĐÃ LẮP PHANH CHỐNG GIẬT)
+    private async void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+    {
+        // 1. Khách gõ chữ liên tục -> Cắt cầu dao cái cũ ngay!
+        _mapSearchCts?.Cancel();
+
+        // 2. Lên cầu dao mới
+        _mapSearchCts = new CancellationTokenSource();
+        var token = _mapSearchCts.Token;
+
+        try
+        {
+            // 3. Đợi nửa giây xem khách có gõ thêm không
+            await Task.Delay(500, token);
+
+            // 4. Khách dừng tay rồi -> Lấy danh sách ghim (Pins) đem đi lọc!
+            await FilterAndShowPins(e.NewTextValue ?? "");
+        }
+        catch (TaskCanceledException)
+        {
+            // Bị cắt cầu dao thì im lặng cho qua, không báo lỗi văng app
+        }
     }
 
     private void HighlightClosestPin(Location userLocation)
@@ -480,7 +529,7 @@ public partial class MapPage : ContentPage
         lblPoiDescription.Text = poi.CurrentDescription;
         lblPoiAddress.Text = $"Tọa độ: {poi.Latitude:F4}, {poi.Longitude:F4}";
         lblFavoriteIcon.Text = poi.IsFavorite ? "❤️" : "🤍";
-        imgPoiImage.Source = !string.IsNullOrEmpty(poi.ImageUrl) ? ImageSource.FromUri(new Uri(poi.FullImageUrl)) : "img_default_poi.png";
+        imgPoiImage.Source = poi.LocalImageSource;
 
         btnReadAudio.Text = TourGuideApp.Resources.Languages.AppLang.ListenAudio;
         btnReadAudio.BackgroundColor = Color.FromArgb("#F39C12");
@@ -567,7 +616,7 @@ public partial class MapPage : ContentPage
     private void OnPopupLangChanged(object sender, EventArgs e)
     {
         string lang = PopupLangPicker.SelectedIndex switch { 1 => "en", 2 => "zh", 3 => "ko", 4 => "ja", _ => "vi" };
-        Preferences.Set("AppLanguage", lang);
+        Preferences.Set("TTSLanguage", lang);
 
         if (_isAudioPlaying)
         {
@@ -596,16 +645,5 @@ public partial class MapPage : ContentPage
     {
         if (_temporaryPoi == null) return;
         await Microsoft.Maui.ApplicationModel.Map.OpenAsync(_temporaryPoi.Latitude, _temporaryPoi.Longitude, new MapLaunchOptions { Name = _temporaryPoi.CurrentName });
-    }
-
-    private async void OnSearchButtonPressed(object sender, EventArgs e)
-    {
-        mapSearchBar.Unfocus();
-        await FilterAndShowPins(mapSearchBar.Text?.ToLower() ?? "");
-    }
-
-    private async void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(e.NewTextValue)) await FilterAndShowPins("");
     }
 }

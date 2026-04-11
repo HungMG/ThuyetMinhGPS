@@ -35,6 +35,24 @@ namespace TourGuideApp.Models
             }
         }
 
+        // 🌟 DÁN THÊM CÁI NÀY VÀO ĐỂ LỌC TOUR THEO MÔ TẢ ĐA NGÔN NGỮ
+        [Ignore]
+        public string CurrentDescription
+        {
+            get
+            {
+                string lang = Preferences.Get("AppLanguage", "vi");
+                return lang switch
+                {
+                    "en" => Description_EN,
+                    "zh" => Description_ZH,
+                    "ko" => Description_KO,
+                    "ja" => Description_JA,
+                    _ => Description_VI
+                };
+            }
+        }
+
         [Ignore]
         [JsonIgnore]
         public string FullImageUrl
@@ -59,7 +77,24 @@ namespace TourGuideApp.Models
                 }
 
                 // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG (Lấy từ Server của sếp)
-                return $"http://192.168.1.40:5136/images/tours/{ImageUrl}";
+                return $"http://192.168.1.151:5136/images/tours/{ImageUrl}";
+            }
+        }
+        // 🌟 BẢO BỐI TẢI ẢNH OFFLINE CHO TOUR
+        [Ignore]
+        [JsonIgnore]
+        public string LocalImageSource
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ImageUrl)) return "img_default_tour.png";
+
+                string localPath = Path.Combine(FileSystem.AppDataDirectory, ImageUrl);
+
+                if (File.Exists(localPath))
+                    return localPath;
+                else
+                    return FullImageUrl;
             }
         }
     }

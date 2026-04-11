@@ -14,6 +14,8 @@ public partial class MainPage : ContentPage
     private DatabaseService _dbService;
     private NarrationEngine _narrationEngine = new NarrationEngine();
     private Location _userLocation;
+    // Cục phanh dùng cho thanh tìm kiếm
+    private CancellationTokenSource _searchCts;
 
     private List<POI> _allPois = new List<POI>();
     private List<Tour> _allTours = new List<Tour>();
@@ -36,11 +38,13 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
 
+        // TÌM VÀ SỬA KHÚC NÀY:
         if (NarrationLangPicker.SelectedIndex == -1)
         {
-            string systemLang = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLower();
-            string currentLang = Preferences.Get("AppLanguage", systemLang);
-            NarrationLangPicker.SelectedIndex = currentLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
+            // Ưu tiên lấy ngôn ngữ Audio đã lưu, nếu chưa có thì lấy ngôn ngữ của App
+            string defaultLang = Preferences.Get("AppLanguage", "vi");
+            string currentTTSLang = Preferences.Get("TTSLanguage", defaultLang);
+            NarrationLangPicker.SelectedIndex = currentTTSLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
         }
 
         if (!_isDataLoaded)
@@ -86,7 +90,7 @@ public partial class MainPage : ContentPage
             _ => "vi"
         };
 
-        Preferences.Set("AppLanguage", selectedLang);
+        Preferences.Set("TTSLanguage", selectedLang);
 
         // Nếu đổi ngôn ngữ lúc đang đọc thì ép nó nín
         if (_isAudioPlaying)
@@ -146,38 +150,62 @@ public partial class MainPage : ContentPage
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
     }
 
+    // 🌟 1. MÁY LỌC ĐA NGÔN NGỮ CHO CẢ TOUR VÀ POI
     private void FilterData(string keyword)
     {
-        keyword = keyword?.ToLower();
+        string searchWord = keyword?.ToLower() ?? "";
 
-        if (string.IsNullOrWhiteSpace(keyword))
+        // Nếu người dùng xóa hết chữ -> Trả lại toàn bộ danh sách gốc
+        if (string.IsNullOrWhiteSpace(searchWord))
         {
             tourListView.ItemsSource = _allTours;
             BindableLayout.SetItemsSource(poiStackLayout, _allPois);
             return;
         }
 
+        // 🔍 LỌC ĐỊA ĐIỂM (POI): Tìm trong Tên HOẶC Mô tả theo đúng ngôn ngữ đang mở
         var filteredPois = _allPois.Where(p =>
-            (!string.IsNullOrEmpty(p.CurrentName) && p.CurrentName.ToLower().Contains(keyword)) ||
-            (!string.IsNullOrEmpty(p.CurrentDescription) && p.CurrentDescription.ToLower().Contains(keyword))
+            (!string.IsNullOrEmpty(p.CurrentName) && p.CurrentName.ToLower().Contains(searchWord)) ||
+            (!string.IsNullOrEmpty(p.CurrentDescription) && p.CurrentDescription.ToLower().Contains(searchWord))
         ).ToList();
 
+        // 🔍 LỌC LỘ TRÌNH (TOUR): Tìm trong Tên HOẶC Mô tả theo đúng ngôn ngữ đang mở
         var filteredTours = _allTours.Where(t =>
-            (!string.IsNullOrEmpty(t.Name_VI) && t.Name_VI.ToLower().Contains(keyword)) ||
-            (!string.IsNullOrEmpty(t.Description_VI) && t.Description_VI.ToLower().Contains(keyword)) ||
-            (!string.IsNullOrEmpty(t.Name_EN) && t.Name_EN.ToLower().Contains(keyword)) ||
-            (!string.IsNullOrEmpty(t.Description_EN) && t.Description_EN.ToLower().Contains(keyword))
+            (!string.IsNullOrEmpty(t.CurrentName) && t.CurrentName.ToLower().Contains(searchWord)) ||
+            (!string.IsNullOrEmpty(t.CurrentDescription) && t.CurrentDescription.ToLower().Contains(searchWord))
         ).ToList();
 
+        // Đẩy kết quả đã lọc lên màn hình
         tourListView.ItemsSource = filteredTours;
         BindableLayout.SetItemsSource(poiStackLayout, filteredPois);
     }
 
-    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    // 🌟 2. SỰ KIỆN GÕ CHỮ (Gõ tới đâu lọc tới đó)
+    // 🌟 SỰ KIỆN GÕ CHỮ (ĐÃ LẮP PHANH ABS CHỐNG GIẬT)
+    private async void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
-        FilterData(e.NewTextValue);
+        // 1. Hủy ngay cái lệnh tìm kiếm trước đó nếu sếp vẫn đang gõ liên tục
+        _searchCts?.Cancel();
+
+        // 2. Tạo một cái phanh mới
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+
+        try
+        {
+            // 3. Bảo app: "Khoan đã, đợi nửa giây xem sếp có gõ chữ tiếp không"
+            await Task.Delay(500, token);
+
+            // 4. Nếu qua 500 mili-giây mà sếp dừng tay -> Mới bắt đầu mang máy lọc ra chạy!
+            FilterData(e.NewTextValue);
+        }
+        catch (TaskCanceledException)
+        {
+            // Khách vẫn đang gõ chữ tiếp theo -> Máy âm thầm bỏ qua, không báo lỗi.
+        }
     }
 
+    // 🌟 3. SỰ KIỆN BẤM KÍNH LÚP TRÊN BÀN PHÍM
     private void OnSearchButtonPressed(object sender, EventArgs e)
     {
         FilterData((sender as SearchBar)?.Text);

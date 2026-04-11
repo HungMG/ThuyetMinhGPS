@@ -18,28 +18,47 @@ public partial class StartPage : ContentPage // 👇 Đổi tên Class
     private void OnJapaneseTapped(object sender, TappedEventArgs e) => ApplyLanguage("ja");
 
     // 👇 HÀM XỬ LÝ ĐỔI NGÔN NGỮ CHÍNH 👇
-    private void ApplyLanguage(string langCode)
+    // 👇 HÀM XỬ LÝ ĐỔI NGÔN NGỮ ĐÃ ĐƯỢC "BỌC ĐƯỜNG" CHỐNG TREO MÁY 👇
+    private async void ApplyLanguage(string langCode)
     {
-        // 1. Lưu ngôn ngữ khách chọn vào bộ nhớ
-        Preferences.Set("AppLanguage", langCode);
+        // 1. Kéo rèm xuống che màn hình lại, cấm bấm bậy!
+        loadingOverlay.IsVisible = true;
 
-        // 2. Xác định mã văn hóa (Culture Code) chuẩn của Microsoft
-        string cultureCode = langCode switch
+        // 2. Chờ 0.1 giây để giao diện kịp vẽ cái màn che lên (Cực kỳ quan trọng)
+        await Task.Delay(100);
+
+        try
         {
-            "en" => "en-US",
-            "zh" => "zh-CN", // Trung Quốc (Giản thể)
-            "ko" => "ko-KR", // Hàn Quốc
-            "ja" => "ja-JP", // Nhật Bản
-            _ => "vi-VN"     // Mặc định Việt Nam
-        };
+            // 3. Đẩy việc xử lý Data ra đằng sau
+            await Task.Run(() =>
+            {
+                Preferences.Set("AppLanguage", langCode);
 
-        // 3. Ép toàn bộ App đổi ngôn ngữ giao diện (.resx)
-        var culture = new CultureInfo(cultureCode);
-        Thread.CurrentThread.CurrentCulture = culture;
-        Thread.CurrentThread.CurrentUICulture = culture;
-        AppLang.Culture = culture;
+                string cultureCode = langCode switch
+                {
+                    "en" => "en-US",
+                    "zh" => "zh-CN",
+                    "ko" => "ko-KR",
+                    "ja" => "ja-JP",
+                    _ => "vi-VN"
+                };
 
-        // 4. Vô thẳng màn hình chính (AppShell)
-        Application.Current.MainPage = new AppShell();
+                var culture = new CultureInfo(cultureCode);
+                Thread.CurrentThread.CurrentCulture = culture;
+                Thread.CurrentThread.CurrentUICulture = culture;
+                AppLang.Culture = culture;
+            });
+
+            // 4. Việc đổi Giao diện chính (UI) PHẢI GIAO LẠI CHO ANH TIẾP TÂN làm (Bắt buộc của .NET MAUI)
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Application.Current.MainPage = new AppShell();
+            });
+        }
+        catch (Exception)
+        {
+            // Kéo rèm lên nếu lỡ có lỗi
+            loadingOverlay.IsVisible = false;
+        }
     }
 }

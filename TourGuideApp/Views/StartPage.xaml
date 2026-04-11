@@ -83,5 +83,13 @@
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <Grid x:Name="loadingOverlay" BackgroundColor="#B3000000" IsVisible="False" ZIndex="999">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
+                <ActivityIndicator IsRunning="True" Color="#F39C12" WidthRequest="50" HeightRequest="50"/>
+                <Label Text="Đang khởi động..." TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
     </Grid>
 </ContentPage>

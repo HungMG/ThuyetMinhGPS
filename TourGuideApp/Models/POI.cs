@@ -94,7 +94,27 @@ namespace TourGuideApp.Models
                 }
 
                 // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG (Lấy từ Server của sếp)
-                return $"http://192.168.1.40:5136/images/pois/{ImageUrl}";
+                return $"http://192.168.1.151:5136/images/pois/{ImageUrl}";
+            }
+        }
+        
+        // 🌟 BẢO BỐI TẢI ẢNH OFFLINE CHO POI
+        [Ignore]
+        [JsonIgnore]
+        public string LocalImageSource
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ImageUrl)) return "img_default_poi.png";
+
+                // Móc vào bộ nhớ trong của điện thoại xem có tải về chưa
+                string localPath = Path.Combine(FileSystem.AppDataDirectory, ImageUrl);
+
+                // Nếu có ảnh trong máy -> Lấy ra xài. Nếu chưa có -> Lấy link Web của sếp
+                if (File.Exists(localPath))
+                    return localPath;
+                else
+                    return FullImageUrl; // Gọi lại cái biến sếp viết ở trên
             }
         }
         // 👇 THÊM 2 BIẾN NÀY ĐỂ TÍNH KHOẢNG CÁCH KM (KHÔNG LƯU VÀO DB) 👇
