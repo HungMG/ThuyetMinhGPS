@@ -1,0 +1,734 @@
+﻿/* ============================================================
+   ADMIN THEME — đồng bộ với trang Quản lý 
+   Đặt file này tại: wwwroot/css/admin-theme.css
+   Include trong _Layout.cshtml:
+   <link rel="stylesheet" href="~/css/admin-theme.css" />
+   ============================================================ */
+
+:root {
+    --qr-accent: #C0502E;
+    --qr-accent-dark: #9a3e24;
+    --qr-surface: #fff;
+    --qr-muted: #f5f3f0;
+    --qr-border: #e8e0d5;
+    --qr-text: #2c1a0e;
+    --qr-sub: #8a7060;
+}
+
+body {
+    background: #faf7f4;
+    color: var(--qr-text);
+}
+
+/* ===== HERO HEADER ===== */
+.qr-page-header {
+    background: linear-gradient(135deg, #2c1a0e 0%, #4a3020 60%, #c0502e 100%);
+    border-radius: 18px;
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+    .qr-page-header::after {
+        content: attr(data-watermark);
+        position: absolute;
+        right: 32px;
+        top: -10px;
+        font-size: 100px;
+        font-weight: 900;
+        opacity: .07;
+        letter-spacing: -4px;
+        user-select: none;
+    }
+
+    .qr-page-header h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+
+    .qr-page-header p {
+        opacity: .75;
+        margin: 0;
+        font-size: .95rem;
+    }
+
+.qr-stat-badge {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 30px;
+    padding: 5px 16px;
+    font-size: .85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    color: #fff;
+}
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+    background: var(--qr-surface);
+    border: 1px solid var(--qr-border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+    .filter-bar .form-control,
+    .filter-bar .form-select {
+        border-color: var(--qr-border);
+        border-radius: 8px;
+        font-size: .9rem;
+        height: 38px;
+    }
+
+        .filter-bar .form-control:focus,
+        .filter-bar .form-select:focus {
+            border-color: var(--qr-accent);
+            box-shadow: 0 0 0 3px rgba(192,80,46,.12);
+        }
+
+/* ===== BUTTONS ===== */
+.btn-qr {
+    background: var(--qr-accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 600;
+    transition: background .15s;
+}
+
+    .btn-qr:hover {
+        background: var(--qr-accent-dark);
+        color: #fff;
+    }
+
+.btn-qr-outline {
+    background: transparent;
+    color: var(--qr-accent);
+    border: 1.5px solid var(--qr-accent);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 600;
+}
+
+    .btn-qr-outline:hover {
+        background: var(--qr-accent);
+        color: #fff;
+    }
+
+/* ===== CARD / SURFACE ===== */
+.qr-card {
+    background: var(--qr-surface);
+    border: 1px solid var(--qr-border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(44,26,14,.04);
+}
+
+/* ===== TABLE ===== */
+.qr-table {
+    width: 100%;
+    background: var(--qr-surface);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--qr-border);
+}
+
+    .qr-table thead th {
+        background: var(--qr-muted);
+        color: var(--qr-text);
+        font-weight: 700;
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--qr-border);
+    }
+
+    .qr-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--qr-border);
+        font-size: .92rem;
+        vertical-align: middle;
+    }
+
+    .qr-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .qr-table tbody tr:hover {
+        background: #fdfaf6;
+    }
+
+/* ===== STAT CARDS (cho Home) ===== */
+.qr-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.qr-stat-card {
+    background: var(--qr-surface);
+    border: 1px solid var(--qr-border);
+    border-left: 4px solid var(--qr-accent);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: transform .15s, box-shadow .15s;
+}
+
+    .qr-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(44,26,14,.08);
+    }
+
+    .qr-stat-card .num {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--qr-accent);
+        line-height: 1;
+    }
+
+    .qr-stat-card .lbl {
+        color: var(--qr-sub);
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-top: 6px;
+    }
+
+/* ===== PROSE (Privacy) ===== */
+.qr-prose {
+    line-height: 1.75;
+    color: var(--qr-text);
+}
+
+    .qr-prose h3 {
+        color: var(--qr-accent-dark);
+        font-weight: 700;
+        margin-top: 26px;
+        margin-bottom: 10px;
+    }
+
+    .qr-prose p {
+        color: #4a3a30;
+    }
+
+/* ============================================================
+   QR PAGE — class riêng cho trang Quản lý Mã QR
+   (move ra từ <style> inline trong Views/QR/Index.cshtml)
+   ============================================================ */
+
+.action-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+    .action-bar .result-count {
+        font-size: .9rem;
+        color: var(--qr-sub);
+    }
+
+.btn-qr-primary {
+    background: var(--qr-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: .88rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .18s, transform .12s;
+}
+
+    .btn-qr-primary:hover {
+        background: var(--qr-accent-dark);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+/* QR Card Grid */
+.qr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 18px;
+}
+
+/* ⚠️ Đây là card cho 1 mã QR — KHÁC với .qr-card surface trong theme chung.
+   Đã rename: .qr-card -> .qr-item-card */
+.qr-item-card {
+    background: var(--qr-surface);
+    border: 1px solid var(--qr-border);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    transition: box-shadow .2s, transform .18s;
+    position: relative;
+    overflow: hidden;
+}
+
+    .qr-item-card:hover {
+        box-shadow: 0 8px 28px rgba(192,80,46,.13);
+        transform: translateY(-3px);
+    }
+
+    .qr-item-card .tour-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: var(--qr-muted);
+        color: var(--qr-sub);
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: .75rem;
+        font-weight: 600;
+        border: 1px solid var(--qr-border);
+    }
+
+.qr-img-wrap {
+    width: 130px;
+    height: 130px;
+    border: 2px solid var(--qr-border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+}
+
+    .qr-img-wrap:hover {
+        border-color: var(--qr-accent);
+    }
+
+    .qr-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+.qr-card-name {
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--qr-text);
+    text-align: center;
+    line-height: 1.3;
+    max-width: 190px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.qr-card-coord {
+    font-size: .76rem;
+    color: var(--qr-sub);
+    text-align: center;
+}
+
+.qr-card-actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+    .qr-card-actions a {
+        flex: 1;
+        min-width: 60px;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: .78rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1.5px solid transparent;
+        transition: all .15s;
+    }
+
+.btn-dl {
+    background: var(--qr-muted);
+    color: var(--qr-accent);
+    border-color: var(--qr-border);
+}
+
+    .btn-dl:hover {
+        background: var(--qr-accent);
+        color: white;
+        border-color: var(--qr-accent);
+    }
+
+.btn-print-one {
+    background: var(--qr-muted);
+    color: #2c7a2c;
+    border-color: #cde8cd;
+}
+
+    .btn-print-one:hover {
+        background: #2c7a2c;
+        color: white;
+        border-color: #2c7a2c;
+    }
+
+.btn-view {
+    background: var(--qr-muted);
+    color: #1a5ba8;
+    border-color: #cddff5;
+}
+
+    .btn-view:hover {
+        background: #1a5ba8;
+        color: white;
+        border-color: #1a5ba8;
+    }
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 64px 20px;
+    color: var(--qr-sub);
+}
+
+    .empty-state .icon {
+        font-size: 56px;
+        opacity: .35;
+        margin-bottom: 12px;
+    }
+
+/* Modal preview QR */
+.qr-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+    .qr-modal-overlay.active {
+        display: flex;
+    }
+
+.qr-modal-box {
+    background: white;
+    border-radius: 24px;
+    padding: 36px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+    animation: popIn .25s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(.85);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.qr-modal-box img {
+    width: 240px;
+    height: 240px;
+    object-fit: contain;
+    margin: 16px auto;
+    display: block;
+    border: 1px solid var(--qr-border);
+    border-radius: 12px;
+    padding: 8px;
+}
+
+.qr-modal-box h5 {
+    font-weight: 700;
+    color: var(--qr-text);
+    margin-bottom: 4px;
+}
+
+.qr-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+}
+
+.qr-modal-box .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 18px;
+}
+
+/* ============================================================
+   SIDEBAR — đồng bộ với theme nâu/cam
+   ============================================================ */
+.qr-sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #2c1a0e 0%, #4a3020 100%);
+    color: #fff;
+    padding: 24px 18px;
+    position: relative;
+    box-shadow: 2px 0 16px rgba(0,0,0,.08);
+}
+
+    .qr-sidebar .brand {
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin: 0 0 4px 6px;
+        color: #fff;
+        letter-spacing: .3px;
+    }
+
+    .qr-sidebar .brand-sub {
+        font-size: .75rem;
+        color: rgba(255,255,255,.55);
+        margin: 0 0 22px 6px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .qr-sidebar hr.brand-sep {
+        border: none;
+        border-top: 1px solid rgba(255,255,255,.12);
+        margin: 0 0 18px 0;
+    }
+
+    .qr-sidebar .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .qr-sidebar .nav-list li {
+            margin-bottom: 4px;
+        }
+
+        .qr-sidebar .nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: rgba(255,255,255,.78);
+            text-decoration: none;
+            font-size: .92rem;
+            font-weight: 500;
+            transition: background .15s, color .15s, transform .15s;
+            border-left: 3px solid transparent;
+        }
+
+            .qr-sidebar .nav-list a:hover {
+                background: rgba(255,255,255,.07);
+                color: #fff;
+                transform: translateX(2px);
+            }
+
+            .qr-sidebar .nav-list a.active {
+                background: rgba(192,80,46,.18);
+                color: #fff;
+                border-left-color: var(--qr-accent);
+                font-weight: 600;
+            }
+
+            .qr-sidebar .nav-list a .ico {
+                font-size: 1.1rem;
+                width: 22px;
+                text-align: center;
+            }
+
+.qr-main {
+    flex: 1;
+    padding: 32px 36px;
+    min-width: 0;
+}
+
+/* ============================================================
+   FORM — dùng chung cho Create / Edit / Delete / Details
+   ============================================================ */
+.qr-form {
+    display: grid;
+    gap: 18px;
+}
+
+.qr-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .qr-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.qr-field label {
+    display: block;
+    font-weight: 600;
+    font-size: .88rem;
+    color: var(--qr-text);
+    margin-bottom: 6px;
+}
+
+    .qr-field label .req {
+        color: #c0392b;
+    }
+
+.qr-field .form-control,
+.qr-field .form-select,
+.qr-field input[type=text],
+.qr-field input[type=number],
+.qr-field input[type=file],
+.qr-field textarea {
+    width: 100%;
+    border: 1px solid var(--qr-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .92rem;
+    background: #fff;
+    color: var(--qr-text);
+    transition: border-color .15s, box-shadow .15s;
+}
+
+    .qr-field .form-control:focus,
+    .qr-field textarea:focus,
+    .qr-field input:focus {
+        outline: none;
+        border-color: var(--qr-accent);
+        box-shadow: 0 0 0 3px rgba(192,80,46,.12);
+    }
+
+.qr-field textarea {
+    resize: vertical;
+    min-height: 110px;
+    font-family: inherit;
+}
+
+.qr-field .hint {
+    color: var(--qr-sub);
+    font-size: .78rem;
+    margin-top: 4px;
+}
+
+.qr-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--qr-muted);
+    border: 1px solid var(--qr-border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--qr-text);
+}
+
+    .qr-check input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--qr-accent);
+    }
+
+.qr-form-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 18px;
+    border-top: 1px solid var(--qr-border);
+}
+
+.btn-qr-danger {
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s;
+}
+
+    .btn-qr-danger:hover {
+        background: #962d22;
+        color: #fff;
+    }
+
+/* Read-only display rows (Details / Delete) */
+.qr-info-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--qr-border);
+}
+
+    .qr-info-row:last-child {
+        border-bottom: none;
+    }
+
+    .qr-info-row .lbl {
+        color: var(--qr-sub);
+        font-weight: 600;
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+    }
+
+    .qr-info-row .val {
+        color: var(--qr-text);
+        font-size: .95rem;
+    }
+
+@media (max-width: 768px) {
+    .qr-info-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
+
+.qr-validation {
+    color: #c0392b;
+    font-size: .82rem;
+    margin-top: 4px;
+}

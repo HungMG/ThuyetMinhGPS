@@ -8,258 +8,6 @@
     var totalCount = (int)ViewBag.TotalCount;
 }
 
-<style>
-    :root {
-        --qr-accent: #C0502E;
-        --qr-accent-dark: #9a3e24;
-        --qr-surface: #fff;
-        --qr-muted: #f5f3f0;
-        --qr-border: #e8e0d5;
-        --qr-text: #2c1a0e;
-        --qr-sub: #8a7060;
-    }
-
-    body { background: #faf7f4; }
-
-    .qr-page-header {
-        background: linear-gradient(135deg, #2c1a0e 0%, #4a3020 60%, #c0502e 100%);
-        border-radius: 18px;
-        padding: 28px 32px;
-        color: white;
-        margin-bottom: 28px;
-        position: relative;
-        overflow: hidden;
-    }
-    .qr-page-header::after {
-        content: "QR";
-        position: absolute;
-        right: 32px; top: -10px;
-        font-size: 100px;
-        font-weight: 900;
-        opacity: 0.07;
-        letter-spacing: -4px;
-        user-select: none;
-    }
-    .qr-page-header h2 { font-size: 1.7rem; font-weight: 700; margin: 0 0 4px; }
-    .qr-page-header p { opacity: .75; margin: 0; font-size: .95rem; }
-
-    .qr-stat-badge {
-        background: rgba(255,255,255,.15);
-        border: 1px solid rgba(255,255,255,.25);
-        border-radius: 30px;
-        padding: 5px 16px;
-        font-size: .85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 12px;
-    }
-
-    .filter-bar {
-        background: var(--qr-surface);
-        border: 1px solid var(--qr-border);
-        border-radius: 14px;
-        padding: 16px 20px;
-        margin-bottom: 22px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-    }
-    .filter-bar .form-control,
-    .filter-bar .form-select {
-        border-color: var(--qr-border);
-        border-radius: 8px;
-        font-size: .9rem;
-        height: 38px;
-    }
-    .filter-bar .form-control:focus,
-    .filter-bar .form-select:focus {
-        border-color: var(--qr-accent);
-        box-shadow: 0 0 0 3px rgba(192,80,46,.12);
-    }
-
-    .action-bar {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .action-bar .result-count {
-        font-size: .9rem;
-        color: var(--qr-sub);
-    }
-
-    .btn-qr-primary {
-        background: var(--qr-accent);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-size: .88rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: background .18s, transform .12s;
-    }
-    .btn-qr-primary:hover { background: var(--qr-accent-dark); color: white; transform: translateY(-1px); }
-
-    .btn-qr-outline {
-        background: transparent;
-        color: var(--qr-accent);
-        border: 1.5px solid var(--qr-accent);
-        border-radius: 8px;
-        padding: 7px 16px;
-        font-size: .85rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        transition: all .18s;
-    }
-    .btn-qr-outline:hover { background: var(--qr-accent); color: white; }
-
-    /* QR Card Grid */
-    .qr-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-        gap: 18px;
-    }
-
-    .qr-card {
-        background: var(--qr-surface);
-        border: 1px solid var(--qr-border);
-        border-radius: 16px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-        transition: box-shadow .2s, transform .18s;
-        position: relative;
-        overflow: hidden;
-    }
-    .qr-card:hover {
-        box-shadow: 0 8px 28px rgba(192,80,46,.13);
-        transform: translateY(-3px);
-    }
-    .qr-card .tour-badge {
-        position: absolute;
-        top: 12px; left: 12px;
-        background: var(--qr-muted);
-        color: var(--qr-sub);
-        border-radius: 20px;
-        padding: 2px 10px;
-        font-size: .75rem;
-        font-weight: 600;
-        border: 1px solid var(--qr-border);
-    }
-
-    .qr-img-wrap {
-        width: 130px; height: 130px;
-        border: 2px solid var(--qr-border);
-        border-radius: 12px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: border-color .18s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fafafa;
-    }
-    .qr-img-wrap:hover { border-color: var(--qr-accent); }
-    .qr-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
-
-    .qr-card-name {
-        font-weight: 700;
-        font-size: .95rem;
-        color: var(--qr-text);
-        text-align: center;
-        line-height: 1.3;
-        max-width: 190px;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-    .qr-card-coord {
-        font-size: .76rem;
-        color: var(--qr-sub);
-        text-align: center;
-    }
-    .qr-card-actions {
-        display: flex;
-        gap: 7px;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-    }
-    .qr-card-actions a {
-        flex: 1;
-        min-width: 60px;
-        text-align: center;
-        padding: 6px 10px;
-        border-radius: 8px;
-        font-size: .78rem;
-        font-weight: 600;
-        text-decoration: none;
-        border: 1.5px solid transparent;
-        transition: all .15s;
-    }
-    .btn-dl { background: var(--qr-muted); color: var(--qr-accent); border-color: var(--qr-border); }
-    .btn-dl:hover { background: var(--qr-accent); color: white; border-color: var(--qr-accent); }
-    .btn-print-one { background: var(--qr-muted); color: #2c7a2c; border-color: #cde8cd; }
-    .btn-print-one:hover { background: #2c7a2c; color: white; border-color: #2c7a2c; }
-    .btn-view { background: var(--qr-muted); color: #1a5ba8; border-color: #cddff5; }
-    .btn-view:hover { background: #1a5ba8; color: white; border-color: #1a5ba8; }
-
-    /* Empty state */
-    .empty-state {
-        text-align: center;
-        padding: 64px 20px;
-        color: var(--qr-sub);
-    }
-    .empty-state .icon { font-size: 56px; opacity: .35; margin-bottom: 12px; }
-
-    /* Modal */
-    .qr-modal-overlay {
-        display: none;
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,.6);
-        z-index: 9999;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(4px);
-    }
-    .qr-modal-overlay.active { display: flex; }
-    .qr-modal-box {
-        background: white;
-        border-radius: 24px;
-        padding: 36px;
-        max-width: 380px;
-        width: 90%;
-        text-align: center;
-        box-shadow: 0 30px 80px rgba(0,0,0,.25);
-        animation: popIn .25s cubic-bezier(.34,1.56,.64,1);
-    }
-    @@keyframes popIn {
-        from { transform: scale(.85); opacity: 0; }
-        to   { transform: scale(1);   opacity: 1; }
-    }
-    .qr-modal-box img { width: 240px; height: 240px; object-fit: contain; margin: 16px auto; display: block; border: 1px solid var(--qr-border); border-radius: 12px; padding: 8px; }
-    .qr-modal-box h5 { font-weight: 700; color: var(--qr-text); margin-bottom: 4px; }
-    .qr-modal-close {
-        position: absolute; top: 14px; right: 18px;
-        background: none; border: none; font-size: 22px;
-        cursor: pointer; color: #888; line-height: 1;
-    }
-    .qr-modal-box .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
-</style>
 
 <!-- Page Header -->
 <div class="qr-page-header">
@@ -317,7 +65,7 @@ else
     <div class="qr-grid">
         @foreach (var poi in Model)
         {
-            <div class="qr-card">
+            <div class="qr-item-card">
                 <span class="tour-badge">Tour @poi.TourId</span>
 
                 <div class="qr-img-wrap mt-3"
@@ -353,28 +101,28 @@ else
 </div>
 
 @section Scripts {
-<script>
-    function openQRModal(poiId, poiName) {
-        document.getElementById('modalPoiName').textContent = poiName;
-        document.getElementById('modalPoiSub').textContent = 'ID: ' + poiId;
-        document.getElementById('modalQRImg').src = '/QR/Image/' + poiId + '?size=12';
-        document.getElementById('modalDownloadBtn').href = '/QR/Download/' + poiId;
-        document.getElementById('modalPrintBtn').href = '/QR/Print/' + poiId;
-        document.getElementById('qrModal').classList.add('active');
-    }
+    <script>
+        function openQRModal(poiId, poiName) {
+            document.getElementById('modalPoiName').textContent = poiName;
+            document.getElementById('modalPoiSub').textContent = 'ID: ' + poiId;
+            document.getElementById('modalQRImg').src = '/QR/Image/' + poiId + '?size=12';
+            document.getElementById('modalDownloadBtn').href = '/QR/Download/' + poiId;
+            document.getElementById('modalPrintBtn').href = '/QR/Print/' + poiId;
+            document.getElementById('qrModal').classList.add('active');
+        }
 
-    function closeQRModal(e) {
-        if (e.target === document.getElementById('qrModal')) {
+        function closeQRModal(e) {
+            if (e.target === document.getElementById('qrModal')) {
+                document.getElementById('qrModal').classList.remove('active');
+            }
+        }
+
+        function closeQRModalBtn() {
             document.getElementById('qrModal').classList.remove('active');
         }
-    }
 
-    function closeQRModalBtn() {
-        document.getElementById('qrModal').classList.remove('active');
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') document.getElementById('qrModal').classList.remove('active');
-    });
-</script>
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') document.getElementById('qrModal').classList.remove('active');
+        });
+    </script>
 }

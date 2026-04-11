@@ -87,10 +87,23 @@ namespace TourGuideApp.Services
         // 👇 DÁN THÊM 2 HÀM NÀY VÀO ĐỂ LÀM TÍNH NĂNG OFFLINE-FIRST 👇
         // ==========================================================
 
+
         // 7. Nhận hàng loạt Tour từ Web và cất vào kho
         public async Task SaveToursFromWebAsync(List<Tour> tours)
         {
             await InitAsync();
+
+            // 🌟 BƯỚC 1: DỌN RÁC (Xóa những Tour trong máy không còn tồn tại trên Web)
+            var localTours = await _db.Table<Tour>().ToListAsync();
+            var webTourIds = tours.Select(t => t.Id).ToList();
+
+            var toursToDelete = localTours.Where(t => !webTourIds.Contains(t.Id)).ToList();
+            foreach (var ghostTour in toursToDelete)
+            {
+                await _db.DeleteAsync(ghostTour); // Xóa vĩnh viễn khỏi điện thoại
+            }
+
+            // 🌟 BƯỚC 2: THÊM HOẶC CẬP NHẬT DỮ LIỆU MỚI
             foreach (var tour in tours)
             {
                 var existing = await _db.Table<Tour>().Where(t => t.Id == tour.Id).FirstOrDefaultAsync();
@@ -109,6 +122,18 @@ namespace TourGuideApp.Services
         public async Task SavePOIsFromWebAsync(List<POI> pois)
         {
             await InitAsync();
+
+            // 🌟 BƯỚC 1: DỌN RÁC (Xóa những POI trong máy không còn tồn tại trên Web)
+            var localPois = await _db.Table<POI>().ToListAsync();
+            var webPoiIds = pois.Select(p => p.Id).ToList();
+
+            var poisToDelete = localPois.Where(p => !webPoiIds.Contains(p.Id)).ToList();
+            foreach (var ghostPoi in poisToDelete)
+            {
+                await _db.DeleteAsync(ghostPoi); // Xóa vĩnh viễn khỏi điện thoại
+            }
+
+            // 🌟 BƯỚC 2: THÊM HOẶC CẬP NHẬT DỮ LIỆU MỚI
             foreach (var poi in pois)
             {
                 var existing = await _db.Table<POI>().Where(p => p.Id == poi.Id).FirstOrDefaultAsync();

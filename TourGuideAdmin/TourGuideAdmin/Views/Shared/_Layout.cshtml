@@ -1,5 +1,11 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var ctx = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var act = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    string Active(string c, string a = "")
+        => (ctx == c && (string.IsNullOrEmpty(a) || act == a)) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,51 +14,53 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TourGuideAdmin.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-theme.css" asp-append-version="true" />
 </head>
 <body>
     <div class="d-flex">
 
-        <!-- Sidebar -->
-        <div class="bg-dark text-white p-3" style="width:250px; min-height:100vh;">
-            <h4>Admin Panel</h4>
-            <hr class="text-white" />
-            <ul class="nav flex-column">
+        <aside class="qr-sidebar">
+            <h4 class="brand">🧭 Tour Guide</h4>
+            <p class="brand-sub">Admin Panel</p>
+            <hr class="brand-sep" />
 
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
-                        🏠 Home / Dashboard
+            <ul class="nav-list">
+                <li>
+                    <a class="@Active("Home", "Index")"
+                           asp-controller="Home" asp-action="Index">
+                        <span class="ico">🏠</span> Trang chủ
                     </a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-area="" asp-controller="POIs" asp-action="Index">
-                        📍 Quản lý Địa điểm (POI)
+                <li>
+                    <a class="@Active("POIs")"
+                           asp-controller="POIs" asp-action="Index">
+                        <span class="ico">📍</span> Quản lý Địa điểm
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-area="" asp-controller="Tours" asp-action="Index">
-                        🛣️ Quản lý Tour
+                <li>
+                    <a class="@Active("Tours")"
+                           asp-controller="Tours" asp-action="Index">
+                        <span class="ico">🗺️</span> Quản lý Tour
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-area="" asp-controller="QR" asp-action="Index">
-                        📲 Quản lý Mã QR
+                <li>
+                    <a class="@Active("QR")"
+                           asp-controller="QR" asp-action="Index">
+                        <span class="ico">📲</span> Quản lý Mã QR
                     </a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">
-                        🛡️ Privacy
+                <li>
+                    <a class="@Active("Home", "Privacy")"
+                           asp-controller="Home" asp-action="Privacy">
+                        <span class="ico">🔒</span> Chính sách
                     </a>
                 </li>
-
             </ul>
-        </div>
+        </aside>
 
-        <!-- Main content -->
-        <div class="flex-grow-1 p-4">
+        <main class="qr-main">
             @RenderBody()
-        </div>
+        </main>
 
     </div>
     @RenderSection("Scripts", required: false)

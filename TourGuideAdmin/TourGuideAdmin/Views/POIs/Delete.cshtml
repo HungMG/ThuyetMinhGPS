@@ -1,129 +1,40 @@
 ﻿@model TourGuideAdmin.Models.POI
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Xóa Địa điểm";
 }
 
-<h1>Delete</h1>
+<div class="qr-page-header" data-watermark="DELETE" style="background:linear-gradient(135deg,#3a1a0e 0%,#5a2010 60%,#c0392b 100%);">
+    <h2>🗑️ Xóa Địa điểm</h2>
+    <p>Bạn có chắc chắn muốn xóa địa điểm này? Hành động không thể hoàn tác.</p>
+</div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>POI</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TourId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TourId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_VI)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name_VI)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_EN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name_EN)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_ZH)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name_ZH)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_KO)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name_KO)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name_JA)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name_JA)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Latitude)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Latitude)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Longitude)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Longitude)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TriggerRadius)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TriggerRadius)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Priority)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Priority)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_VI)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description_VI)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_EN)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description_EN)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_ZH)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description_ZH)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_KO)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description_KO)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description_JA)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description_JA)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsFavorite)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsFavorite)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastPlayedTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastPlayedTime)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
+<div class="qr-card" style="border-color:#f5c6c0;">
+    <div style="background:#fdecea;border:1px solid #f5c6c0;color:#962d22;padding:14px 18px;border-radius:10px;margin-bottom:20px;font-weight:600;">
+        ⚠️ Cảnh báo: Toàn bộ dữ liệu liên quan đến địa điểm này sẽ bị xóa vĩnh viễn.
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="~/images/pois/@Model.ImageUrl" class="card-img-top" alt="@Model.Name_VI" style="max-width:500px;width:100%;border-radius:12px;border:1px solid var(--qr-border);" />
+    }
+    else
+    {
+        <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 250px;">
+            <span class="text-muted">📷 Chưa có hình ảnh</span>
+        </div>
+    }
+
+    <div class="qr-info-row"><div class="lbl">Mã ID</div><div class="val">#@Model.Id</div></div>
+    <div class="qr-info-row"><div class="lbl">Tên (VI)</div><div class="val" style="font-weight:600;">@Model.Name_VI</div></div>
+    <div class="qr-info-row"><div class="lbl">Thuộc Tour</div><div class="val">Tour #@Model.TourId</div></div>
+    <div class="qr-info-row"><div class="lbl">Tọa độ</div><div class="val">@Model.Latitude, @Model.Longitude</div></div>
+
+    <form asp-action="Delete" class="qr-form" style="margin-top:20px;">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <div class="qr-form-actions">
+            <button type="submit" class="btn-qr-danger">🗑️ Xác nhận xóa</button>
+            <a asp-action="Index" class="btn-qr-outline">← Hủy</a>
+        </div>
     </form>
 </div>

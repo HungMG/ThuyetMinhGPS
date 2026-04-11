@@ -4,109 +4,36 @@
     ViewData["Title"] = "Chi tiết Địa điểm";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>ℹ️ Chi tiết Địa điểm: <span class="text-primary fw-bold">@Model.Name_VI</span></h2>
-    <div>
-        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning fw-bold me-2 px-4 shadow-sm">✏️ Chỉnh sửa</a>
-        <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">🔙 Quay lại</a>
-    </div>
+<div class="qr-page-header" data-watermark="INFO">
+    <h2>📄 Chi tiết Địa điểm</h2>
+    <p>Thông tin đầy đủ của: <strong>@Model.Name_VI</strong></p>
 </div>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="~/images/pois/@Model.ImageUrl" class="card-img-top" alt="@Model.Name_VI" style="height: 250px; object-fit: cover;">
-            }
-            else
-            {
-                <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 250px;">
-                    <span class="text-muted">📷 Chưa có hình ảnh</span>
-                </div>
-            }
-
-            <div class="card-body bg-light">
-                <h5 class="card-title text-primary fw-bold mb-3">📍 Thông số Định vị & Kích hoạt</h5>
-                <ul class="list-group list-group-flush rounded shadow-sm">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Thuộc Tour (ID):</b> <span class="badge bg-info text-dark fs-6">@Model.TourId</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Vĩ độ (Lat):</b> <span class="text-muted">@Model.Latitude</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Kinh độ (Lng):</b> <span class="text-muted">@Model.Longitude</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Bán kính kích hoạt:</b> <span>@Model.TriggerRadius m</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Độ ưu tiên:</b> <span>@Model.Priority</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <b>Nổi bật:</b>
-                        @if (Model.IsFavorite)
-                        {
-                            <span class="badge bg-danger fs-6">❤️ Có</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary fs-6">Không</span>
-                        }
-                    </li>
-                </ul>
-            </div>
+<div class="qr-card">
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="~/images/pois/@Model.ImageUrl" class="card-img-top" alt="@Model.Name_VI" style="max-width:500px;width:100%;border-radius:12px;border:1px solid var(--qr-border);" />
+    }
+    else
+    {
+        <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 250px;">
+            <span class="text-muted">📷 Chưa có hình ảnh</span>
         </div>
-    </div>
+    }
+    
+    
+    <div class="qr-info-row"><div class="lbl">Mã ID</div><div class="val">#@Model.Id</div></div>
+    <div class="qr-info-row"><div class="lbl">Thuộc Tour</div><div class="val">Tour #@Model.TourId</div></div>
+    <div class="qr-info-row"><div class="lbl">Tên (VI)</div><div class="val" style="font-weight:600;color:var(--qr-accent-dark);">@Model.Name_VI</div></div>
+    <div class="qr-info-row"><div class="lbl">Vĩ độ</div><div class="val">@Model.Latitude</div></div>
+    <div class="qr-info-row"><div class="lbl">Kinh độ</div><div class="val">@Model.Longitude</div></div>
+    <div class="qr-info-row"><div class="lbl">Bán kính kích hoạt</div><div class="val">@Model.TriggerRadius m</div></div>
+    <div class="qr-info-row"><div class="lbl">Độ ưu tiên</div><div class="val">@Model.Priority</div></div>
+    <div class="qr-info-row"><div class="lbl">Nổi bật</div><div class="val">@(Model.IsFavorite ? "❤️ Có" : "—")</div></div>
+    <div class="qr-info-row"><div class="lbl">Thuyết minh (VI)</div><div class="val" style="white-space:pre-wrap;line-height:1.7;">@Model.Description_VI</div></div>
 
-    <div class="col-md-8 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-primary text-white fw-bold py-3">
-                🌍 Nội dung Thuyết minh (Đa ngôn ngữ)
-            </div>
-            <div class="card-body">
-                <ul class="nav nav-tabs" id="langTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold" id="vi-tab" data-bs-toggle="tab" data-bs-target="#vi" type="button" role="tab">🇻🇳 Tiếng Việt</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="en-tab" data-bs-toggle="tab" data-bs-target="#en" type="button" role="tab">🇬🇧 English</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="zh-tab" data-bs-toggle="tab" data-bs-target="#zh" type="button" role="tab">🇨🇳 中文</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="ko-tab" data-bs-toggle="tab" data-bs-target="#ko" type="button" role="tab">🇰🇷 한국어</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="ja-tab" data-bs-toggle="tab" data-bs-target="#ja" type="button" role="tab">🇯🇵 日本語</button>
-                    </li>
-                </ul>
-
-                <div class="tab-content mt-4 p-2" id="langTabsContent">
-                    <div class="tab-pane fade show active" id="vi" role="tabpanel">
-                        <h4 class="text-dark">@Model.Name_VI</h4>
-                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_VI</p>
-                    </div>
-                    <div class="tab-pane fade" id="en" role="tabpanel">
-                        <h4 class="text-dark">@Model.Name_EN</h4>
-                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_EN</p>
-                    </div>
-                    <div class="tab-pane fade" id="zh" role="tabpanel">
-                        <h4 class="text-dark">@Model.Name_ZH</h4>
-                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_ZH</p>
-                    </div>
-                    <div class="tab-pane fade" id="ko" role="tabpanel">
-                        <h4 class="text-dark">@Model.Name_KO</h4>
-                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_KO</p>
-                    </div>
-                    <div class="tab-pane fade" id="ja" role="tabpanel">
-                        <h4 class="text-dark">@Model.Name_JA</h4>
-                        <p class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">@Model.Description_JA</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="qr-form-actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-qr">✏️ Sửa</a>
+        <a asp-action="Index" class="btn-qr-outline">← Quay lại danh sách</a>
     </div>
 </div>

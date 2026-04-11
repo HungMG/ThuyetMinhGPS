@@ -1,17 +1,40 @@
 ﻿@using TourGuideAdmin.Models
+@{
+    ViewData["Title"] = "Trang chủ Quản trị";
+}
+<div class="qr-page-header" data-watermark="HOME">
+    <h2>🏠 Bảng điều khiển</h2>
+    <p>Chào mừng đến với hệ thống quản trị Tour Guide</p>
+    <span class="qr-stat-badge">⚙️ Phiên bản Admin 1.0</span>
+</div>
 
-<h2 class="mb-4">📊 Dashboard</h2>
+<div class="qr-stat-grid">
+    <a asp-controller="POIs" asp-action="Index" class="qr-stat-card text-decoration-none">
+        <div class="num">📍</div>
+        <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Quản lý Địa điểm</div>
+        <div class="lbl">Thêm, sửa, xóa các POI</div>
+    </a>
+    <a asp-controller="Tours" asp-action="Index" class="qr-stat-card text-decoration-none">
+        <div class="num">🛣️</div>
+        <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Quản lý Tour</div>
+        <div class="lbl">Tạo và sắp xếp các tour</div>
+    </a>
+    <a asp-controller="QR" asp-action="Index" class="qr-stat-card text-decoration-none">
+        <div class="num">📱</div>
+        <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Quản lý Mã QR</div>
+        <div class="lbl">In và phát hành mã QR</div>
+    </a>
+    <a asp-controller="Home" asp-action="Privacy" class="qr-stat-card text-decoration-none">
+        <div class="num">🛡️</div>
+        <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Chính sách</div>
+        <div class="lbl">Quyền riêng tư &amp; điều khoản</div>
+    </a>
+</div>
 
-<div class="row">
-
-    <!-- Card Địa điểm -->
-    <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-                <h5 class="card-title">📍 Địa điểm</h5>
-                <h2>@ViewBag.LocationCount</h2>
-            </div>
-        </div>
-    </div>
-
+<div class="qr-card">
+    <h4 style="color:var(--qr-accent-dark);font-weight:700;">Hướng dẫn nhanh</h4>
+    <p class="mb-0" style="color:var(--qr-sub);">
+        Chọn một mục ở trên để bắt đầu. Mọi thay đổi trên hệ thống admin sẽ được đồng bộ
+        đến ứng dụng di động khi người dùng tải lại dữ liệu.
+    </p>
 </div>

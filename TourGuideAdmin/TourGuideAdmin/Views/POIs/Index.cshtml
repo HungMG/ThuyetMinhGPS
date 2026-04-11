@@ -4,56 +4,49 @@
     ViewData["Title"] = "Quản lý Địa điểm";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>📍 Danh sách Địa điểm (POI)</h2>
-    <a asp-action="Create" class="btn btn-success">+ Thêm Địa điểm mới</a>
+<div class="qr-page-header" data-watermark="POI">
+    <h2>📍 Quản lý Địa điểm</h2>
+    <p>Thêm, sửa, xóa các điểm tham quan trong hệ thống</p>
+    <span class="qr-stat-badge">📌 Tổng số: @Model.Count() địa điểm</span>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <form asp-action="Index" method="get" class="mb-3">
-                <div class="input-group">
-                    <input type="text" name="searchString" class="form-control"
-                           placeholder="🔍 Tìm theo tên địa điểm..."
-                           value="@Context.Request.Query["searchString"]" />
-                    <button type="submit" class="btn btn-primary">Tìm</button>
-                    <a asp-action="Index" class="btn btn-secondary">Đặt lại</a>
-                </div>
-            </form>
-            <table class="table table-hover table-striped align-middle mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Tour ID</th>
-                        <th>Tên Địa Điểm (VI)</th>
-                        <th>Vĩ độ (Lat)</th>
-                        <th>Kinh độ (Lng)</th>
-                        <th>Bán kính (m)</th>
-                        <th class="text-center">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                <span class="badge bg-secondary">Tour @Html.DisplayFor(modelItem => item.TourId)</span>
-                            </td>
-                            <td class="fw-bold text-primary">
-                                @Html.DisplayFor(modelItem => item.Name_VI)
-                            </td>
-                            <td>@Html.DisplayFor(modelItem => item.Latitude)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Longitude)</td>
-                            <td>@Html.DisplayFor(modelItem => item.TriggerRadius)</td>
-                            <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">✏️ Sửa</a>
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">📄 Chi tiết</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">🗑️ Xóa</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
+<form asp-action="Index" method="get" class="filter-bar">
+    <input type="text" name="searchString" class="form-control" style="flex:1;min-width:240px;"
+           placeholder="🔍 Tìm theo tên địa điểm..."
+           value="@Context.Request.Query["searchString"]" />
+    <button type="submit" class="btn-qr">Tìm kiếm</button>
+    <a asp-action="Index" class="btn-qr-outline">Đặt lại</a>
+    <a asp-action="Create" class="btn-qr ms-auto">+ Thêm địa điểm</a>
+</form>
+
+<div class="qr-card p-0" style="overflow:hidden;">
+    <table class="qr-table">
+        <thead>
+            <tr>
+                <th>Tour</th>
+                <th>Tên địa điểm (VI)</th>
+                <th>Vĩ độ</th>
+                <th>Kinh độ</th>
+                <th>Bán kính (m)</th>
+                <th class="text-center">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><span class="qr-stat-badge" style="background:var(--qr-muted);color:var(--qr-text);border-color:var(--qr-border);margin:0;">Tour @item.TourId</span></td>
+                    <td style="font-weight:600;color:var(--qr-accent-dark);">@item.Name_VI</td>
+                    <td>@item.Latitude</td>
+                    <td>@item.Longitude</td>
+                    <td>@item.TriggerRadius</td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-qr-outline" style="padding:4px 10px;font-size:.8rem;">✏️ Sửa</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn-qr-outline" style="padding:4px 10px;font-size:.8rem;">📄 Chi tiết</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-qr-outline" style="padding:4px 10px;font-size:.8rem;border-color:#c0392b;color:#c0392b;">🗑️ Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
