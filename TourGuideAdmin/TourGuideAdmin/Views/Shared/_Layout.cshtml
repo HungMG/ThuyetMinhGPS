@@ -27,34 +27,47 @@
             <ul class="nav-list">
                 <li>
                     <a class="@Active("Home", "Index")"
-                           asp-controller="Home" asp-action="Index">
+                       asp-controller="Home" asp-action="Index">
                         <span class="ico">🏠</span> Trang chủ
                     </a>
                 </li>
                 <li>
                     <a class="@Active("POIs")"
-                           asp-controller="POIs" asp-action="Index">
+                       asp-controller="POIs" asp-action="Index">
                         <span class="ico">📍</span> Quản lý Địa điểm
+                    </a>
+                </li>
+
+                <li>
+                    <a class="@Active("Approval")"
+                       asp-controller="Approval" asp-action="Index">
+                        <span class="ico">🛡️</span> Kiểm duyệt POI
+                    </a>
+                </li>
+                <li>
+                    <a class="@Active("User")" asp-controller="User" asp-action="Index">
+                        <span class="ico">👤</span> Quản lý Tài khoản
                     </a>
                 </li>
                 <li>
                     <a class="@Active("Tours")"
-                           asp-controller="Tours" asp-action="Index">
+                       asp-controller="Tours" asp-action="Index">
                         <span class="ico">🗺️</span> Quản lý Tour
                     </a>
                 </li>
                 <li>
                     <a class="@Active("QR")"
-                           asp-controller="QR" asp-action="Index">
+                       asp-controller="QR" asp-action="Index">
                         <span class="ico">📲</span> Quản lý Mã QR
                     </a>
                 </li>
                 <li>
                     <a class="@Active("Home", "Privacy")"
-                           asp-controller="Home" asp-action="Privacy">
+                       asp-controller="Home" asp-action="Privacy">
                         <span class="ico">🔒</span> Chính sách
                     </a>
                 </li>
+            </ul>
             </ul>
         </aside>
 

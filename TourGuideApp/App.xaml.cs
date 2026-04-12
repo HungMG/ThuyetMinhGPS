@@ -13,24 +13,23 @@ public partial class App : Application
         // =========================================================
         // 🌟 BƯỚC 1: KHÓA CHẶT ĐỊNH DẠNG SỐ LÀ DẤU CHẤM (CỨU TINH CỦA GPS)
         // =========================================================
-        // Khóa cho luồng mặc định (các luồng đẻ ra sau này cũng bị khóa)
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-        // Khóa cho luồng chạy giao diện hiện tại
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
 
+        // =========================================================
+        // 🌟 BƯỚC 2: KIỂM TRA NGÔN NGỮ
+        // =========================================================
         string savedLang = Preferences.Get("AppLanguage", "");
 
         if (string.IsNullOrEmpty(savedLang))
         {
-            // Chưa chọn ngôn ngữ -> Mở trang StartPage
+            // Trạm 1: Chưa chọn ngôn ngữ -> Bắt buộc mở StartPage đầu tiên
             MainPage = new NavigationPage(new StartPage());
         }
         else
         {
-            // =========================================================
-            // 🌟 BƯỚC 2: CÀI ĐẶT NGÔN NGỮ HIỂN THỊ (CHỮ)
-            // =========================================================
+            // Đã có ngôn ngữ -> Cài đặt ngôn ngữ hiển thị
             string cultureCode = savedLang switch
             {
                 "en" => "en-US",
@@ -41,18 +40,25 @@ public partial class App : Application
             };
 
             var uiCulture = new CultureInfo(cultureCode);
-
-    
             CultureInfo.DefaultThreadCurrentUICulture = uiCulture;
-
-      
             Thread.CurrentThread.CurrentUICulture = uiCulture;
-
-        
             AppLang.Culture = uiCulture;
 
-            // Nhảy thẳng vào App chính
-            MainPage = new AppShell();
+            // =========================================================
+            // 🌟 BƯỚC 3: KIỂM TRA ĐĂNG NHẬP (TRẠM GÁC SỐ 2)
+            // =========================================================
+            int currentUserId = Preferences.Get("UserId", -1);
+
+            if (currentUserId == -1)
+            {
+                // Có ngôn ngữ rồi, nhưng chưa có thẻ (chưa từng Đăng nhập/Ẩn danh) -> Vào trang Login
+                MainPage = new LoginPage();
+            }
+            else
+            {
+                // Đã có ngôn ngữ VÀ đã có thẻ (Hoặc thẻ User thật, hoặc thẻ Ẩn danh 0) -> Vào Trang chủ
+                MainPage = new AppShell();
+            }
         }
     }
 }

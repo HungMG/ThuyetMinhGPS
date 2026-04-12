@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="TourGuideApp.Views.RegisterPage"
+             Title="Đăng Ký"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FA">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30,50,30,30" VerticalOptions="Center">
+
+            <Label Text="Tạo Tài Khoản" FontSize="28" FontAttributes="Bold" TextColor="#C0502E" HorizontalOptions="Center"/>
+            <Label Text="Tham gia cộng đồng khám phá" FontSize="14" TextColor="#7F8C8D" HorizontalOptions="Center" Margin="0,0,0,20"/>
+
+            <Frame CornerRadius="15" HasShadow="True" Padding="20" BackgroundColor="White" BorderColor="#E8E0D5">
+                <VerticalStackLayout Spacing="15">
+
+                    <Border Stroke="#E8E0D5" StrokeThickness="1" BackgroundColor="#F8F9FA" Padding="10,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry x:Name="txtUsername" Placeholder="Tên đăng nhập" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
+                    </Border>
+
+                    <Border Stroke="#E8E0D5" StrokeThickness="1" BackgroundColor="#F8F9FA" Padding="10,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry x:Name="txtPassword" Placeholder="Mật khẩu" IsPassword="True" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
+                    </Border>
+
+                    <Border Stroke="#E8E0D5" StrokeThickness="1" BackgroundColor="#F8F9FA" Padding="10,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Entry x:Name="txtConfirmPassword" Placeholder="Nhập lại mật khẩu" IsPassword="True" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
+                    </Border>
+
+                    <Button x:Name="btnRegister" Text="Đăng Ký Mới" FontAttributes="Bold" CornerRadius="25"
+                            BackgroundColor="#27AE60" TextColor="White" Margin="0,10,0,0"
+                            Clicked="OnRegisterClicked"/>
+
+                    <Button Text="Quay lại Đăng nhập" FontAttributes="Bold" CornerRadius="25"
+                            BackgroundColor="Transparent" TextColor="#7F8C8D" Margin="0,5,0,0"
+                            Clicked="OnBackToLoginClicked"/>
+
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

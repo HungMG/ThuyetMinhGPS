@@ -180,5 +180,21 @@
             </VerticalStackLayout>
         </Frame>
 
+        <Button x:Name="btnAddPoi"
+                Text="+"
+                FontSize="32"
+                FontAttributes="Bold"
+                CornerRadius="30"
+                WidthRequest="60"
+                HeightRequest="60"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20,20,20,40"
+                BackgroundColor="#C0502E"
+                TextColor="White"
+                Shadow="{Shadow Brush=Black, Offset='0,5', Opacity=0.3, Radius=5}"
+                IsVisible="False" 
+                Clicked="OnAddPoiClicked" />
+
     </Grid>
 </ContentPage>

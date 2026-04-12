@@ -1,0 +1,87 @@
+﻿@model IEnumerable<TourGuideAdmin.Models.POI>
+@* Nhớ đổi chữ TourGuideAdmin.Models thành namespace của sếp nha *@
+
+@{
+    ViewData["Title"] = "Kiểm duyệt Địa điểm";
+    // Nó sẽ tự động ăn theo cái _Layout.cshtml của sếp (có sẵn Header, Menu, Footer)
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 style="color: #C0502E; font-weight: bold;">🛡️ Danh sách chờ duyệt</h2>
+            <p class="text-muted">Các địa điểm do người dùng đóng góp đang chờ bạn kiểm tra.</p>
+        </div>
+        <div class="badge bg-warning text-dark p-2 fs-6">Đang chờ: @Model.Count() bài</div>
+    </div>
+
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Địa Điểm (Tiếng Việt)</th>
+                    <th>Tọa độ GPS</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center py-4 text-muted">🎉 Hiện không có bài nào cần duyệt!</td></tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">#@item.Id</td>
+                        <td class="fw-bold" style="color: #4A3A31;">@item.Name_VI</td>
+                        <td><small class="text-muted">Lat: @item.Latitude<br />Lng: @item.Longitude</small></td>
+                        <td><span class="badge bg-warning text-dark">⏳ Chờ duyệt</span></td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm rounded-pill px-3">
+                                🔍 Xem Chi Tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Gọi thẳng vào cái API mà sếp đã tạo hôm qua
+        const API_BASE_URL = "/api/Admin";
+
+        async function ApprovePOI(id) {
+            if (!confirm("Sếp chắc chắn muốn đẩy địa điểm này lên Mobile App chứ?")) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/approve-poi/${id}`, { method: 'PUT' });
+                if (response.ok) {
+                    alert("Đã duyệt thành công! Địa điểm đã có mặt trên App.");
+                    // Xóa dòng đó khỏi bảng mà không cần tải lại trang (Mượt mà)
+                    document.getElementById(`row-${id}`).remove();
+                } else {
+                    alert("Có lỗi xảy ra khi duyệt!");
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        async function RejectPOI(id) {
+            if (!confirm("Sếp sẽ cho địa điểm này vào sọt rác. Chắc chắn chứ?")) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/reject-poi/${id}`, { method: 'PUT' });
+                if (response.ok) {
+                    alert("Đã từ chối địa điểm!");
+                    document.getElementById(`row-${id}`).remove();
+                } else {
+                    alert("Có lỗi xảy ra khi từ chối!");
+                }
+            } catch (error) { console.error(error); }
+        }
+    </script>
+}

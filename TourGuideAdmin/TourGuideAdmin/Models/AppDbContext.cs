@@ -11,6 +11,7 @@ namespace TourGuideAdmin.Models
         // 👇 Đổi dòng này thành DbSet<POI>
         public DbSet<POI> POIs { get; set; }
         public DbSet<Tour> Tours { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -38,7 +38,10 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
 
-        // TÌM VÀ SỬA KHÚC NÀY:
+        // 🌟 BẬT / TẮT NÚT THÊM ĐỊA ĐIỂM (Chỉ cho phép tài khoản thật)
+        int userId = Preferences.Get("UserId", -1);
+        btnAddPoi.IsVisible = (userId > 0);
+
         if (NarrationLangPicker.SelectedIndex == -1)
         {
             // Ưu tiên lấy ngôn ngữ Audio đã lưu, nếu chưa có thì lấy ngôn ngữ của App
@@ -402,5 +405,18 @@ public partial class MainPage : ContentPage
         {
             await DisplayAlert("Lỗi", "Không thể mở bản đồ chỉ đường: " + ex.Message, "OK");
         }
+    }
+
+    // ==========================================================
+    // 🌟 SỰ KIỆN: CHUYỂN SANG TRANG THÊM ĐỊA ĐIỂM
+    // ==========================================================
+    private async void OnAddPoiClicked(object sender, EventArgs e)
+    {
+        // Hiệu ứng nhún nhảy cho nút bấm
+        await btnAddPoi.ScaleTo(0.9, 100);
+        await btnAddPoi.ScaleTo(1.0, 100);
+
+        // Mở trang nhập liệu
+        await Navigation.PushAsync(new AddPoiPage());
     }
 }

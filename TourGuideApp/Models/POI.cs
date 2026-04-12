@@ -15,7 +15,7 @@ namespace TourGuideApp.Models
 
         // 👇 ĐÃ TRẢ LẠI: Các biến cũ dùng để thiết lập Audio và Yêu thích 👇
         public int TriggerRadius { get; set; } = 50; // Bán kính kích hoạt (mét)
-        public int Priority { get; set; }=1; // Độ ưu tiên (số nhỏ hơn = ưu tiên hơn)
+        public int Priority { get; set; } = 1; // Độ ưu tiên (số nhỏ hơn = ưu tiên hơn)
         public DateTime? LastPlayedTime { get; set; }
         public bool IsFavorite { get; set; }
 
@@ -33,6 +33,15 @@ namespace TourGuideApp.Models
         public string Description_ZH { get; set; }
         public string Description_KO { get; set; }
         public string Description_JA { get; set; }
+
+        // 🌟 BỘ ĐÔI KIỂM DUYỆT CỦA ADMIN 🌟
+
+        // 1. Trỏ về ông chủ quán nào đã tạo ra điểm này (Cho phép null 'int?' vì có thể sếp là người tự tạo)
+        public int? OwnerId { get; set; }
+
+        // 2. Trạng thái kiểm duyệt
+        // Quy ước: 0 = Đang chờ duyệt | 1 = Đã duyệt (Được lên App) | 2 = Bị từ chối
+        public int ApprovalStatus { get; set; } = 0;
 
         // 👇 TUYỆT CHIÊU TỰ ĐỘNG CHỌN NGÔN NGỮ (Dùng switch cho gọn) 👇
         [Ignore]
@@ -97,7 +106,7 @@ namespace TourGuideApp.Models
                 return $"http://192.168.1.151:5136/images/pois/{ImageUrl}";
             }
         }
-        
+
         // 🌟 BẢO BỐI TẢI ẢNH OFFLINE CHO POI
         [Ignore]
         [JsonIgnore]
@@ -123,5 +132,25 @@ namespace TourGuideApp.Models
 
         [Ignore]
         public string DistanceDisplay => DistanceFromUser > 0 ? $"{DistanceFromUser:F1} km" : "";
+
+        [Ignore]
+        [JsonIgnore]
+        public string ApprovalStatusText => ApprovalStatus switch
+        {
+            0 => "⏳ Đang chờ duyệt",
+            1 => "✅ Đã lên App",
+            2 => "❌ Bị từ chối",
+            _ => "Không xác định"
+        };
+
+        [Ignore]
+        [JsonIgnore]
+        public Color ApprovalStatusColor => ApprovalStatus switch
+        {
+            0 => Color.FromArgb("#F39C12"), // Màu cam
+            1 => Color.FromArgb("#27AE60"), // Màu xanh lá
+            2 => Color.FromArgb("#E74C3C"), // Màu đỏ
+            _ => Colors.Gray
+        };
     }
 }

@@ -24,7 +24,12 @@ namespace TourGuideAdmin.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<POI>>> GetPOIs()
         {
-            return await _context.POIs.ToListAsync();
+            // 🌟 MÀNG LỌC ĐA TẦNG: Chỉ trả về những điểm ĐÃ ĐƯỢC DUYỆT (ApprovalStatus == 1)
+            var approvedPOIs = await _context.POIs
+                                             .Where(p => p.ApprovalStatus == 1)
+                                             .ToListAsync();
+
+            return approvedPOIs;
         }
 
         // GET: api/POIsApi/5

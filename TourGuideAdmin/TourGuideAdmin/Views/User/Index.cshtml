@@ -1,0 +1,71 @@
+﻿@model IEnumerable<TourGuideAdmin.Models.User>
+
+@{
+    ViewData["Title"] = "Quản lý Tài khoản";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-primary">👤 Quản lý Tài khoản</h2>
+            <p class="text-muted">Danh sách tất cả người dùng và chủ quán trong hệ thống.</p>
+        </div>
+        <div class="badge bg-info text-dark p-2">Tổng cộng: @Model.Count() tài khoản</div>
+    </div>
+
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Mật khẩu (Test)</th>
+                    <th>Vai trò</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.Id</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-2" style="width: 35px; height: 35px;">
+                                    @(item.Role == 1 ? "🛡️" : "👤")
+                                </div>
+                                <strong>@item.Username</strong>
+                            </div>
+                        </td>
+                        <td><code class="text-muted">@item.Password</code></td>
+                        <td>
+                            @if (item.Role == 1)
+                            {
+                                <span class="badge bg-danger">Quản trị viên (Admin)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Người dùng (User)</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <form asp-action="ChangeRole" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                @if (item.Role == 0)
+                                {
+                                    <input type="hidden" name="newRole" value="1" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Thăng chức Admin</button>
+                                }
+                                else
+                                {
+                                    <input type="hidden" name="newRole" value="0" />
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Hạ xuống User</button>
+                                }
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

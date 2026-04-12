@@ -1,0 +1,80 @@
+﻿@model TourGuideAdmin.Models.POI
+
+@{
+    ViewData["Title"] = "Chi tiết chờ duyệt";
+}
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">⬅ Quay lại danh sách</a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-5 bg-light d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    // Lấy ảnh trực tiếp từ thư mục wwwroot/images/pois/
+                    <img src="~/images/pois/@Model.ImageUrl" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Ảnh do người dùng chụp">
+                }
+                else
+                {
+                    <div class="text-center text-muted">
+                        <h1 class="display-1">📷</h1>
+                        <p>Người dùng không đính kèm ảnh</p>
+                    </div>
+                }
+            </div>
+
+            <div class="col-md-7">
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h2 class="card-title fw-bold" style="color: #C0502E;">@Model.Name_VI</h2>
+                        <span class="badge bg-warning text-dark fs-6">⏳ Chờ duyệt</span>
+                    </div>
+
+                    <p class="text-muted mb-4"><i class="bi bi-person-circle"></i> Đóng góp bởi: <strong>@ViewBag.OwnerName</strong> (ID: @Model.OwnerId)</p>
+
+                    <h5 class="fw-bold" style="color: #4A3A31;">📝 Thuyết minh / Mô tả:</h5>
+                    <div class="p-3 mb-4 rounded" style="background-color: #FAF7F2; border: 1px solid #E8E0D5;">
+                        <p class="mb-0" style="white-space: pre-line;">@(string.IsNullOrEmpty(Model.Description_VI) ? "Không có mô tả." : Model.Description_VI)</p>
+                    </div>
+
+                    <h5 class="fw-bold" style="color: #4A3A31;">📍 Tọa độ GPS:</h5>
+                    <div class="d-flex gap-3 mb-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">Vĩ độ (Lat)</span>
+                            <input type="text" class="form-control bg-white" value="@Model.Latitude" readonly>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">Kinh độ (Lng)</span>
+                            <input type="text" class="form-control bg-white" value="@Model.Longitude" readonly>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=@Model.Latitude,@Model.Longitude" target="_blank" class="btn btn-outline-info text-nowrap">
+                            🗺️ Xem Maps
+                        </a>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex gap-3 mt-4">
+                        <form asp-action="ChangeStatus" method="post" class="flex-grow-1">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="1" /> <button type="submit" class="btn btn-success w-100 py-3 fw-bold fs-5 rounded-pill shadow-sm">
+                                ✅ DUYỆT BÀI NÀY LÊN APP
+                            </button>
+                        </form>
+
+                        <form asp-action="ChangeStatus" method="post" class="flex-grow-1">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="2" /> <button type="submit" class="btn btn-outline-danger w-100 py-3 fw-bold fs-5 rounded-pill" onclick="return confirm('Sếp chắc chắn muốn từ chối địa điểm này chứ?');">
+                                ❌ TỪ CHỐI
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -52,7 +52,8 @@ public partial class StartPage : ContentPage // 👇 Đổi tên Class
             // 4. Việc đổi Giao diện chính (UI) PHẢI GIAO LẠI CHO ANH TIẾP TÂN làm (Bắt buộc của .NET MAUI)
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                Application.Current.MainPage = new AppShell();
+                // Đã chọn ngôn ngữ xong, bây giờ chuyển qua trạm thu phí Đăng nhập
+                Application.Current.MainPage = new LoginPage();
             });
         }
         catch (Exception)

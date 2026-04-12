@@ -1,9 +1,9 @@
 ﻿using System;
-using System.IO; // Thêm thư viện File
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting; // Thêm thư viện môi trường
-using Microsoft.AspNetCore.Http; // Thêm thư viện Upload File
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,7 @@ namespace TourGuideAdmin.Controllers
     {
         private readonly AppDbContext _context;
         private readonly TranslationService _translationService;
-        private readonly IWebHostEnvironment _env; // 🌟 Thêm ông thủ kho
+        private readonly IWebHostEnvironment _env;
 
         public POIsController(AppDbContext context, TranslationService translationService, IWebHostEnvironment env)
         {
@@ -27,7 +27,8 @@ namespace TourGuideAdmin.Controllers
 
         public async Task<IActionResult> Index(string searchString)
         {
-            var pois = _context.POIs.AsEnumerable();
+            // 🌟 CHỈ LẤY NHỮNG BÀI ĐÃ ĐƯỢC DUYỆT HOẶC DO ADMIN TỰ TẠO (ApprovalStatus = 1)
+            var pois = _context.POIs.Where(p => p.ApprovalStatus == 1).AsEnumerable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -41,6 +42,7 @@ namespace TourGuideAdmin.Controllers
 
             return View(pois.ToList());
         }
+
         public static string RemoveDiacritics(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
@@ -75,7 +77,6 @@ namespace TourGuideAdmin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // 🌟 THÊM IFormFile ĐỂ UPLOAD ẢNH POI
         public async Task<IActionResult> Create([Bind("Id,TourId,Name_VI,Latitude,Longitude,TriggerRadius,Priority,Description_VI,IsFavorite")] POI pOI, IFormFile? fileHinhAnh)
         {
             // Bịt miệng ModelState cho các cột tự dịch
@@ -84,6 +85,9 @@ namespace TourGuideAdmin.Controllers
 
             if (ModelState.IsValid)
             {
+                // 🌟 BÙA BẢO MỆNH ADMIN: Đánh dấu bài này là đã duyệt (Status = 1) ngay từ lúc mới sinh ra!
+                pOI.ApprovalStatus = 1;
+
                 // 1. TỰ ĐỘNG DỊCH
                 if (!string.IsNullOrEmpty(pOI.Name_VI))
                 {
@@ -131,7 +135,6 @@ namespace TourGuideAdmin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // 🌟 SỬ DỤNG BÚA TẠ ĐỂ EDIT POI CHO CHẮC CÚ
         public async Task<IActionResult> Edit(int id, POI poiInput, IFormFile? fileHinhAnh)
         {
             if (id != poiInput.Id) return NotFound();
@@ -183,7 +186,7 @@ namespace TourGuideAdmin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-         public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
@@ -193,7 +196,6 @@ namespace TourGuideAdmin.Controllers
             return View(pois);
         }
 
-        // POST: Tours/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -6,57 +6,113 @@
              BackgroundColor="#FAF7F2"
              Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20,40,20,40" Spacing="20">
+    <RefreshView x:Name="refreshView" Refreshing="OnRefreshing" RefreshColor="#C0502E">
+        <ScrollView>
+            <VerticalStackLayout Padding="20,40,20,40" Spacing="20">
 
-            <Label Text="{x:Static lang:AppLang.SetTitle}"
-                   FontFamily="Serif"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="#4A3A31"/>
+                <Frame x:Name="pnlGuest" CornerRadius="15" BackgroundColor="#E8E0D5" BorderColor="Transparent" HasShadow="False" Padding="20" IsVisible="False">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Góc đóng góp" FontSize="18" FontAttributes="Bold" TextColor="#4A3A31"/>
+                        <Label Text="Đăng nhập để chia sẻ những địa điểm thú vị của riêng bạn lên bản đồ nhé!" FontSize="14" TextColor="#8D7A6D"/>
+                    </VerticalStackLayout>
+                </Frame>
 
-            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="{x:Static lang:AppLang.SetLanguage}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                <VerticalStackLayout x:Name="pnlLoggedIn" Spacing="20" IsVisible="True">
 
-                    <Picker x:Name="LanguagePicker" Grid.Column="1" WidthRequest="140" HorizontalTextAlignment="End" SelectedIndexChanged="OnLanguageChanged">
-                        <Picker.Items>
-                            <x:String>🇻🇳 Tiếng Việt</x:String>
-                            <x:String>🇬🇧 English</x:String>
-                            <x:String>🇨🇳 中文</x:String>
-                            <x:String>🇰🇷 한국어</x:String>
-                            <x:String>🇯🇵 日本語</x:String>
-                        </Picker.Items>
-                    </Picker>
-                </Grid>
-            </Frame>
+                    <Frame CornerRadius="15" Padding="20" HasShadow="True" BorderColor="Transparent" BackgroundColor="#C0502E">
+                        <Grid ColumnDefinitions="Auto, *">
+                            <Frame WidthRequest="60" HeightRequest="60" CornerRadius="30" BackgroundColor="White" Padding="0" Grid.Column="0" VerticalOptions="Center">
+                                <Label Text="🧑‍🚀" FontSize="35" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="15,0,0,0">
+                                <Label Text="Xin chào," FontSize="14" TextColor="#FDEBD0"/>
+                                <Label x:Name="lblUserName" Text="Tên User" FontSize="20" FontAttributes="Bold" TextColor="White"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Frame>
 
-            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="{x:Static lang:AppLang.SetAutoAudio}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
-                    <Switch Grid.Column="1" IsToggled="True" OnColor="#C0502E" VerticalOptions="Center"/>
-                </Grid>
-            </Frame>
+                    <Grid ColumnDefinitions="*, Auto" VerticalOptions="Center" Margin="0,10,0,0">
+                        <Label Text="Địa điểm của tôi" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" VerticalOptions="Center"/>
+                        <Button Grid.Column="1" Text="+ Thêm mới" BackgroundColor="#27AE60" TextColor="White" CornerRadius="15" HeightRequest="35" Padding="15,0" FontAttributes="Bold" Clicked="OnAddNewPoiClicked"/>
+                    </Grid>
 
-            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
-                <Frame.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnOfflineTapped"/>
-                </Frame.GestureRecognizers>
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="{x:Static lang:AppLang.SetOffline}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
-                    <Label Text=">" Grid.Column="1" FontSize="18" TextColor="Gray" VerticalOptions="Center"/>
-                </Grid>
-            </Frame>
+                    <Label x:Name="lblEmptyPoi" Text="📭 Bạn chưa đóng góp địa điểm nào." TextColor="#8D7A6D" HorizontalOptions="Center" Margin="0,20" IsVisible="False"/>
 
-            <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
-                <VerticalStackLayout Spacing="5">
-                    <Label Text="{x:Static lang:AppLang.SetAppInfo}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16"/>
-                    <Label Text="TourGuide App" TextColor="#8D7A6D" FontSize="14"/>
-                    <Label Text="{x:Static lang:AppLang.SetVersion}" TextColor="#8D7A6D" FontSize="14"/>
+                    <VerticalStackLayout x:Name="myPoiLayout" Spacing="15">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Padding="10" CornerRadius="12" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                                    <Grid ColumnDefinitions="70, *, Auto" ColumnSpacing="15">
+                                        <Image Grid.Column="0" Source="{Binding FullImageUrl}" Aspect="AspectFill" WidthRequest="70" HeightRequest="70">
+                                            <Image.Clip>
+                                                <RoundRectangleGeometry CornerRadius="10" Rect="0,0,70,70"/>
+                                            </Image.Clip>
+                                        </Image>
+
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="5">
+                                            <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding ApprovalStatusText}" FontSize="13" FontAttributes="Bold" TextColor="{Binding ApprovalStatusColor}"/>
+                                        </VerticalStackLayout>
+
+                                        <Frame Grid.Column="2" WidthRequest="40" HeightRequest="40" CornerRadius="8" BackgroundColor="#FAF7F2" Padding="0" VerticalOptions="Center">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnEditPoiTapped" CommandParameter="{Binding .}"/>
+                                            </Frame.GestureRecognizers>
+                                            <Label Text="✏️" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Frame>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
                 </VerticalStackLayout>
-            </Frame>
 
-        </VerticalStackLayout>
-    </ScrollView>
+                <Label Text="{x:Static lang:AppLang.SetTitle}" FontFamily="Serif" FontSize="22" FontAttributes="Bold" TextColor="#4A3A31" Margin="0,10,0,0"/>
 
+                <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{x:Static lang:AppLang.SetLanguage}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                        <Picker x:Name="LanguagePicker" Grid.Column="1" WidthRequest="140" HorizontalTextAlignment="End" SelectedIndexChanged="OnLanguageChanged">
+                            <Picker.Items>
+                                <x:String>🇻🇳 Tiếng Việt</x:String>
+                                <x:String>🇬🇧 English</x:String>
+                                <x:String>🇨🇳 中文</x:String>
+                                <x:String>🇰🇷 한국어</x:String>
+                                <x:String>🇯🇵 日本語</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Grid>
+                </Frame>
+
+                <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{x:Static lang:AppLang.SetAutoAudio}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                        <Switch Grid.Column="1" IsToggled="True" OnColor="#C0502E" VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOfflineTapped"/>
+                    </Frame.GestureRecognizers>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{x:Static lang:AppLang.SetOffline}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16" VerticalOptions="Center"/>
+                        <Label Text=">" Grid.Column="1" FontSize="18" TextColor="Gray" VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <Button x:Name="btnAuthAction" FontAttributes="Bold" CornerRadius="15" Padding="15" Margin="0,10,0,0" Clicked="OnAuthActionClicked" />
+
+                <Frame CornerRadius="15" BackgroundColor="White" BorderColor="#E8E0D5" HasShadow="False" Padding="15">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="{x:Static lang:AppLang.SetAppInfo}" FontAttributes="Bold" TextColor="#4A3A31" FontSize="16"/>
+                        <Label Text="TourGuide App" TextColor="#8D7A6D" FontSize="14"/>
+                        <Label Text="{x:Static lang:AppLang.SetVersion}" TextColor="#8D7A6D" FontSize="14"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
 </ContentPage>
