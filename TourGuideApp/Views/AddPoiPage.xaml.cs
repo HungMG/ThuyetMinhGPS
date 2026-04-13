@@ -111,29 +111,35 @@ public partial class AddPoiPage : ContentPage
 
         int currentUserId = Preferences.Get("UserId", 0);
 
-        var newPoi = new POI
         {
-            Name_VI = txtName.Text.Trim(),
-            Description_VI = txtDescription.Text?.Trim(),
-            Latitude = Convert.ToDouble(txtLat.Text),
-            Longitude = Convert.ToDouble(txtLng.Text),
-            ImageUrl = _localImagePath,
-            OwnerId = currentUserId,
-            ApprovalStatus = 0 // 0 = Chờ duyệt
-        };
+            // 1. Khởi tạo đối tượng POI mới
+            var newPoi = new POI
+            {
+                Name_VI = txtName.Text,
+                Description_VI = txtDescription.Text,
+                Latitude = double.Parse(txtLat.Text),
+                Longitude = double.Parse(txtLng.Text),
 
-        // 🌟 BẮT ĐẦU GỌI SERVER
-        ApiService apiService = new ApiService();
-        bool isSuccess = await apiService.SubmitPoiAsync(newPoi, _localImagePath);
+                // 🌟 ÉP SỐ 50 Ở ĐÂY: Để đảm bảo khi lên Web nó không bị thành số 0
+                TriggerRadius = 50,
 
-        if (isSuccess)
-        {
-            await DisplayAlert("Thành công", "Đã gửi địa điểm! Đang chờ Admin duyệt.", "Tuyệt vời");
-            await Navigation.PopAsync(); // Đóng trang, quay về bản đồ
-        }
-        else
-        {
-            await DisplayAlert("Thất bại", "Máy chủ không phản hồi, sếp kiểm tra lại mạng nhé!", "Đóng");
+                ApprovalStatus = 0, // Chờ duyệt
+                OwnerId = Preferences.Get("UserId", 0)
+            };
+
+            // 🌟 BẮT ĐẦU GỌI SERVER
+            ApiService apiService = new ApiService();
+            bool isSuccess = await apiService.SubmitPoiAsync(newPoi, _localImagePath);
+
+            if (isSuccess)
+            {
+                await DisplayAlert("Thành công", "Đã gửi địa điểm! Đang chờ Admin duyệt.", "Tuyệt vời");
+                await Navigation.PopAsync(); // Đóng trang, quay về bản đồ
+            }
+            else
+            {
+                await DisplayAlert("Thất bại", "Máy chủ không phản hồi, sếp kiểm tra lại mạng nhé!", "Đóng");
+            }
         }
     }
 }

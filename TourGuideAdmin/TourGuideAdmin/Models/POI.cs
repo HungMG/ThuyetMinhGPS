@@ -17,7 +17,7 @@ namespace TourGuideAdmin.Models
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public int TriggerRadius { get; set; }
+        public int TriggerRadius { get; set; } = 50;
         public int Priority { get; set; }
 
         public string? Description_VI { get; set; }

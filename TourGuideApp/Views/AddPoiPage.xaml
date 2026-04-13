@@ -43,20 +43,31 @@
             <Frame CornerRadius="12" Padding="15" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
                 <VerticalStackLayout Spacing="15">
                     <Button Text="{x:Static lang:AppLang.AddPoiGetLocation}" 
-                            BackgroundColor="#E8E0D5" TextColor="#C0502E" FontAttributes="Bold" CornerRadius="8"
-                            Clicked="OnGetLocationClicked"/>
+                BackgroundColor="#E8E0D5" TextColor="#C0502E" FontAttributes="Bold" CornerRadius="8"
+                Clicked="OnGetLocationClicked"/>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <VerticalStackLayout Grid.Column="0" Spacing="5">
                             <Label Text="{x:Static lang:AppLang.AddPoiLat}" FontSize="12" FontAttributes="Bold" TextColor="#8D7A6D"/>
-                            <Entry x:Name="txtLat" Placeholder="0.000000" TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13" Keyboard="Numeric"/>
+                            <Entry x:Name="txtLat" Placeholder="0.000000" 
+                       Keyboard="Text"
+                       TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="{x:Static lang:AppLang.AddPoiLng}" FontSize="12" FontAttributes="Bold" TextColor="#8D7A6D"/>
-                            <Entry x:Name="txtLng" Placeholder="0.000000" TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13" Keyboard="Numeric"/>
+                            <Entry x:Name="txtLng" Placeholder="0.000000" 
+                       Keyboard="Text"
+                       TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13"/>
                         </VerticalStackLayout>
                     </Grid>
+
+                    <VerticalStackLayout Spacing="5" Margin="0,5,0,0">
+                        <Label Text="{x:Static lang:AppLang.AddPoiRadius}" FontSize="12" FontAttributes="Bold" TextColor="#8D7A6D"/>
+                        <Entry Text="50" IsReadOnly="True" 
+                   TextColor="#7F8C8D" BackgroundColor="#F2F2F2" 
+                   FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
 

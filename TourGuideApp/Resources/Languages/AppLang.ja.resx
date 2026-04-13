@@ -378,4 +378,7 @@
   <data name="FavLoginButton" xml:space="preserve">
     <value>今すぐログイン / 登録</value>
   </data>
+  <data name="AddPoiRadius" xml:space="preserve">
+    <value>トリガー半径 (m) - デフォルト</value>
+  </data>
 </root>

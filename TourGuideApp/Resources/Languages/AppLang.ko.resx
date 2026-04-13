@@ -378,4 +378,7 @@
   <data name="FavLoginButton" xml:space="preserve">
     <value>지금 로그인 / 회원가입</value>
   </data>
+  <data name="AddPoiRadius" xml:space="preserve">
+    <value>트리거 반경 (m) - 기본</value>
+  </data>
 </root>

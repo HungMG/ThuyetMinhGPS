@@ -133,6 +133,15 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bán kính hoạt động (m) - Mặc định.
+        /// </summary>
+        public static string AddPoiRadius {
+            get {
+                return ResourceManager.GetString("AddPoiRadius", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gửi Yêu Cầu Chờ Duyệt.
         /// </summary>
         public static string AddPoiSubmit {

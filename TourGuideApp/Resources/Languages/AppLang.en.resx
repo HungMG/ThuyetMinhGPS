@@ -378,4 +378,7 @@
   <data name="FavLoginButton" xml:space="preserve">
     <value>Login / Register Now</value>
   </data>
+  <data name="AddPoiRadius" xml:space="preserve">
+    <value>Trigger Radius (m) - Default</value>
+  </data>
 </root>

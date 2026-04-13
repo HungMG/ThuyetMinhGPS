@@ -378,4 +378,7 @@
   <data name="FavLoginButton" xml:space="preserve">
     <value>立即登录 / 注册</value>
   </data>
+  <data name="AddPoiRadius" xml:space="preserve">
+    <value>触发半径 (m) - 默认</value>
+  </data>
 </root>

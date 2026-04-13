@@ -18,10 +18,8 @@ namespace TourGuideAdmin.Controllers
         }
 
         // 1. TRANG DANH SÁCH CHỜ DUYỆT
-        // 1. TRANG DANH SÁCH CHỜ DUYỆT
         public async Task<IActionResult> Index(string searchString)
         {
-            // 🌟 LỖI Ở ĐÂY NÈ SẾP: ĐỔI LẠI THÀNH SỐ 0 (CHỈ LẤY BÀI CHỜ DUYỆT)
             var pois = _context.POIs.Where(p => p.ApprovalStatus == 0).AsEnumerable();
 
             if (!string.IsNullOrEmpty(searchString))
@@ -43,15 +41,14 @@ namespace TourGuideAdmin.Controllers
             var poi = await _context.POIs.FindAsync(id);
             if (poi == null) return NotFound();
 
-            // Lấy tên ông khách ra xem (tùy thuộc sếp có nối bảng Users không)
+            // Lấy tên ông khách ra xem
             var owner = await _context.Users.FindAsync(poi.OwnerId);
             ViewBag.OwnerName = owner != null ? owner.Username : "Khách Vãng Lai";
 
             return View(poi);
         }
 
-        // 🌟 3. HÀM XỬ LÝ: VỪA DUYỆT VỪA DỊCH
-        // 🌟 3. HÀM XỬ LÝ: VỪA DUYỆT VỪA DỊCH (ĐÃ BỌC ÁO GIÁP CHỐNG LỖI)
+        // 🌟 3. HÀM XỬ LÝ: VỪA DUYỆT VỪA DỊCH VÀ CHỐT CHẶN BÁN KÍNH
         [HttpPost]
         public async Task<IActionResult> ChangeStatus(int id, int status)
         {
@@ -63,9 +60,16 @@ namespace TourGuideAdmin.Controllers
                     // 🌟 1. ÉP NGAY TRẠNG THÁI MỚI (1 = Duyệt, 2 = Từ chối)
                     poi.ApprovalStatus = status;
 
-                    // 🌟 2. NẾU LÀ DUYỆT THÌ THỬ GỌI MÁY DỊCH
+                    // 🌟 2. NẾU LÀ DUYỆT THÌ THỰC HIỆN CÁC BƯỚC CHUẨN HÓA
                     if (status == 1)
                     {
+                        // 🛡️ CHỐT CHẶN BÁN KÍNH: Ép về 50m nếu đang là 0
+                        if (poi.TriggerRadius <= 0)
+                        {
+                            poi.TriggerRadius = 50;
+                        }
+
+                        // Gọi máy dịch
                         try
                         {
                             if (!string.IsNullOrEmpty(poi.Name_VI))
@@ -85,25 +89,24 @@ namespace TourGuideAdmin.Controllers
                         }
                         catch (Exception transEx)
                         {
-                            // Nếu máy dịch đình công thì chỉ ghi Log, KHÔNG ĐƯỢC LÀM CHẾT APP
                             Console.WriteLine($"[LỖI MÁY DỊCH] Kệ nó, vẫn cho duyệt qua! Lỗi: {transEx.Message}");
                         }
                     }
 
                     // 🌟 3. BƯỚC QUAN TRỌNG NHẤT: LƯU VÀO DATABASE
-                    _context.Update(poi); // Báo cho Database biết là tao có sửa dòng này
+                    _context.Update(poi);
                     await _context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
             {
-                // Bắt lỗi nếu Database có vấn đề
                 Console.WriteLine($"[LỖI DATABASE] Không lưu được: {ex.Message}");
             }
 
             return RedirectToAction(nameof(Index));
         }
-        // 🌟 HÀM HỖ TRỢ XÓA DẤU TIẾNG VIỆT (Để tìm kiếm không phân biệt dấu)
+
+        // 🌟 HÀM HỖ TRỢ XÓA DẤU TIẾNG VIỆT
         public static string RemoveDiacritics(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;

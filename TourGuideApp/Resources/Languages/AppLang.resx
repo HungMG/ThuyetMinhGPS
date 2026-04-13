@@ -378,4 +378,7 @@
   <data name="FavLoginButton" xml:space="preserve">
     <value>Đăng Nhập / Đăng Ký Ngay</value>
   </data>
+  <data name="AddPoiRadius" xml:space="preserve">
+    <value>Bán kính hoạt động (m) - Mặc định</value>
+  </data>
 </root>
