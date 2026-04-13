@@ -249,4 +249,133 @@
   <data name="RemoveFav" xml:space="preserve">
     <value>💔 取消收藏</value>
   </data>
+  <data name="AddPoiTitle" xml:space="preserve">
+    <value>分享您的发现</value>
+  </data>
+  <data name="AddPoiImagePrompt" xml:space="preserve">
+    <value>点击拍照或选择照片</value>
+  </data>
+  <data name="AddPoiName" xml:space="preserve">
+    <value>地点名称</value>
+  </data>
+  <data name="AddPoiNamePlaceholder" xml:space="preserve">
+    <value>例如：滨城市场</value>
+  </data>
+  <data name="AddPoiDesc" xml:space="preserve">
+    <value>体验描述</value>
+  </data>
+  <data name="AddPoiDescPlaceholder" xml:space="preserve">
+    <value>这里有什么有趣的...</value>
+  </data>
+  <data name="AddPoiGetLocation" xml:space="preserve">
+    <value>📍 获取您当前的位置</value>
+  </data>
+  <data name="AddPoiLat" xml:space="preserve">
+    <value>纬度 (Lat)</value>
+  </data>
+  <data name="AddPoiLng" xml:space="preserve">
+    <value>经度 (Lng)</value>
+  </data>
+  <data name="AddPoiSubmit" xml:space="preserve">
+    <value>提交审核请求</value>
+  </data>
+  <data name="EditPoiTitle" xml:space="preserve">
+    <value>编辑地点信息</value>
+  </data>
+  <data name="EditPoiImagePrompt" xml:space="preserve">
+    <value>点击更换照片（可选）</value>
+  </data>
+  <data name="EditPoiGetLocation" xml:space="preserve">
+    <value>📍 重新获取GPS（如果需要）</value>
+  </data>
+  <data name="EditPoiSubmit" xml:space="preserve">
+    <value>保存并等待重新审核</value>
+  </data>
+  <data name="LoginSubtitle" xml:space="preserve">
+    <value>以您的方式探索世界</value>
+  </data>
+  <data name="LoginUsername" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="LoginPassword" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="LoginNoAccount" xml:space="preserve">
+    <value>还没有账号？</value>
+  </data>
+  <data name="LoginRegisterNow" xml:space="preserve">
+    <value>立即注册</value>
+  </data>
+  <data name="LoginOr" xml:space="preserve">
+    <value>或者</value>
+  </data>
+  <data name="LoginAnonymous" xml:space="preserve">
+    <value>立即探索（匿名）</value>
+  </data>
+  <data name="RegisterTitle" xml:space="preserve">
+    <value>创建账号</value>
+  </data>
+  <data name="RegisterSubtitle" xml:space="preserve">
+    <value>加入发现社区</value>
+  </data>
+  <data name="RegisterConfirmPassword" xml:space="preserve">
+    <value>确认密码</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>注册</value>
+  </data>
+  <data name="RegisterBackToLogin" xml:space="preserve">
+    <value>返回登录</value>
+  </data>
+  <data name="SettingsGuestTitle" xml:space="preserve">
+    <value>贡献角</value>
+  </data>
+  <data name="SettingsGuestSubtitle" xml:space="preserve">
+    <value>登录以在地图上分享您有趣的地点！</value>
+  </data>
+  <data name="SettingsHello" xml:space="preserve">
+    <value>你好，</value>
+  </data>
+  <data name="SettingsMyPois" xml:space="preserve">
+    <value>我的地点</value>
+  </data>
+  <data name="SettingsAddNew" xml:space="preserve">
+    <value>+ 添加新</value>
+  </data>
+  <data name="SettingsEmptyPoi" xml:space="preserve">
+    <value>📭 您还没有贡献任何地点。</value>
+  </data>
+  <data name="SettingsAuthLogin" xml:space="preserve">
+    <value>登录 / 注册</value>
+  </data>
+  <data name="SettingsAuthLogout" xml:space="preserve">
+    <value>登出账号</value>
+  </data>
+  <data name="QrCameraDenied" xml:space="preserve">
+    <value>❌ 未授予相机权限</value>
+  </data>
+  <data name="QrCameraErrorTitle" xml:space="preserve">
+    <value>相机错误</value>
+  </data>
+  <data name="QrCameraErrorDesc" xml:space="preserve">
+    <value>请授予相机权限以扫描二维码！</value>
+  </data>
+  <data name="QrNotFoundTitle" xml:space="preserve">
+    <value>未找到</value>
+  </data>
+  <data name="QrNotFoundDesc" xml:space="preserve">
+    <value>此二维码不匹配任何地点。请尝试重新同步数据。</value>
+  </data>
+  <data name="FavGuestTitle" xml:space="preserve">
+    <value>🔒 仅限会员</value>
+  </data>
+  <data name="FavGuestSubtitle" xml:space="preserve">
+    <value>请登录以保存和查看您最喜欢的地点！</value>
+  </data>
+  <data name="FavLoginButton" xml:space="preserve">
+    <value>立即登录 / 注册</value>
+  </data>
 </root>

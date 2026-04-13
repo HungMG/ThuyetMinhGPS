@@ -18,18 +18,13 @@ public partial class FavoritePage : ContentPage
         _dbService = new DatabaseService();
     }
 
-    // Mỗi lần mở tab này lên là tự động load lại dữ liệu mới nhất
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
-        // Đóng popup phòng hờ nó bị "ám" từ lần trước
         favoriteDetailPopup.IsOpen = false;
-
         await LoadFavoritesAsync();
     }
 
-    // Tắt tiếng nếu sếp chuyển qua tab khác
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
@@ -40,15 +35,38 @@ public partial class FavoritePage : ContentPage
         }
     }
 
+    // =================================================================
+    // 🌟 TRẠM KIỂM SOÁT VÉ VÀO CỔNG 🌟
+    // =================================================================
     private async Task LoadFavoritesAsync()
     {
-        // Lấy danh sách tim đỏ từ Database
-        var danhSachYeuThich = await _dbService.GetFavoritePOIsAsync();
-        favoriteListView.ItemsSource = danhSachYeuThich;
+        int userId = Preferences.Get("UserId", -1);
+
+        if (userId <= 0)
+        {
+            // Nếu chưa đăng nhập: Trưng bảng cấm lên
+            pnlGuest.IsVisible = true;
+            pnlLoggedIn.IsVisible = false;
+        }
+        else
+        {
+            // Nếu có vé: Mở cửa cho xem danh sách
+            pnlGuest.IsVisible = false;
+            pnlLoggedIn.IsVisible = true;
+
+            var danhSachYeuThich = await _dbService.GetFavoritePOIsAsync();
+            favoriteListView.ItemsSource = danhSachYeuThich;
+        }
+    }
+
+    // 🌟 SỰ KIỆN: Khách bấm nút đòi Đăng Nhập
+    private void OnLoginButtonClicked(object sender, EventArgs e)
+    {
+        Application.Current.MainPage = new LoginPage();
     }
 
     // =================================================================
-    // 🌟 1. SỰ KIỆN: XÓA KHỎI DANH SÁCH YÊU THÍCH (Ở BÊN NGOÀI LIST)
+    // CÁC HÀM XỬ LÝ CŨ CỦA SẾP GIỮ NGUYÊN HOÀN TOÀN
     // =================================================================
     private async void OnRemoveFavoriteClicked(object sender, EventArgs e)
     {
@@ -57,55 +75,45 @@ public partial class FavoritePage : ContentPage
 
         if (poiBiXoa != null)
         {
-            bool xacNhan = await DisplayAlert("Xác nhận", $"Bạn có chắc muốn bỏ '{poiBiXoa.CurrentName}' khỏi danh sách yêu thích?", "Đồng ý", "Hủy");
+            bool xacNhan = await DisplayAlert(
+                TourGuideApp.Resources.Languages.AppLang.SetTitle ?? "Xác nhận",
+                $"Bạn có chắc muốn bỏ '{poiBiXoa.CurrentName}' khỏi danh sách yêu thích?",
+                "Đồng ý", "Hủy");
 
             if (xacNhan)
             {
                 poiBiXoa.IsFavorite = false;
                 await _dbService.UpdatePOIAsync(poiBiXoa);
-                await LoadFavoritesAsync(); // Tải lại danh sách
+                await LoadFavoritesAsync();
             }
         }
     }
 
-    // =================================================================
-    // 🌟 2. SỰ KIỆN: BẤM VÀO ITEM ĐỂ MỞ POPUP
-    // =================================================================
     private void OnFavoriteItemTapped(object sender, TappedEventArgs e)
     {
         if (e.Parameter is POI poi)
         {
             _temporaryPoi = poi;
-
-            // Đổ dữ liệu lên UI của Popup
             lblPopupName.Text = poi.CurrentName;
             lblPopupDescription.Text = poi.CurrentDescription;
             imgPopupImage.Source = !string.IsNullOrEmpty(poi.ImageUrl) ? ImageSource.FromUri(new Uri(poi.FullImageUrl)) : "img_default_poi.png";
 
-            // Đồng bộ ngôn ngữ hiện tại của máy vào Picker
             string savedLang = Preferences.Get("AppLanguage", "vi");
             PopupLangPicker.SelectedIndexChanged -= OnPopupLangChanged;
             PopupLangPicker.SelectedIndex = savedLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
             PopupLangPicker.SelectedIndexChanged += OnPopupLangChanged;
 
-            // Reset trạng thái nút Audio bằng AppLang
             btnReadAudio.Text = TourGuideApp.Resources.Languages.AppLang.ListenAudio;
             btnReadAudio.BackgroundColor = Color.FromArgb("#F39C12");
             _isAudioPlaying = false;
 
-            // Bung lụa!
             favoriteDetailPopup.IsOpen = true;
         }
     }
 
-    // =================================================================
-    // 🌟 3. SỰ KIỆN: NGHE AUDIO & ĐỔI NGÔN NGỮ POPUP
-    // =================================================================
     private async void OnReadDescriptionClicked(object sender, EventArgs e)
     {
         if (_temporaryPoi == null) return;
-
-        // Nếu đang đọc thì bấm cái nữa là DỪNG
         if (_isAudioPlaying)
         {
             _narrationEngine.Stop();
@@ -113,8 +121,6 @@ public partial class FavoritePage : ContentPage
             UpdateAudioButton(false);
             return;
         }
-
-        // Bắt đầu đọc
         _isAudioPlaying = true;
         UpdateAudioButton(true);
 
@@ -122,7 +128,6 @@ public partial class FavoritePage : ContentPage
         string text = langCode switch { "en" => _temporaryPoi.Description_EN, "zh" => _temporaryPoi.Description_ZH, "ko" => _temporaryPoi.Description_KO, "ja" => _temporaryPoi.Description_JA, _ => _temporaryPoi.Description_VI };
 
         await _narrationEngine.SpeakAsync($"{_temporaryPoi.CurrentName}. {text}", langCode);
-
         _isAudioPlaying = false;
         UpdateAudioButton(false);
     }
@@ -146,48 +151,26 @@ public partial class FavoritePage : ContentPage
         }
     }
 
-    // =================================================================
-    // 🌟 4. SỰ KIỆN: CHỈ ĐƯỜNG TRÊN GOOGLE MAPS NGOÀI
-    // =================================================================
     private async void OnNavigationClicked(object sender, EventArgs e)
     {
         if (_temporaryPoi == null) return;
         await Microsoft.Maui.ApplicationModel.Map.OpenAsync(_temporaryPoi.Latitude, _temporaryPoi.Longitude, new MapLaunchOptions { Name = _temporaryPoi.CurrentName });
     }
 
-    // =================================================================
-    // 🌟 5. SỰ KIỆN: CHUYỂN QUA BẢN ĐỒ CỦA APP
-    // =================================================================
     private async void OnViewOnMapClicked(object sender, EventArgs e)
     {
         if (_temporaryPoi == null) return;
-
-        // 1. Tắt audio nếu đang rên rỉ
-        if (_isAudioPlaying)
-        {
-            _narrationEngine.Stop();
-            _isAudioPlaying = false;
-        }
-
-        // 2. Dọn dẹp đóng Popup lại
+        if (_isAudioPlaying) { _narrationEngine.Stop(); _isAudioPlaying = false; }
         favoriteDetailPopup.IsOpen = false;
-
-        // 3. Gửi "Mật thư" (Tọa độ) qua cho trang MapPage
         Preferences.Set("TargetPoiLat", _temporaryPoi.Latitude);
         Preferences.Set("TargetPoiLon", _temporaryPoi.Longitude);
-
-        // 4. Đá văng khách sang Tab Bản đồ (MapPage)
         await Shell.Current.GoToAsync("//MapPage");
     }
 
-    // =================================================================
-    // 🌟 6. SỰ KIỆN MỚI: XÓA YÊU THÍCH NGAY TRONG POPUP 🌟
-    // =================================================================
     private async void OnPopupRemoveFavClicked(object sender, EventArgs e)
     {
         if (_temporaryPoi == null) return;
 
-        // Xác nhận lại với khách hàng (Sử dụng song ngữ cho oai)
         bool isConfirm = await DisplayAlert(
             TourGuideApp.Resources.Languages.AppLang.SetTitle ?? "Xác nhận",
             $"Bạn có chắc muốn bỏ '{_temporaryPoi.CurrentName}' khỏi danh sách?",
@@ -195,21 +178,12 @@ public partial class FavoritePage : ContentPage
 
         if (isConfirm)
         {
-            // 1. Tắt audio nếu đang đọc
-            if (_isAudioPlaying)
-            {
-                _narrationEngine.Stop();
-                _isAudioPlaying = false;
-            }
+            if (_isAudioPlaying) { _narrationEngine.Stop(); _isAudioPlaying = false; }
 
-            // 2. Xóa khỏi Database
             _temporaryPoi.IsFavorite = false;
             await _dbService.UpdatePOIAsync(_temporaryPoi);
 
-            // 3. Đóng popup
             favoriteDetailPopup.IsOpen = false;
-
-            // 4. Tải lại danh sách bên ngoài để nó biến mất
             await LoadFavoritesAsync();
         }
     }

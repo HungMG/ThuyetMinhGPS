@@ -61,6 +61,96 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mô tả trải nghiệm.
+        /// </summary>
+        public static string AddPoiDesc {
+            get {
+                return ResourceManager.GetString("AddPoiDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nơi này có gì thú vị....
+        /// </summary>
+        public static string AddPoiDescPlaceholder {
+            get {
+                return ResourceManager.GetString("AddPoiDescPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📍 Lấy tọa độ hiện tại của bạn.
+        /// </summary>
+        public static string AddPoiGetLocation {
+            get {
+                return ResourceManager.GetString("AddPoiGetLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhấn để chụp hoặc chọn ảnh.
+        /// </summary>
+        public static string AddPoiImagePrompt {
+            get {
+                return ResourceManager.GetString("AddPoiImagePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vĩ độ (Lat).
+        /// </summary>
+        public static string AddPoiLat {
+            get {
+                return ResourceManager.GetString("AddPoiLat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kinh độ (Lng).
+        /// </summary>
+        public static string AddPoiLng {
+            get {
+                return ResourceManager.GetString("AddPoiLng", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tên địa điểm.
+        /// </summary>
+        public static string AddPoiName {
+            get {
+                return ResourceManager.GetString("AddPoiName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ví dụ: Chợ Bến Thành.
+        /// </summary>
+        public static string AddPoiNamePlaceholder {
+            get {
+                return ResourceManager.GetString("AddPoiNamePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gửi Yêu Cầu Chờ Duyệt.
+        /// </summary>
+        public static string AddPoiSubmit {
+            get {
+                return ResourceManager.GetString("AddPoiSubmit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chia sẻ khám phá của bạn.
+        /// </summary>
+        public static string AddPoiTitle {
+            get {
+                return ResourceManager.GetString("AddPoiTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chỉ đường.
         /// </summary>
         public static string BtnDirections {
@@ -75,6 +165,42 @@ namespace TourGuideApp.Resources.Languages {
         public static string ChooseTourSubtitle {
             get {
                 return ResourceManager.GetString("ChooseTourSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📍 Lấy lại tọa độ GPS (nếu cần).
+        /// </summary>
+        public static string EditPoiGetLocation {
+            get {
+                return ResourceManager.GetString("EditPoiGetLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhấn để đổi ảnh khác (tùy chọn).
+        /// </summary>
+        public static string EditPoiImagePrompt {
+            get {
+                return ResourceManager.GetString("EditPoiImagePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lưu Và Chờ Duyệt Lại.
+        /// </summary>
+        public static string EditPoiSubmit {
+            get {
+                return ResourceManager.GetString("EditPoiSubmit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sửa thông tin địa điểm.
+        /// </summary>
+        public static string EditPoiTitle {
+            get {
+                return ResourceManager.GetString("EditPoiTitle", resourceCulture);
             }
         }
         
@@ -111,6 +237,33 @@ namespace TourGuideApp.Resources.Languages {
         public static string FavEmptySub {
             get {
                 return ResourceManager.GetString("FavEmptySub", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vui lòng đăng nhập để lưu trữ và xem lại những địa điểm bạn yêu thích nhé!.
+        /// </summary>
+        public static string FavGuestSubtitle {
+            get {
+                return ResourceManager.GetString("FavGuestSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🔒 Dành riêng cho Thành viên.
+        /// </summary>
+        public static string FavGuestTitle {
+            get {
+                return ResourceManager.GetString("FavGuestTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng Nhập / Đăng Ký Ngay.
+        /// </summary>
+        public static string FavLoginButton {
+            get {
+                return ResourceManager.GetString("FavLoginButton", resourceCulture);
             }
         }
         
@@ -156,6 +309,78 @@ namespace TourGuideApp.Resources.Languages {
         public static string ListenAudio {
             get {
                 return ResourceManager.GetString("ListenAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Khám Phá Ngay (Ẩn Danh).
+        /// </summary>
+        public static string LoginAnonymous {
+            get {
+                return ResourceManager.GetString("LoginAnonymous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng Nhập.
+        /// </summary>
+        public static string LoginButton {
+            get {
+                return ResourceManager.GetString("LoginButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chưa có tài khoản?.
+        /// </summary>
+        public static string LoginNoAccount {
+            get {
+                return ResourceManager.GetString("LoginNoAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HOẶC.
+        /// </summary>
+        public static string LoginOr {
+            get {
+                return ResourceManager.GetString("LoginOr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mật khẩu.
+        /// </summary>
+        public static string LoginPassword {
+            get {
+                return ResourceManager.GetString("LoginPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng ký ngay.
+        /// </summary>
+        public static string LoginRegisterNow {
+            get {
+                return ResourceManager.GetString("LoginRegisterNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Khám phá thế giới theo cách của bạn.
+        /// </summary>
+        public static string LoginSubtitle {
+            get {
+                return ResourceManager.GetString("LoginSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tên đăng nhập.
+        /// </summary>
+        public static string LoginUsername {
+            get {
+                return ResourceManager.GetString("LoginUsername", resourceCulture);
             }
         }
         
@@ -268,6 +493,51 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ❌ Chưa cấp quyền Camera.
+        /// </summary>
+        public static string QrCameraDenied {
+            get {
+                return ResourceManager.GetString("QrCameraDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sếp phải cho phép dùng Camera thì mới quét mã QR được nhé!.
+        /// </summary>
+        public static string QrCameraErrorDesc {
+            get {
+                return ResourceManager.GetString("QrCameraErrorDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lỗi Camera.
+        /// </summary>
+        public static string QrCameraErrorTitle {
+            get {
+                return ResourceManager.GetString("QrCameraErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mã QR này không khớp với địa điểm nào. Hãy thử đồng bộ lại dữ liệu..
+        /// </summary>
+        public static string QrNotFoundDesc {
+            get {
+                return ResourceManager.GetString("QrNotFoundDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Không tìm thấy.
+        /// </summary>
+        public static string QrNotFoundTitle {
+            get {
+                return ResourceManager.GetString("QrNotFoundTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đưa mã QR vào khung.
         /// </summary>
         public static string QRSubtitle {
@@ -291,6 +561,51 @@ namespace TourGuideApp.Resources.Languages {
         public static string ReadLanguage {
             get {
                 return ResourceManager.GetString("ReadLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quay lại Đăng nhập.
+        /// </summary>
+        public static string RegisterBackToLogin {
+            get {
+                return ResourceManager.GetString("RegisterBackToLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng Ký Mới.
+        /// </summary>
+        public static string RegisterButton {
+            get {
+                return ResourceManager.GetString("RegisterButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nhập lại mật khẩu.
+        /// </summary>
+        public static string RegisterConfirmPassword {
+            get {
+                return ResourceManager.GetString("RegisterConfirmPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tham gia cộng đồng khám phá.
+        /// </summary>
+        public static string RegisterSubtitle {
+            get {
+                return ResourceManager.GetString("RegisterSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tạo Tài Khoản.
+        /// </summary>
+        public static string RegisterTitle {
+            get {
+                return ResourceManager.GetString("RegisterTitle", resourceCulture);
             }
         }
         
@@ -363,6 +678,78 @@ namespace TourGuideApp.Resources.Languages {
         public static string SetOffline {
             get {
                 return ResourceManager.GetString("SetOffline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to + Thêm mới.
+        /// </summary>
+        public static string SettingsAddNew {
+            get {
+                return ResourceManager.GetString("SettingsAddNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng nhập / Đăng ký.
+        /// </summary>
+        public static string SettingsAuthLogin {
+            get {
+                return ResourceManager.GetString("SettingsAuthLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng xuất tài khoản.
+        /// </summary>
+        public static string SettingsAuthLogout {
+            get {
+                return ResourceManager.GetString("SettingsAuthLogout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 📭 Bạn chưa đóng góp địa điểm nào..
+        /// </summary>
+        public static string SettingsEmptyPoi {
+            get {
+                return ResourceManager.GetString("SettingsEmptyPoi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Đăng nhập để chia sẻ những địa điểm thú vị của riêng bạn lên bản đồ nhé!.
+        /// </summary>
+        public static string SettingsGuestSubtitle {
+            get {
+                return ResourceManager.GetString("SettingsGuestSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Góc đóng góp.
+        /// </summary>
+        public static string SettingsGuestTitle {
+            get {
+                return ResourceManager.GetString("SettingsGuestTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xin chào,.
+        /// </summary>
+        public static string SettingsHello {
+            get {
+                return ResourceManager.GetString("SettingsHello", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Địa điểm của tôi.
+        /// </summary>
+        public static string SettingsMyPois {
+            get {
+                return ResourceManager.GetString("SettingsMyPois", resourceCulture);
             }
         }
         

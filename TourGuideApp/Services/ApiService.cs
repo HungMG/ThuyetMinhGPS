@@ -14,8 +14,17 @@ namespace TourGuideApp.Services
         {
             _httpClient = new HttpClient();
             // ⚠️ IP máy tính của sếp
-            _httpClient.BaseAddress = new Uri("http://192.168.1.151:5136/");
+            _httpClient.BaseAddress = new Uri("http://192.168.1.229:5136/");
             _httpClient.Timeout = TimeSpan.FromSeconds(3); // 🌟 Khiên chống đơ máy
+        }
+
+        // 🌟 KHUÔN ĐỂ HỨNG DỮ LIỆU ĐĂNG NHẬP TỪ SERVER TRẢ VỀ
+        public class LoginResponse
+        {
+            public int UserId { get; set; }
+            public string Username { get; set; }
+            public int Role { get; set; }
+            public string Message { get; set; }
         }
 
         public async Task<bool> SyncToursAsync(DatabaseService dbService)
@@ -138,6 +147,52 @@ namespace TourGuideApp.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"[LỖI ĐƯỜNG TRUYỀN] Không thể gửi POI: {ex.Message}");
+                return false;
+            }
+        }
+
+        // ==========================================================
+        // 🌟 API: ĐĂNG NHẬP
+        // ==========================================================
+        public async Task<LoginResponse> LoginAsync(string username, string password)
+        {
+            try
+            {
+                // Đóng gói tài khoản, mật khẩu
+                var loginData = new { Username = username, Password = password };
+
+                // Gửi lên cổng api/Auth/login của sếp
+                var response = await _httpClient.PostAsJsonAsync("api/Auth/login", loginData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Lấy cục dữ liệu trả về (gồm UserId, Role...) ép vào cái Khuôn
+                    return await response.Content.ReadFromJsonAsync<LoginResponse>();
+                }
+                return null; // Sai pass hoặc không tồn tại
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LỖI ĐĂNG NHẬP] {ex.Message}");
+                return null;
+            }
+        }
+
+        // ==========================================================
+        // 🌟 API: ĐĂNG KÝ TÀI KHOẢN
+        // ==========================================================
+        public async Task<bool> RegisterAsync(string username, string password)
+        {
+            try
+            {
+                var registerData = new { Username = username, Password = password };
+                var response = await _httpClient.PostAsJsonAsync("api/Auth/register", registerData);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LỖI ĐĂNG KÝ] {ex.Message}");
                 return false;
             }
         }

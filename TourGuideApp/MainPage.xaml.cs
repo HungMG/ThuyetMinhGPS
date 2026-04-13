@@ -42,13 +42,14 @@ public partial class MainPage : ContentPage
         int userId = Preferences.Get("UserId", -1);
         btnAddPoi.IsVisible = (userId > 0);
 
-        if (NarrationLangPicker.SelectedIndex == -1)
-        {
-            // Ưu tiên lấy ngôn ngữ Audio đã lưu, nếu chưa có thì lấy ngôn ngữ của App
-            string defaultLang = Preferences.Get("AppLanguage", "vi");
-            string currentTTSLang = Preferences.Get("TTSLanguage", defaultLang);
-            NarrationLangPicker.SelectedIndex = currentTTSLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
-        }
+        // 🌟 ĐÃ BỎ LỆNH IF ĐỂ LUÔN ĐỒNG BỘ GIỌNG ĐỌC MỖI KHI VÀO TRANG
+        string defaultLang = Preferences.Get("AppLanguage", "vi");
+        string currentTTSLang = Preferences.Get("TTSLanguage", defaultLang);
+
+        // Bọc công tắc lại để lúc đổi code không bị tự động kích hoạt sự kiện đọc
+        NarrationLangPicker.SelectedIndexChanged -= OnNarrationLangChanged;
+        NarrationLangPicker.SelectedIndex = currentTTSLang switch { "en" => 1, "zh" => 2, "ko" => 3, "ja" => 4, _ => 0 };
+        NarrationLangPicker.SelectedIndexChanged += OnNarrationLangChanged;
 
         if (!_isDataLoaded)
         {
@@ -111,6 +112,7 @@ public partial class MainPage : ContentPage
 
         _allPois = await _dbService.GetAllPOIsAsync() ?? new List<POI>();
 
+        // Tạm thời hiển thị danh sách trước khi có GPS cho App nó mượt, không bị khựng
         MainThread.BeginInvokeOnMainThread(() =>
         {
             tourListView.ItemsSource = null;
@@ -118,6 +120,7 @@ public partial class MainPage : ContentPage
             BindableLayout.SetItemsSource(poiStackLayout, _allPois);
         });
 
+        // 🌟 Chờ lấy GPS
         await GetUserLocationAsync();
 
         if (_userLocation != null && _allPois.Any())
@@ -128,29 +131,58 @@ public partial class MainPage : ContentPage
                 poi.DistanceFromUser = Location.CalculateDistance(_userLocation, poiLoc, DistanceUnits.Kilometers);
             }
 
+            // Sắp xếp từ gần tới xa
             _allPois = _allPois.OrderBy(p => p.DistanceFromUser).ToList();
-
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                BindableLayout.SetItemsSource(poiStackLayout, _allPois);
-            });
         }
+        else
+        {
+            // Đề phòng mất sóng GPS, gán số 9999 siêu to để nó hiện "Đang dò GPS..." chứ không hiện 0 km
+            foreach (var poi in _allPois)
+            {
+                poi.DistanceFromUser = 9999;
+            }
+        }
+
+        // 🌟 ÉP GIAO DIỆN CẬP NHẬT LẠI KHOẢNG CÁCH
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            BindableLayout.SetItemsSource(poiStackLayout, null); // Mẹo nhỏ: Xóa cache layout cũ
+            BindableLayout.SetItemsSource(poiStackLayout, _allPois); // Bơm layout mới vào
+        });
     }
 
     private async Task GetUserLocationAsync()
     {
         try
         {
+            // 🌟 1. Ép xin quyền lên luồng giao diện chính để không bị đứng App
             var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-            if (status != PermissionStatus.Granted) status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    return await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                });
+            }
 
+            // 🌟 2. Nếu khách đồng ý thì mới lấy tọa độ
             if (status == PermissionStatus.Granted)
             {
+                // Lấy vị trí cũ cho nhanh
                 _userLocation = await Geolocation.GetLastKnownLocationAsync();
-                if (_userLocation == null) _userLocation = await Geolocation.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(3)));
+
+                // Nếu không có, bắt đầu dò sóng mới (Chờ tối đa 5 giây cho chắc ăn)
+                if (_userLocation == null)
+                {
+                    var request = new GeolocationRequest(GeolocationAccuracy.High, TimeSpan.FromSeconds(5));
+                    _userLocation = await Geolocation.GetLocationAsync(request);
+                }
             }
         }
-        catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[LỖI GPS MAINPAGE]: {ex.Message}");
+        }
     }
 
     // 🌟 1. MÁY LỌC ĐA NGÔN NGỮ CHO CẢ TOUR VÀ POI

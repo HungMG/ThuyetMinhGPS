@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TourGuideAdmin; // Sửa đúng tên namespace nhà sếp
-using TourGuideAdmin.Models;
+using TourGuideAdmin.Models; // Hoặc tên namespace chứa Models của sếp
+using TourGuideAdmin;   // Hoặc tên namespace chứa AppDbContext của sếp
 
-namespace   TourGuideAdmin.Controllers
+namespace TourGuideAdmin.Controllers
 {
     public class UserController : Controller
     {
@@ -14,22 +14,33 @@ namespace   TourGuideAdmin.Controllers
             _context = context;
         }
 
-        // 🌟 Trang danh sách tài khoản
+        // 🌟 1. HIỂN THỊ DANH SÁCH TÀI KHOẢN
         public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
             return View(users);
         }
 
-        // 🌟 Hàm phụ: Đổi quyền Admin/Khách (Dành cho sếp trảm bớt hoặc thăng chức)
+        // 🌟 2. HÀM XÓA TÀI KHOẢN RÁC/LÂU KHÔNG DÙNG
         [HttpPost]
-        public async Task<IActionResult> ChangeRole(int id, int newRole)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
-                user.Role = newRole;
+                // 🛡️ BẢO VỆ: Không cho phép xóa tài khoản Admin (Role = 1)
+                if (user.Role == 1)
+                {
+                    TempData["ErrorMessage"] = "Cảnh báo: Sếp không thể tự xóa tài khoản Admin được!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Xóa User khỏi Database
+                _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Đã tiễn tài khoản '{user.Username}' ra đảo thành công!";
             }
             return RedirectToAction(nameof(Index));
         }

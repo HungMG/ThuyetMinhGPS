@@ -1,6 +1,7 @@
 using ZXing.Net.Maui;
 using TourGuideApp.Services;
 using TourGuideApp.Models;
+using TourGuideApp.Resources.Languages; // 🌟 Gọi thư viện Đa ngôn ngữ
 
 namespace TourGuideApp.Views;
 
@@ -29,8 +30,6 @@ public partial class QRCodePage : ContentPage
 
     private void barcodeReader_BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"[QR] BarcodesDetected fired. Count={e?.Results?.Length ?? 0}");
-
         if (e?.Results == null || e.Results.Length == 0) return;
 
         var first = e.Results.FirstOrDefault();
@@ -49,7 +48,9 @@ public partial class QRCodePage : ContentPage
             _lastScanTime = DateTime.Now;
 
             _isProcessing = true;
-            barcodeResult.Text = $"Đã quét: {qrCode}";
+
+            // 🌟 ẨN CHỮ ĐI LÚC QUÉT ĐƯỢC CHO ĐẸP
+            barcodeResult.Text = "";
 
             var poi = await FindPoiByQrCodeAsync(qrCode);
 
@@ -61,20 +62,14 @@ public partial class QRCodePage : ContentPage
             }
             else
             {
-                barcodeResult.Text = $"❌ Không tìm thấy địa điểm: {qrCode}";
-                await DisplayAlert(
-                    "Không tìm thấy",
-                    $"Mã QR \"{qrCode}\" không khớp với địa điểm nào trong hệ thống.\n\nHãy thử đồng bộ dữ liệu lại.",
-                    "OK"
-                );
+                // 🌟 GỌI ĐA NGÔN NGỮ KHI LỖI QR
+                barcodeResult.Text = ""; // Ẩn luôn chữ trên màn hình
+                await DisplayAlert(AppLang.QrNotFoundTitle, AppLang.QrNotFoundDesc, "OK");
                 _isProcessing = false;
             }
         });
     }
 
-    // =========================================================
-    // 🌟 GIẢI MÃ QR → TÌM POI TRONG DATABASE
-    // =========================================================
     private async Task<POI> FindPoiByQrCodeAsync(string qrCode)
     {
         try
@@ -135,14 +130,41 @@ public partial class QRCodePage : ContentPage
         return r;
     }
 
+    // 🌟 SỬA Ở ĐÂY NÈ SẾP: DÙNG ĐA NGÔN NGỮ VÀ ẨN CHỮ
     protected override void OnAppearing()
     {
         base.OnAppearing();
         _isProcessing = false;
         _lastScanned = "";
-        if (barcodeReader != null)
-            barcodeReader.IsDetecting = true;
-        barcodeResult.Text = "Đang quét...";
+
+        // Ẩn chữ lúc mới vào
+        barcodeResult.Text = "";
+
+        Dispatcher.Dispatch(async () =>
+        {
+            await Task.Delay(300);
+
+            var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.Camera>();
+            }
+
+            if (status == PermissionStatus.Granted)
+            {
+                if (barcodeReader != null)
+                    barcodeReader.IsDetecting = true;
+
+                // Ẩn chữ lúc đang quét luôn cho thoáng
+                barcodeResult.Text = "";
+            }
+            else
+            {
+                // Báo lỗi Đa ngôn ngữ
+                barcodeResult.Text = AppLang.QrCameraDenied;
+                await DisplayAlert(AppLang.QrCameraErrorTitle, AppLang.QrCameraErrorDesc, "OK");
+            }
+        });
     }
 
     protected override void OnDisappearing()

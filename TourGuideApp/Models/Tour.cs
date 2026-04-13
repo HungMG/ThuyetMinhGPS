@@ -77,7 +77,7 @@ namespace TourGuideApp.Models
                 }
 
                 // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG (Lấy từ Server của sếp)
-                return $"http://192.168.1.151:5136/images/tours/{ImageUrl}";
+                return $"http://192.168.1.229:5136/images/tours/{ImageUrl}";
             }
         }
         // 🌟 BẢO BỐI TẢI ẢNH OFFLINE CHO TOUR

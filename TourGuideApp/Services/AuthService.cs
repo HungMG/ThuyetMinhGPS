@@ -8,7 +8,7 @@ namespace TourGuideApp.Services
         private readonly HttpClient _httpClient;
 
         // 🌟 SẾP THAY CÁI PORT 5001 THÀNH PORT CỦA WEB API NHÀ SẾP NHA
-        private const string BaseUrl = "http://192.168.1.151:5136/api/Auth/";
+        private const string BaseUrl = "http://192.168.1.229:5136/api/Auth/";
 
         public AuthService()
         {

@@ -15,6 +15,12 @@ public partial class RegisterPage : ContentPage
 
     private async void OnRegisterClicked(object sender, EventArgs e)
     {
+        // 🌟 TRẠM GÁC: KIỂM TRA MẠNG TRƯỚC KHI ĐĂNG KÝ
+        if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+        {
+            await DisplayAlert("Mất kết nối", "Sếp ơi, phải có Internet thì mới kiểm tra và tạo tài khoản mới được nhé!", "Đã hiểu");
+            return; // Chặn đứng tại đây, không cho chạy code gọi API ở dưới nữa
+        }
         string username = txtUsername.Text?.Trim();
         string password = txtPassword.Text?.Trim();
         string confirmPassword = txtConfirmPassword.Text?.Trim();

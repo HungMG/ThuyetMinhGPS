@@ -6,20 +6,32 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="text-primary">👤 Quản lý Tài khoản</h2>
-            <p class="text-muted">Danh sách tất cả người dùng và chủ quán trong hệ thống.</p>
-        </div>
-        <div class="badge bg-info text-dark p-2">Tổng cộng: @Model.Count() tài khoản</div>
+        <h2 style="color: #C0502E; font-weight: bold;">👥 Quản lý Người Dùng</h2>
+        <span class="badge bg-info text-dark fs-6">Tổng cộng: @Model.Count() tài khoản</span>
     </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            ✅ @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            ❌ @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <div class="table-responsive bg-white rounded shadow-sm">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
+                    <th class="ps-4">ID</th>
                     <th>Tên đăng nhập</th>
-                    <th>Mật khẩu (Test)</th>
+                    <th>Mật khẩu</th>
                     <th>Vai trò</th>
                     <th class="text-center">Hành động</th>
                 </tr>
@@ -28,40 +40,41 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="fw-bold">@item.Id</td>
+                        <td class="ps-4 fw-bold text-muted">#@item.Id</td>
+                        <td class="fw-bold" style="color: #4A3A31;">@item.Username</td>
+
                         <td>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-2" style="width: 35px; height: 35px;">
-                                    @(item.Role == 1 ? "🛡️" : "👤")
-                                </div>
-                                <strong>@item.Username</strong>
-                            </div>
+                            <span class="text-secondary" style="letter-spacing: 2px;">••••••••</span>
                         </td>
-                        <td><code class="text-muted">@item.Password</code></td>
+
                         <td>
                             @if (item.Role == 1)
                             {
-                                <span class="badge bg-danger">Quản trị viên (Admin)</span>
+                                <span class="badge bg-danger">👑 Admin</span>
                             }
                             else
                             {
-                                <span class="badge bg-success">Người dùng (User)</span>
+                                <span class="badge bg-secondary">🎒 Khách vãng lai</span>
                             }
                         </td>
+
                         <td class="text-center">
-                            <form asp-action="ChangeRole" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@item.Id" />
-                                @if (item.Role == 0)
-                                {
-                                    <input type="hidden" name="newRole" value="1" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Thăng chức Admin</button>
-                                }
-                                else
-                                {
-                                    <input type="hidden" name="newRole" value="0" />
-                                    <button type="submit" class="btn btn-outline-success btn-sm">Hạ xuống User</button>
-                                }
-                            </form>
+                            @if (item.Role != 1)
+                            {
+                                <form asp-action="Delete" method="post" class="d-inline"
+                                      onsubmit="return confirm('Sếp có chắc chắn muốn xóa vĩnh viễn tài khoản [@item.Username] không? Mọi dữ liệu địa điểm của người này có thể trở thành Vô Danh đấy!');">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                        🗑️ Xóa Tài Khoản
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>
+                                    🛡️ Bất tử
+                                </button>
+                            }
                         </td>
                     </tr>
                 }

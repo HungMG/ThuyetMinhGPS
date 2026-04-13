@@ -78,7 +78,7 @@
                                     </Frame.GestureRecognizers>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                        <Image Grid.Column="0" WidthRequest="70" HeightRequest="70" Aspect="AspectFill" Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
+                                        <Image Grid.Column="0" WidthRequest="70" HeightRequest="70" Aspect="AspectFill" Source="{Binding LocalImageSource, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
                                             <Image.Clip>
                                                 <RoundRectangleGeometry CornerRadius="12" Rect="0,0,70,70"/>
                                             </Image.Clip>
@@ -149,7 +149,7 @@
                                     </Frame.GestureRecognizers>
 
                                     <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                        <Image Grid.Column="0" WidthRequest="60" HeightRequest="60" Aspect="AspectFill" Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
+                                        <Image Grid.Column="0" WidthRequest="60" HeightRequest="60" Aspect="AspectFill" Source="{Binding LocalImageSource, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
                                             <Image.Clip>
                                                 <RoundRectangleGeometry CornerRadius="12" Rect="0,0,60,60"/>
                                             </Image.Clip>

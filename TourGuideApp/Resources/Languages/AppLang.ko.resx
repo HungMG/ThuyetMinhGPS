@@ -249,4 +249,133 @@
   <data name="RemoveFav" xml:space="preserve">
     <value>💔 즐겨찾기 취소</value>
   </data>
+  <data name="AddPoiTitle" xml:space="preserve">
+    <value>あなたの発見を共有する</value>
+  </data>
+  <data name="AddPoiImagePrompt" xml:space="preserve">
+    <value>タップして写真を撮るか選択します</value>
+  </data>
+  <data name="AddPoiName" xml:space="preserve">
+    <value>場所の名前</value>
+  </data>
+  <data name="AddPoiNamePlaceholder" xml:space="preserve">
+    <value>例：ベンタイン市場</value>
+  </data>
+  <data name="AddPoiDesc" xml:space="preserve">
+    <value>体験の説明</value>
+  </data>
+  <data name="AddPoiDescPlaceholder" xml:space="preserve">
+    <value>ここに何が面白いですか...</value>
+  </data>
+  <data name="AddPoiGetLocation" xml:space="preserve">
+    <value>📍 現在地を取得する</value>
+  </data>
+  <data name="AddPoiLat" xml:space="preserve">
+    <value>緯度 (Lat)</value>
+  </data>
+  <data name="AddPoiLng" xml:space="preserve">
+    <value>経度 (Lng)</value>
+  </data>
+  <data name="AddPoiSubmit" xml:space="preserve">
+    <value>承認リクエストを送信する</value>
+  </data>
+  <data name="EditPoiTitle" xml:space="preserve">
+    <value>場所の情報を編集する</value>
+  </data>
+  <data name="EditPoiImagePrompt" xml:space="preserve">
+    <value>タップして写真を変更 (オプション)</value>
+  </data>
+  <data name="EditPoiGetLocation" xml:space="preserve">
+    <value>📍 GPS座標を再取得 (必要な場合)</value>
+  </data>
+  <data name="EditPoiSubmit" xml:space="preserve">
+    <value>保存して再承認を待つ</value>
+  </data>
+  <data name="LoginSubtitle" xml:space="preserve">
+    <value>あなたのやり方で世界を探索する</value>
+  </data>
+  <data name="LoginUsername" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="LoginPassword" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>ログイン</value>
+  </data>
+  <data name="LoginNoAccount" xml:space="preserve">
+    <value>アカウントを持っていませんか？</value>
+  </data>
+  <data name="LoginRegisterNow" xml:space="preserve">
+    <value>今すぐ登録</value>
+  </data>
+  <data name="LoginOr" xml:space="preserve">
+    <value>または</value>
+  </data>
+  <data name="LoginAnonymous" xml:space="preserve">
+    <value>今すぐ探索 (匿名)</value>
+  </data>
+  <data name="RegisterTitle" xml:space="preserve">
+    <value>アカウントを作成する</value>
+  </data>
+  <data name="RegisterSubtitle" xml:space="preserve">
+    <value>発見コミュニティに参加する</value>
+  </data>
+  <data name="RegisterConfirmPassword" xml:space="preserve">
+    <value>パスワードの確認</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>登録</value>
+  </data>
+  <data name="RegisterBackToLogin" xml:space="preserve">
+    <value>ログインに戻る</value>
+  </data>
+  <data name="SettingsGuestTitle" xml:space="preserve">
+    <value>貢献コーナー</value>
+  </data>
+  <data name="SettingsGuestSubtitle" xml:space="preserve">
+    <value>ログインして、地図上で面白い場所を共有しましょう！</value>
+  </data>
+  <data name="SettingsHello" xml:space="preserve">
+    <value>こんにちは、</value>
+  </data>
+  <data name="SettingsMyPois" xml:space="preserve">
+    <value>私の場所</value>
+  </data>
+  <data name="SettingsAddNew" xml:space="preserve">
+    <value>+ 新規追加</value>
+  </data>
+  <data name="SettingsEmptyPoi" xml:space="preserve">
+    <value>📭 まだ場所を貢献していません。</value>
+  </data>
+  <data name="SettingsAuthLogin" xml:space="preserve">
+    <value>로그인 / 회원가입</value>
+  </data>
+  <data name="SettingsAuthLogout" xml:space="preserve">
+    <value>로그아웃</value>
+  </data>
+  <data name="QrCameraDenied" xml:space="preserve">
+    <value>❌ 카메라 권한 거부됨</value>
+  </data>
+  <data name="QrCameraErrorTitle" xml:space="preserve">
+    <value>카메라 오류</value>
+  </data>
+  <data name="QrCameraErrorDesc" xml:space="preserve">
+    <value>QR 코드를 스캔하려면 카메라 권한을 허용해주세요!</value>
+  </data>
+  <data name="QrNotFoundTitle" xml:space="preserve">
+    <value>찾을 수 없음</value>
+  </data>
+  <data name="QrNotFoundDesc" xml:space="preserve">
+    <value>이 QR 코드는 어떤 장소와도 일치하지 않습니다. 데이터를 다시 동기화해보세요.</value>
+  </data>
+  <data name="FavGuestTitle" xml:space="preserve">
+    <value>🔒 회원 전용</value>
+  </data>
+  <data name="FavGuestSubtitle" xml:space="preserve">
+    <value>즐겨찾는 장소를 저장하고 보려면 로그인하세요!</value>
+  </data>
+  <data name="FavLoginButton" xml:space="preserve">
+    <value>지금 로그인 / 회원가입</value>
+  </data>
 </root>

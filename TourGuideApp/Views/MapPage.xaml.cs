@@ -446,10 +446,19 @@ public partial class MapPage : ContentPage
     {
         try
         {
+            // 🌟 1. Kiểm tra ngầm trước (Không làm giật UI)
             var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-            if (status != PermissionStatus.Granted)
-                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
 
+            // 🌟 2. Nếu chưa có quyền thì mới trồi lên mặt nước xin phép
+            if (status != PermissionStatus.Granted)
+            {
+                status = await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    return await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                });
+            }
+
+            // 🌟 3. Nếu khách cho phép thì chạy GPS
             if (status == PermissionStatus.Granted)
             {
                 var location = await Geolocation.GetLastKnownLocationAsync() ??
@@ -470,8 +479,19 @@ public partial class MapPage : ContentPage
 
                 await Geolocation.StartListeningForegroundAsync(new GeolocationListeningRequest(GeolocationAccuracy.High, TimeSpan.FromSeconds(5)));
             }
+            else
+            {
+                // Nếu khách từ chối
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await DisplayAlert("Cần quyền Vị trí", "Sếp chưa cấp quyền GPS thì Bản đồ không tự động tìm điểm được nhé!", "Đã hiểu");
+                });
+            }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Lỗi GPS]: {ex.Message}");
+        }
     }
 
     private void Geolocation_LocationChanged(object sender, GeolocationLocationChangedEventArgs e)

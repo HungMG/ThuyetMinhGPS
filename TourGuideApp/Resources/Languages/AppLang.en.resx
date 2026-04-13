@@ -249,4 +249,133 @@
   <data name="RemoveFav" xml:space="preserve">
     <value>💔 Remove Favorite</value>
   </data>
+  <data name="AddPoiTitle" xml:space="preserve">
+    <value>Share your discovery</value>
+  </data>
+  <data name="AddPoiImagePrompt" xml:space="preserve">
+    <value>Tap to take or choose a photo</value>
+  </data>
+  <data name="AddPoiName" xml:space="preserve">
+    <value>Place Name</value>
+  </data>
+  <data name="AddPoiNamePlaceholder" xml:space="preserve">
+    <value>E.g., Ben Thanh Market</value>
+  </data>
+  <data name="AddPoiDesc" xml:space="preserve">
+    <value>Experience Description</value>
+  </data>
+  <data name="AddPoiDescPlaceholder" xml:space="preserve">
+    <value>What's interesting here...</value>
+  </data>
+  <data name="AddPoiGetLocation" xml:space="preserve">
+    <value>📍 Get your current location</value>
+  </data>
+  <data name="AddPoiLat" xml:space="preserve">
+    <value>Latitude (Lat)</value>
+  </data>
+  <data name="AddPoiLng" xml:space="preserve">
+    <value>Longitude (Lng)</value>
+  </data>
+  <data name="AddPoiSubmit" xml:space="preserve">
+    <value>Submit Request for Approval</value>
+  </data>
+  <data name="EditPoiTitle" xml:space="preserve">
+    <value>Edit place information</value>
+  </data>
+  <data name="EditPoiImagePrompt" xml:space="preserve">
+    <value>Tap to change photo (optional)</value>
+  </data>
+  <data name="EditPoiGetLocation" xml:space="preserve">
+    <value>📍 Get GPS again (if needed)</value>
+  </data>
+  <data name="EditPoiSubmit" xml:space="preserve">
+    <value>Save and Wait for Re-approval</value>
+  </data>
+  <data name="LoginSubtitle" xml:space="preserve">
+    <value>Explore the world your way</value>
+  </data>
+  <data name="LoginUsername" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="LoginPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginNoAccount" xml:space="preserve">
+    <value>Don't have an account?</value>
+  </data>
+  <data name="LoginRegisterNow" xml:space="preserve">
+    <value>Register now</value>
+  </data>
+  <data name="LoginOr" xml:space="preserve">
+    <value>OR</value>
+  </data>
+  <data name="LoginAnonymous" xml:space="preserve">
+    <value>Explore Now (Anonymous)</value>
+  </data>
+  <data name="RegisterTitle" xml:space="preserve">
+    <value>Create Account</value>
+  </data>
+  <data name="RegisterSubtitle" xml:space="preserve">
+    <value>Join the discovery community</value>
+  </data>
+  <data name="RegisterConfirmPassword" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="RegisterBackToLogin" xml:space="preserve">
+    <value>Back to Login</value>
+  </data>
+  <data name="SettingsGuestTitle" xml:space="preserve">
+    <value>Contribution Corner</value>
+  </data>
+  <data name="SettingsGuestSubtitle" xml:space="preserve">
+    <value>Log in to share your interesting places on the map!</value>
+  </data>
+  <data name="SettingsHello" xml:space="preserve">
+    <value>Hello,</value>
+  </data>
+  <data name="SettingsMyPois" xml:space="preserve">
+    <value>My Places</value>
+  </data>
+  <data name="SettingsAddNew" xml:space="preserve">
+    <value>+ Add New</value>
+  </data>
+  <data name="SettingsEmptyPoi" xml:space="preserve">
+    <value>📭 You haven't contributed any places yet.</value>
+  </data>
+  <data name="SettingsAuthLogin" xml:space="preserve">
+    <value>Login / Register</value>
+  </data>
+  <data name="SettingsAuthLogout" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="QrCameraDenied" xml:space="preserve">
+    <value>❌ Camera permission denied</value>
+  </data>
+  <data name="QrCameraErrorTitle" xml:space="preserve">
+    <value>Camera Error</value>
+  </data>
+  <data name="QrCameraErrorDesc" xml:space="preserve">
+    <value>Please grant Camera permission to scan QR codes!</value>
+  </data>
+  <data name="QrNotFoundTitle" xml:space="preserve">
+    <value>Not Found</value>
+  </data>
+  <data name="QrNotFoundDesc" xml:space="preserve">
+    <value>This QR code does not match any place. Please try syncing data again.</value>
+  </data>
+  <data name="FavGuestTitle" xml:space="preserve">
+    <value>🔒 Members Only</value>
+  </data>
+  <data name="FavGuestSubtitle" xml:space="preserve">
+    <value>Please log in to save and review your favorite places!</value>
+  </data>
+  <data name="FavLoginButton" xml:space="preserve">
+    <value>Login / Register Now</value>
+  </data>
 </root>

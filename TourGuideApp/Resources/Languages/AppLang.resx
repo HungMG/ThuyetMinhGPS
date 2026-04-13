@@ -249,4 +249,133 @@
   <data name="RemoveFav" xml:space="preserve">
     <value>💔 Bỏ yêu thích</value>
   </data>
+  <data name="AddPoiTitle" xml:space="preserve">
+    <value>Chia sẻ khám phá của bạn</value>
+  </data>
+  <data name="AddPoiImagePrompt" xml:space="preserve">
+    <value>Nhấn để chụp hoặc chọn ảnh</value>
+  </data>
+  <data name="AddPoiName" xml:space="preserve">
+    <value>Tên địa điểm</value>
+  </data>
+  <data name="AddPoiNamePlaceholder" xml:space="preserve">
+    <value>Ví dụ: Chợ Bến Thành</value>
+  </data>
+  <data name="AddPoiDesc" xml:space="preserve">
+    <value>Mô tả trải nghiệm</value>
+  </data>
+  <data name="AddPoiDescPlaceholder" xml:space="preserve">
+    <value>Nơi này có gì thú vị...</value>
+  </data>
+  <data name="AddPoiGetLocation" xml:space="preserve">
+    <value>📍 Lấy tọa độ hiện tại của bạn</value>
+  </data>
+  <data name="AddPoiLat" xml:space="preserve">
+    <value>Vĩ độ (Lat)</value>
+  </data>
+  <data name="AddPoiLng" xml:space="preserve">
+    <value>Kinh độ (Lng)</value>
+  </data>
+  <data name="AddPoiSubmit" xml:space="preserve">
+    <value>Gửi Yêu Cầu Chờ Duyệt</value>
+  </data>
+  <data name="EditPoiTitle" xml:space="preserve">
+    <value>Sửa thông tin địa điểm</value>
+  </data>
+  <data name="EditPoiImagePrompt" xml:space="preserve">
+    <value>Nhấn để đổi ảnh khác (tùy chọn)</value>
+  </data>
+  <data name="EditPoiGetLocation" xml:space="preserve">
+    <value>📍 Lấy lại tọa độ GPS (nếu cần)</value>
+  </data>
+  <data name="EditPoiSubmit" xml:space="preserve">
+    <value>Lưu Và Chờ Duyệt Lại</value>
+  </data>
+  <data name="LoginSubtitle" xml:space="preserve">
+    <value>Khám phá thế giới theo cách của bạn</value>
+  </data>
+  <data name="LoginUsername" xml:space="preserve">
+    <value>Tên đăng nhập</value>
+  </data>
+  <data name="LoginPassword" xml:space="preserve">
+    <value>Mật khẩu</value>
+  </data>
+  <data name="LoginButton" xml:space="preserve">
+    <value>Đăng Nhập</value>
+  </data>
+  <data name="LoginNoAccount" xml:space="preserve">
+    <value>Chưa có tài khoản?</value>
+  </data>
+  <data name="LoginRegisterNow" xml:space="preserve">
+    <value>Đăng ký ngay</value>
+  </data>
+  <data name="LoginOr" xml:space="preserve">
+    <value>HOẶC</value>
+  </data>
+  <data name="LoginAnonymous" xml:space="preserve">
+    <value>Khám Phá Ngay (Ẩn Danh)</value>
+  </data>
+  <data name="RegisterTitle" xml:space="preserve">
+    <value>Tạo Tài Khoản</value>
+  </data>
+  <data name="RegisterSubtitle" xml:space="preserve">
+    <value>Tham gia cộng đồng khám phá</value>
+  </data>
+  <data name="RegisterConfirmPassword" xml:space="preserve">
+    <value>Nhập lại mật khẩu</value>
+  </data>
+  <data name="RegisterButton" xml:space="preserve">
+    <value>Đăng Ký Mới</value>
+  </data>
+  <data name="RegisterBackToLogin" xml:space="preserve">
+    <value>Quay lại Đăng nhập</value>
+  </data>
+  <data name="SettingsGuestTitle" xml:space="preserve">
+    <value>Góc đóng góp</value>
+  </data>
+  <data name="SettingsGuestSubtitle" xml:space="preserve">
+    <value>Đăng nhập để chia sẻ những địa điểm thú vị của riêng bạn lên bản đồ nhé!</value>
+  </data>
+  <data name="SettingsHello" xml:space="preserve">
+    <value>Xin chào,</value>
+  </data>
+  <data name="SettingsMyPois" xml:space="preserve">
+    <value>Địa điểm của tôi</value>
+  </data>
+  <data name="SettingsAddNew" xml:space="preserve">
+    <value>+ Thêm mới</value>
+  </data>
+  <data name="SettingsEmptyPoi" xml:space="preserve">
+    <value>📭 Bạn chưa đóng góp địa điểm nào.</value>
+  </data>
+  <data name="SettingsAuthLogin" xml:space="preserve">
+    <value>Đăng nhập / Đăng ký</value>
+  </data>
+  <data name="SettingsAuthLogout" xml:space="preserve">
+    <value>Đăng xuất tài khoản</value>
+  </data>
+  <data name="QrCameraDenied" xml:space="preserve">
+    <value>❌ Chưa cấp quyền Camera</value>
+  </data>
+  <data name="QrCameraErrorTitle" xml:space="preserve">
+    <value>Lỗi Camera</value>
+  </data>
+  <data name="QrCameraErrorDesc" xml:space="preserve">
+    <value>Sếp phải cho phép dùng Camera thì mới quét mã QR được nhé!</value>
+  </data>
+  <data name="QrNotFoundTitle" xml:space="preserve">
+    <value>Không tìm thấy</value>
+  </data>
+  <data name="QrNotFoundDesc" xml:space="preserve">
+    <value>Mã QR này không khớp với địa điểm nào. Hãy thử đồng bộ lại dữ liệu.</value>
+  </data>
+  <data name="FavGuestTitle" xml:space="preserve">
+    <value>🔒 Dành riêng cho Thành viên</value>
+  </data>
+  <data name="FavGuestSubtitle" xml:space="preserve">
+    <value>Vui lòng đăng nhập để lưu trữ và xem lại những địa điểm bạn yêu thích nhé!</value>
+  </data>
+  <data name="FavLoginButton" xml:space="preserve">
+    <value>Đăng Nhập / Đăng Ký Ngay</value>
+  </data>
 </root>

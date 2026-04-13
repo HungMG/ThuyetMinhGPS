@@ -8,8 +8,17 @@
              Shell.NavBarIsVisible="False">
 
     <Grid>
+        <VerticalStackLayout x:Name="pnlGuest" VerticalOptions="Center" HorizontalOptions="Center" Spacing="20" Padding="30" IsVisible="False">
+            <Label Text="🔒" FontSize="80" HorizontalOptions="Center"/>
+            <Label Text="{x:Static lang:AppLang.FavGuestTitle}" FontSize="20" FontAttributes="Bold" TextColor="#4A3A31" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+            <Label Text="{x:Static lang:AppLang.FavGuestSubtitle}" FontSize="14" TextColor="#8D7A6D" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
 
-        <Grid RowDefinitions="Auto,*" Padding="20,40,20,0">
+            <Button Text="{x:Static lang:AppLang.FavLoginButton}" 
+                    BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold" CornerRadius="25" HeightRequest="50" Margin="0,20,0,0"
+                    Clicked="OnLoginButtonClicked"/>
+        </VerticalStackLayout>
+
+        <Grid x:Name="pnlLoggedIn" RowDefinitions="Auto,*" Padding="20,40,20,0" IsVisible="True">
 
             <VerticalStackLayout Grid.Row="0" Margin="0,0,0,20">
                 <Label Text="{x:Static lang:AppLang.FavTitle}" FontSize="28" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif"/>
@@ -21,7 +30,6 @@
                     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10" Margin="0,100,0,0">
                         <Label Text="📭" FontSize="60" HorizontalOptions="Center" Opacity="0.8"/>
                         <Label Text="{x:Static lang:AppLang.FavEmpty}" TextColor="#8D7A6D" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
-
                         <Label Text="{x:Static lang:AppLang.FavEmptySub}" TextColor="#B0A398" FontSize="14" HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
@@ -38,8 +46,7 @@
 
                                 <Frame Grid.Column="0" WidthRequest="75" HeightRequest="75" CornerRadius="12" Padding="0" IsClippedToBounds="True" HasShadow="False" BorderColor="#E8E0D5">
                                     <Image Source="{Binding FullImageUrl, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}" 
-                                           Aspect="AspectFill" 
-                                           BackgroundColor="#F4EDE4"/>
+                                           Aspect="AspectFill" BackgroundColor="#F4EDE4"/>
                                 </Frame>
 
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
@@ -47,13 +54,11 @@
                                     <Label Text="{Binding CurrentDescription}" FontSize="13" TextColor="#7F8C8D" MaxLines="2" LineBreakMode="TailTruncation"/>
                                 </VerticalStackLayout>
 
-                                <ImageButton Grid.Column="2" 
-                                             Source="icon_trash.png" 
+                                <ImageButton Grid.Column="2" Source="icon_trash.png" 
                                              WidthRequest="24" HeightRequest="24" 
                                              VerticalOptions="Center" HorizontalOptions="Center"
                                              BackgroundColor="Transparent"
-                                             CommandParameter="{Binding .}"
-                                             Clicked="OnRemoveFavoriteClicked"/>
+                                             CommandParameter="{Binding .}" Clicked="OnRemoveFavoriteClicked"/>
                             </Grid>
                         </Frame>
                     </DataTemplate>
@@ -76,9 +81,7 @@
                             <Grid ColumnDefinitions="Auto, *" Margin="0,5">
                                 <Label Text="{x:Static lang:AppLang.ReadLanguage}" VerticalOptions="Center" FontSize="13" TextColor="#8D7A6D"/>
                                 <Picker x:Name="PopupLangPicker" Grid.Column="1" Margin="10,0,0,0" 
-                                        Title="{x:Static lang:AppLang.SelectLanguage}" 
-                                        TextColor="#C0502E" FontAttributes="Bold"
-                                        SelectedIndexChanged="OnPopupLangChanged">
+                                        Title="{x:Static lang:AppLang.SelectLanguage}" TextColor="#C0502E" FontAttributes="Bold" SelectedIndexChanged="OnPopupLangChanged">
                                     <Picker.Items>
                                         <x:String>🇻🇳 Tiếng Việt</x:String>
                                         <x:String>🇬🇧 English</x:String>
@@ -98,23 +101,13 @@
                         <VerticalStackLayout Grid.Row="2" Spacing="12" Padding="0,10,0,0">
                             <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
                                 <Button Grid.Column="0" x:Name="btnReadAudio" Text="{x:Static lang:AppLang.ListenAudio}" 
-                                        BackgroundColor="#F39C12" TextColor="White" FontAttributes="Bold"
-                                        CornerRadius="25" Clicked="OnReadDescriptionClicked" />
+                                        BackgroundColor="#F39C12" TextColor="White" FontAttributes="Bold" CornerRadius="25" Clicked="OnReadDescriptionClicked" />
                                 <Button Grid.Column="1" Text="{x:Static lang:AppLang.MapsExternal}" 
-                                        BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold"
-                                        CornerRadius="25" Clicked="OnNavigationClicked" />
+                                        BackgroundColor="#C0502E" TextColor="White" FontAttributes="Bold" CornerRadius="25" Clicked="OnNavigationClicked" />
                             </Grid>
 
-                            <Button Text="{x:Static lang:AppLang.ViewOnAppMap}" 
-                                    BackgroundColor="#2980B9" TextColor="White" FontAttributes="Bold"
-                                    CornerRadius="25" HeightRequest="50"
-                                    Clicked="OnViewOnMapClicked" />
-
-                            <Button Text="{x:Static lang:AppLang.RemoveFav}" 
-                                    BackgroundColor="Transparent" BorderColor="#E74C3C" BorderWidth="1.5" 
-                                    TextColor="#E74C3C" FontAttributes="Bold"
-                                    CornerRadius="25" HeightRequest="50"
-                                    Clicked="OnPopupRemoveFavClicked" />
+                            <Button Text="{x:Static lang:AppLang.ViewOnAppMap}" BackgroundColor="#2980B9" TextColor="White" FontAttributes="Bold" CornerRadius="25" HeightRequest="50" Clicked="OnViewOnMapClicked" />
+                            <Button Text="{x:Static lang:AppLang.RemoveFav}" BackgroundColor="Transparent" BorderColor="#E74C3C" BorderWidth="1.5" TextColor="#E74C3C" FontAttributes="Bold" CornerRadius="25" HeightRequest="50" Clicked="OnPopupRemoveFavClicked" />
                         </VerticalStackLayout>
 
                     </Grid>

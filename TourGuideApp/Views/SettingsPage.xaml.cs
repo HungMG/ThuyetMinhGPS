@@ -100,7 +100,8 @@ public partial class SettingsPage : ContentPage
 
         if (userId > 0) // Đã đăng nhập thật
         {
-            btnAuthAction.Text = "Đăng Xuất";
+            // 🌟 Gắn từ khóa Đa Ngôn Ngữ cho nút Đăng Xuất
+            btnAuthAction.Text = AppLang.SettingsAuthLogout;
             btnAuthAction.BackgroundColor = Colors.Transparent;
             btnAuthAction.TextColor = Color.FromArgb("#E74C3C"); // Chữ đỏ
             btnAuthAction.BorderColor = Color.FromArgb("#E74C3C");
@@ -108,7 +109,8 @@ public partial class SettingsPage : ContentPage
         }
         else // Khách Ẩn danh (0) hoặc chưa có gì (-1)
         {
-            btnAuthAction.Text = "Đăng Nhập / Tạo Tài Khoản";
+            // 🌟 Gắn từ khóa Đa Ngôn Ngữ cho nút Đăng Nhập / Tạo Tài Khoản
+            btnAuthAction.Text = AppLang.SettingsAuthLogin;
             btnAuthAction.BackgroundColor = Color.FromArgb("#27AE60"); // Xanh lá
             btnAuthAction.TextColor = Colors.White;
             btnAuthAction.BorderWidth = 0;
@@ -124,6 +126,7 @@ public partial class SettingsPage : ContentPage
 
         if (userId > 0)
         {
+            // Tạm thời để popup tiếng Việt, nếu sếp muốn đổi thì tạo thêm biến đa ngôn ngữ cho Popup nhé
             bool confirm = await DisplayAlert("Đăng Xuất", "Sếp có chắc chắn muốn đăng xuất không?", "Có", "Không");
             if (confirm)
             {
@@ -179,6 +182,8 @@ public partial class SettingsPage : ContentPage
         if (Preferences.Get("AppLanguage", "vi") == newLangCode) return;
 
         Preferences.Set("AppLanguage", newLangCode);
+
+        Preferences.Set("TTSLanguage", newLangCode);
 
         string cultureCode = newLangCode switch
         {
