@@ -22,10 +22,20 @@
     <a asp-controller="QR" asp-action="Index" class="qr-stat-card text-decoration-none">
         <div class="num">📱</div>
         <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Quản lý Mã QR</div>
-        <div class="lbl">In và phát hành mã QR</div>
+        <div class="lbl">Xem và tải mã QR</div>
+    </a>
+    <a asp-controller="User" asp-action="Index" class="qr-stat-card text-decoration-none">
+        <div class="num">👥</div>
+        <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Quản lý Tài khoản</div>
+        <div class="lbl">Quản lý tài khoản người dùng</div>
+    </a>
+    <a asp-controller="Approval" asp-action="Index" class="qr-stat-card text-decoration-none">
+        <div class="num">🛡️</div>
+        <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Kiểm duyệt Địa điểm</div>
+        <div class="lbl">Kiểm duyệt địa điểm</div>
     </a>
     <a asp-controller="Home" asp-action="Privacy" class="qr-stat-card text-decoration-none">
-        <div class="num">🛡️</div>
+        <div class="num">🔒</div>
         <div class="lbl mt-2" style="font-size:1rem;color:var(--qr-text);font-weight:600;">Chính sách</div>
         <div class="lbl">Quyền riêng tư &amp; điều khoản</div>
     </a>
