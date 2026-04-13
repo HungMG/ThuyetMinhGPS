@@ -1,0 +1,124 @@
+﻿@model IEnumerable<TourGuideAdmin.Models.POI>
+
+@{
+    Layout = null;
+    var tours = ViewBag.Tours as IEnumerable<TourGuideAdmin.Models.Tour>;
+    var selectedTourId = ViewBag.SelectedTourId as int?;
+    var tourName = selectedTourId.HasValue && tours != null
+        ? tours.FirstOrDefault(t => t.Id == selectedTourId)?.Name_VI
+        : null;
+    ViewData["Title"] = tourName != null ? $"In QR — Tour {tourName}" : "In tất cả QR";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        @@page { size: A4; margin: 12mm; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        .toolbar {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 12px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        .toolbar h2 { margin: 0; font-size: 18px; color: #1a3a5c; }
+        .toolbar button {
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #1a73e8;
+            color: white;
+            border: 0;
+            border-radius: 4px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12mm;
+            padding: 12mm;
+            background: white;
+        }
+        .qr-cell {
+            border: 1px dashed #aaa;
+            padding: 16px;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+        .qr-cell img { width: 220px; height: 220px; }
+        .qr-cell .name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a3a5c;
+            margin: 12px 0 4px;
+        }
+        .qr-cell .sub { font-size: 12px; color: #666; }
+        .qr-cell .tour-tag {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+        @@media print {
+            .toolbar { display: none; }
+            body { background: white; }
+            .qr-cell { border-color: #ddd; }
+            /* 4 QR / trang A4 = grid 2x2, mỗi cell ~ 90mm cao */
+            .grid { gap: 8mm; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <h2>
+            🖨️ @ViewData["Title"]
+            <small style="color:#888; font-weight:400;">(@Model.Count() mã QR)</small>
+        </h2>
+        <button onclick="window.print()">🖨️ In ngay (Ctrl+P)</button>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p style="text-align:center; padding:40px; color:#888;">
+            Không có địa điểm nào để in.
+        </p>
+    }
+    else
+    {
+        <div class="grid">
+            @foreach (var poi in Model)
+            {
+                <div class="qr-cell">
+                    <img src="@Url.Action("Image", new { id = poi.Id, size = 10 })"
+                         alt="QR @poi.Name_VI" />
+                    <div class="name">@poi.Name_VI</div>
+                    @if (!string.IsNullOrEmpty(poi.Name_EN))
+                    {
+                        <div class="sub">@poi.Name_EN</div>
+                    }
+                    @{
+                        var poiTour = tours?.FirstOrDefault(t => t.Id == poi.TourId);
+                    }
+                    @if (poiTour != null)
+                    {
+                        <div class="tour-tag">Tour: @poiTour.Name_VI</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</body>
+</html>

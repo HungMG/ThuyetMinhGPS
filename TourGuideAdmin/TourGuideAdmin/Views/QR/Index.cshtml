@@ -40,7 +40,7 @@
 </form>
 
 <!-- Action Bar -->
-<div class="action-bar">
+<div class="action-bar d-flex justify-content-between align-items-center flex-wrap gap-2">
     <span class="result-count">
         Hiển thị <strong>@Model.Count()</strong> địa điểm
         @if (!string.IsNullOrEmpty(searchString) || selectedTourId.HasValue)
@@ -48,6 +48,47 @@
             <span class="text-muted"> (đang lọc)</span>
         }
     </span>
+
+    @if (Model.Any())
+    {
+        <div class="bulk-actions d-flex gap-2">
+            @{
+                // Nếu admin đang lọc theo 1 tour cụ thể, bulk action chỉ áp dụng cho tour đó.
+                // Nếu không, áp dụng toàn bộ POI trong hệ thống.
+                var isFilteredByTour = selectedTourId.HasValue && selectedTourId > 0;
+                var bulkLabel = isFilteredByTour
+                    ? $"tour đang chọn ({Model.Count()} QR)"
+                    : $"tất cả ({Model.Count()} QR)";
+            }
+
+            @if (isFilteredByTour)
+            {
+                <a asp-action="DownloadAll" asp-route-tourId="@selectedTourId"
+                       class="btn-qr-primary"
+                       title="Tải file ZIP chứa mã QR của tour đang chọn">
+                    ⬇️ Tải tất cả (@bulkLabel)
+                </a>
+                <a asp-action="PrintAll" asp-route-tourId="@selectedTourId"
+                       target="_blank" class="btn-qr-outline"
+                       title="Mở trang in tối ưu cho A4 — dùng Ctrl+P để in">
+                    🖨️ In tất cả
+                </a>
+            }
+            else
+            {
+                <a asp-action="DownloadAll"
+                       class="btn-qr-primary"
+                       title="Tải file ZIP chứa toàn bộ mã QR trong hệ thống">
+                    ⬇️ Tải tất cả (@bulkLabel)
+                </a>
+                <a asp-action="PrintAll"
+                       target="_blank" class="btn-qr-outline"
+                       title="Mở trang in tối ưu cho A4 — dùng Ctrl+P để in">
+                    🖨️ In tất cả
+                </a>
+            }
+        </div>
+    }
 </div>
 
 <!-- QR Grid -->
