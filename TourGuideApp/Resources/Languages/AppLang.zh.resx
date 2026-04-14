@@ -381,4 +381,31 @@
   <data name="AddPoiRadius" xml:space="preserve">
     <value>触发半径 (m) - 默认</value>
   </data>
+  <data name="AddPoiTypeLabel" xml:space="preserve">
+    <value>地点类型:</value>
+  </data>
+  <data name="AddPoiTypePlaceholder" xml:space="preserve">
+    <value>-- 选择分类 --</value>
+  </data>
+  <data name="AddPoiTypePublic" xml:space="preserve">
+    <value>🌳 观光景点 (公共)</value>
+  </data>
+  <data name="AddPoiTypeBusiness" xml:space="preserve">
+    <value>🏪 餐厅 / 服务 (商业)</value>
+  </data>
+  <data name="AddPoiProofTitle" xml:space="preserve">
+    <value>商业验证 🔒</value>
+  </data>
+  <data name="AddPoiProofDesc" xml:space="preserve">
+    <value>请上传您的营业执照或食品安全证书的照片以供管理员审核。</value>
+  </data>
+  <data name="AddPoiProofBtn" xml:space="preserve">
+    <value>📷 上传执照照片</value>
+  </data>
+  <data name="AddPoiErrorNoProof" xml:space="preserve">
+    <value>商业地点需要营业执照照片！</value>
+  </data>
+  <data name="AddPoiErrorNoImage" xml:space="preserve">
+    <value>您尚未为此地点选择照片！</value>
+  </data>
 </root>

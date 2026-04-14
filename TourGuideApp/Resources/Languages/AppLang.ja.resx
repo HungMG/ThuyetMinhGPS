@@ -265,7 +265,7 @@
     <value>경험 설명</value>
   </data>
   <data name="AddPoiDescPlaceholder" xml:space="preserve">
-    <value>여기에 무엇이 흥미로운가요...</value>
+    <value>このスポットの写真が選択されていません！</value>
   </data>
   <data name="AddPoiGetLocation" xml:space="preserve">
     <value>📍 현재 위치 가져오기</value>
@@ -380,5 +380,32 @@
   </data>
   <data name="AddPoiRadius" xml:space="preserve">
     <value>トリガー半径 (m) - デフォルト</value>
+  </data>
+  <data name="AddPoiTypeLabel" xml:space="preserve">
+    <value>スポットの種類:</value>
+  </data>
+  <data name="AddPoiTypePlaceholder" xml:space="preserve">
+    <value>-- カテゴリを選択 --</value>
+  </data>
+  <data name="AddPoiTypePublic" xml:space="preserve">
+    <value>🌳 観光スポット (公共)</value>
+  </data>
+  <data name="AddPoiTypeBusiness" xml:space="preserve">
+    <value>🏪 レストラン / サービス (ビジネス)</value>
+  </data>
+  <data name="AddPoiProofTitle" xml:space="preserve">
+    <value>ビジネス認証 🔒</value>
+  </data>
+  <data name="AddPoiProofDesc" xml:space="preserve">
+    <value>管理者の審査のため、営業許可証または食品安全証明書の写真をアップロードしてください。</value>
+  </data>
+  <data name="AddPoiProofBtn" xml:space="preserve">
+    <value>📷 許可証をアップロード</value>
+  </data>
+  <data name="AddPoiErrorNoProof" xml:space="preserve">
+    <value>ビジネススポットには営業許可証の画像が必要です！</value>
+  </data>
+  <data name="AddPoiErrorNoImage" xml:space="preserve">
+    <value>このスポットの写真が選択されていません！</value>
   </data>
 </root>

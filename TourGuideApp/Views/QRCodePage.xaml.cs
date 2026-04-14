@@ -58,6 +58,12 @@ public partial class QRCodePage : ContentPage
             {
                 Preferences.Set("QRScannedPoiId", poi.Id);
                 barcodeReader.IsDetecting = false;
+
+                // 🌟 GẮN MÁY DÒ: BÁO CÁO LÊN SERVER LÀ VỪA QUÉT QR
+                // Bắt buộc có chữ "Quét QR" để Dashboard Admin nó cộng dồn số lượng đếm
+                ApiService apiService = new ApiService();
+                _ = apiService.TrackActionAsync($"Quét QR: {poi.Name_VI}");
+
                 await Shell.Current.GoToAsync("//MapPage");
             }
             else

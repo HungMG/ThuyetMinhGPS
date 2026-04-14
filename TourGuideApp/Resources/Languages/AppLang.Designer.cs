@@ -79,6 +79,24 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sếp chưa chọn ảnh cho địa điểm này kìa!.
+        /// </summary>
+        public static string AddPoiErrorNoImage {
+            get {
+                return ResourceManager.GetString("AddPoiErrorNoImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Khai báo quán ăn thì phải có ảnh chụp Giấy Phép Kinh Doanh sếp ơi!.
+        /// </summary>
+        public static string AddPoiErrorNoProof {
+            get {
+                return ResourceManager.GetString("AddPoiErrorNoProof", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 📍 Lấy tọa độ hiện tại của bạn.
         /// </summary>
         public static string AddPoiGetLocation {
@@ -133,6 +151,33 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 📷 Tải ảnh Giấy phép lên.
+        /// </summary>
+        public static string AddPoiProofBtn {
+            get {
+                return ResourceManager.GetString("AddPoiProofBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vui lòng tải lên ảnh chụp Giấy phép KD hoặc Chứng nhận ATTP để Admin xét duyệt..
+        /// </summary>
+        public static string AddPoiProofDesc {
+            get {
+                return ResourceManager.GetString("AddPoiProofDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xác thực doanh nghiệp 🔒.
+        /// </summary>
+        public static string AddPoiProofTitle {
+            get {
+                return ResourceManager.GetString("AddPoiProofTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Bán kính hoạt động (m) - Mặc định.
         /// </summary>
         public static string AddPoiRadius {
@@ -156,6 +201,42 @@ namespace TourGuideApp.Resources.Languages {
         public static string AddPoiTitle {
             get {
                 return ResourceManager.GetString("AddPoiTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🏪 Quán ăn / Dịch vụ (Kinh doanh).
+        /// </summary>
+        public static string AddPoiTypeBusiness {
+            get {
+                return ResourceManager.GetString("AddPoiTypeBusiness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loại hình địa điểm:.
+        /// </summary>
+        public static string AddPoiTypeLabel {
+            get {
+                return ResourceManager.GetString("AddPoiTypeLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -- Chọn phân loại --.
+        /// </summary>
+        public static string AddPoiTypePlaceholder {
+            get {
+                return ResourceManager.GetString("AddPoiTypePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🌳 Điểm tham quan (Công cộng).
+        /// </summary>
+        public static string AddPoiTypePublic {
+            get {
+                return ResourceManager.GetString("AddPoiTypePublic", resourceCulture);
             }
         }
         

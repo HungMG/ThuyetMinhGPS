@@ -34,6 +34,10 @@ namespace TourGuideApp.Models
         public string Description_KO { get; set; }
         public string Description_JA { get; set; }
 
+        // 🌟 NÂNG CẤP V2: XÁC THỰC DOANH NGHIỆP
+        public int PoiType { get; set; } = 0; // 0 = Công cộng, 1 = Cơ sở kinh doanh
+        public string ProofImageUrl { get; set; } // Link ảnh Giấy phép kinh doanh
+
         // 🌟 BỘ ĐÔI KIỂM DUYỆT CỦA ADMIN 🌟
 
         // 1. Trỏ về ông chủ quán nào đã tạo ra điểm này (Cho phép null 'int?' vì có thể sếp là người tự tạo)
@@ -103,7 +107,8 @@ namespace TourGuideApp.Models
                 }
 
                 // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG (Lấy từ Server của sếp)
-                return $"http://192.168.1.229/images/pois/{ImageUrl}";
+                // 3. NẾU MỚI CHỈ CÓ TÊN FILE VÀ ĐANG CÓ MẠNG
+                return $"https://stauroscopically-unlethargical-merideth.ngrok-free.dev/images/pois/{ImageUrl}";
             }
         }
 

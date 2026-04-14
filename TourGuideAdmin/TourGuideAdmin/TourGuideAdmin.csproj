@@ -19,4 +19,8 @@
     <PackageReference Include="QRCoder" Version="1.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\proofs\" />
+  </ItemGroup>
+
 </Project>

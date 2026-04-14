@@ -1,0 +1,161 @@
+﻿@model IEnumerable<TourGuideAdmin.Models.UserActivity>
+@{
+    ViewData["Title"] = "Phân tích Hành vi Người dùng";
+
+    // 🌟 Tính toán nhanh số lượng Thành viên
+    int totalUsers = ViewBag.TotalUsers ?? 0;
+    int activeGuests = ViewBag.ActiveGuests ?? 0;
+    int activeMembers = totalUsers - activeGuests;
+}
+
+<div class="qr-page-header" data-watermark="DATA">
+    <h2>📈 Dashboard Phân tích Hành vi</h2>
+    <p>Theo dõi luồng Khách vãng lai và Thành viên đăng ký qua Device ID</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm" style="border-radius: 12px; border-left: 5px solid #e74c3c; position: relative; overflow: hidden;">
+            <div class="card-body">
+                <div style="position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; background-color: #2ecc71; border-radius: 50%;" class="animate-pulse"></div>
+
+                <h6 class="text-muted fw-bold">Đang Online</h6>
+                <h3 class="fw-bold text-danger">@ViewBag.OnlineNow</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm" style="border-radius: 12px; border-left: 5px solid #2ecc71;">
+            <div class="card-body">
+                <h6 class="text-muted">Tổng Thiết Bị</h6>
+                <h3 class="fw-bold">@ViewBag.TotalUsers</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm" style="border-radius: 12px; border-left: 5px solid #f39c12;">
+            <div class="card-body">
+                <h6 class="text-muted">Tổng Khách (Guest)</h6>
+                <h3 class="fw-bold text-warning">@ViewBag.ActiveGuests</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm" style="border-radius: 12px; border-left: 5px solid #9b59b6;">
+            <div class="card-body">
+                <h6 class="text-muted">Quét QR Hôm nay</h6>
+                <h3 class="fw-bold text-primary">@ViewBag.QRToday</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100" style="border-radius: 12px; border: none;">
+            <div class="card-body">
+                <h5 class="card-title fw-bold text-secondary mb-4">Tỷ lệ Người Dùng</h5>
+                <canvas id="userTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm h-100" style="border-radius: 12px; border: none;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title fw-bold text-secondary">Hoạt động Gần đây (Realtime)</h5>
+                    <span class="badge bg-danger animate-pulse">🔴 Live</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Loại</th>
+                                <th>Device ID / Tên</th>
+                                <th>Hành động vừa làm</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.DeviceOrUserName.StartsWith("Guest_"))
+                                        {
+                                            <span class="badge bg-warning text-dark">Guest</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Member</span>
+                                        }
+                                    </td>
+                                    <td class="font-monospace text-muted small">@item.DeviceOrUserName</td>
+                                    <td class="fw-bold">@item.Action</td>
+                                    <td class="text-secondary">@item.Timestamp.ToString("HH:mm - dd/MM/yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('userTypeChart').getContext('2d');
+        const userTypeChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Thành viên', 'Khách vãng lai'],
+                datasets: [{
+                    // 🌟 TRUYỀN DỮ LIỆU THẬT TỪ C# XUỐNG JAVASCRIPT
+                    data: [@activeMembers, @activeGuests],
+                    backgroundColor: ['#2ecc71', '#f39c12'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .animate-pulse {
+        animation: pulse 1.5s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.4;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+<script>
+    // 🌟 VŨ KHÍ BÍ MẬT: TỰ ĐỘNG TẢI LẠI TRANG MỖI 3 GIÂY
+    // Giúp Dashboard nhảy số Real-time ngay khi có người cầm điện thoại bấm
+    setInterval(function () {
+        // Chỉ tải lại dữ liệu tĩnh, không làm giật màn hình
+        window.location.reload();
+    }, 3000);
+</script>

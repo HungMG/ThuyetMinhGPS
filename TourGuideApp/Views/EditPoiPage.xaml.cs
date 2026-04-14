@@ -99,6 +99,9 @@ public partial class EditPoiPage : ContentPage
 
         if (isSuccess)
         {
+            // 🌟 GẮN MÁY DÒ: BÁO LÊN SERVER LÀ VỪA SỬA ĐỊA ĐIỂM
+            _ = apiService.TrackActionAsync($"Sửa địa điểm: {_editingPoi.Name_VI}");
+
             await DisplayAlert("Thành công", "Đã cập nhật bài! Admin sẽ xem xét lại nhé sếp.", "Tuyệt vời");
             await Navigation.PopAsync();
         }

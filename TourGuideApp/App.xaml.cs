@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using TourGuideApp.Views;
 using TourGuideApp.Resources.Languages;
+using TourGuideApp.Services; // 🌟 Bắt buộc thêm dòng này để gọi ApiService
 
 namespace TourGuideApp;
 
@@ -16,7 +17,6 @@ public partial class App : Application
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-
         // =========================================================
         // 🌟 BƯỚC 2: KIỂM TRA NGÔN NGỮ
         // =========================================================
@@ -24,12 +24,10 @@ public partial class App : Application
 
         if (string.IsNullOrEmpty(savedLang))
         {
-            // Trạm 1: Chưa chọn ngôn ngữ -> Bắt buộc mở StartPage đầu tiên
             MainPage = new NavigationPage(new StartPage());
         }
         else
         {
-            // Đã có ngôn ngữ -> Cài đặt ngôn ngữ hiển thị
             string cultureCode = savedLang switch
             {
                 "en" => "en-US",
@@ -45,20 +43,52 @@ public partial class App : Application
             AppLang.Culture = uiCulture;
 
             // =========================================================
-            // 🌟 BƯỚC 3: KIỂM TRA ĐĂNG NHẬP (TRẠM GÁC SỐ 2)
+            // 🌟 BƯỚC 3: KIỂM TRA ĐĂNG NHẬP
             // =========================================================
             int currentUserId = Preferences.Get("UserId", -1);
 
             if (currentUserId == -1)
             {
-                // Có ngôn ngữ rồi, nhưng chưa có thẻ (chưa từng Đăng nhập/Ẩn danh) -> Vào trang Login
                 MainPage = new LoginPage();
             }
             else
             {
-                // Đã có ngôn ngữ VÀ đã có thẻ (Hoặc thẻ User thật, hoặc thẻ Ẩn danh 0) -> Vào Trang chủ
                 MainPage = new AppShell();
             }
+        }
+    }
+
+    // ==========================================
+    // 🌟 HÀM 1: KHI NGƯỜI DÙNG VỪA MỞ APP LÊN
+    // ==========================================
+    protected override void OnStart()
+    {
+        base.OnStart();
+        ReportOnlineStatus("Mở ứng dụng");
+    }
+
+    // ==========================================
+    // 🌟 HÀM 2: KHI NGƯỜI DÙNG ẨN APP RỒI MỞ SÁNG LÊN LẠI
+    // ==========================================
+    protected override void OnResume()
+    {
+        base.OnResume();
+        ReportOnlineStatus("Quay lại ứng dụng");
+    }
+
+    // ==========================================
+    // 🌟 LOGIC BÁO CÁO SERVER
+    // ==========================================
+    private void ReportOnlineStatus(string actionName)
+    {
+        int userId = Preferences.Get("UserId", -1);
+        string guestId = Preferences.Get("AnonymousDeviceId", "");
+
+        // Nếu đã từng lấy thẻ (Khách hoặc User) thì mới báo cáo
+        if (userId >= 0 || !string.IsNullOrEmpty(guestId))
+        {
+            ApiService apiService = new ApiService();
+            _ = apiService.TrackActionAsync(actionName);
         }
     }
 }

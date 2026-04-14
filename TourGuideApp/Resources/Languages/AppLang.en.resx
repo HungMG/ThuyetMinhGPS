@@ -381,4 +381,31 @@
   <data name="AddPoiRadius" xml:space="preserve">
     <value>Trigger Radius (m) - Default</value>
   </data>
+  <data name="AddPoiTypeLabel" xml:space="preserve">
+    <value>Location Type:</value>
+  </data>
+  <data name="AddPoiTypePlaceholder" xml:space="preserve">
+    <value>-- Select category --</value>
+  </data>
+  <data name="AddPoiTypePublic" xml:space="preserve">
+    <value>🌳 Sightseeing (Public)</value>
+  </data>
+  <data name="AddPoiTypeBusiness" xml:space="preserve">
+    <value>🏪 Restaurant / Service (Business)</value>
+  </data>
+  <data name="AddPoiProofTitle" xml:space="preserve">
+    <value>Business Verification 🔒</value>
+  </data>
+  <data name="AddPoiProofDesc" xml:space="preserve">
+    <value>Please upload a photo of your Business License or Food Safety Certificate for Admin review.</value>
+  </data>
+  <data name="AddPoiProofBtn" xml:space="preserve">
+    <value>📷 Upload License Photo</value>
+  </data>
+  <data name="AddPoiErrorNoProof" xml:space="preserve">
+    <value>Business locations require a Business License photo!</value>
+  </data>
+  <data name="AddPoiErrorNoImage" xml:space="preserve">
+    <value>You haven't selected a photo for this location!</value>
+  </data>
 </root>

@@ -13,9 +13,9 @@ namespace TourGuideApp.Services
         public ApiService()
         {
             _httpClient = new HttpClient();
-            // ⚠️ IP máy tính của sếp
-            _httpClient.BaseAddress = new Uri("http://192.168.1.229:5136/");
-            _httpClient.Timeout = TimeSpan.FromSeconds(3); // 🌟 Khiên chống đơ máy
+            // 🌟 Đã đổi sang link Ngrok
+            _httpClient.BaseAddress = new Uri("https://stauroscopically-unlethargical-merideth.ngrok-free.dev/");
+            _httpClient.Timeout = TimeSpan.FromSeconds(3);
         }
 
         // 🌟 KHUÔN ĐỂ HỨNG DỮ LIỆU ĐĂNG NHẬP TỪ SERVER TRẢ VỀ
@@ -25,6 +25,38 @@ namespace TourGuideApp.Services
             public string Username { get; set; }
             public int Role { get; set; }
             public string Message { get; set; }
+        }
+
+        // ==========================================================
+        // 🌟 API: TỰ ĐỘNG BÁO CÁO HÀNH VI (BẢN V2 TỰ NHẬN DIỆN USER)
+        // ==========================================================
+        public async Task TrackActionAsync(string actionName)
+        {
+            try
+            {
+                // 1. Tự động kiểm tra xem ai đang dùng App
+                int userId = Preferences.Get("UserId", 0);
+                string identifier = "";
+
+                if (userId > 0)
+                {
+                    // Nếu là Thành viên có tài khoản -> Lấy Tên thật
+                    identifier = Preferences.Get("UserName", "Thành Viên Không Tên");
+                }
+                else
+                {
+                    // Nếu là Khách vãng lai -> Lấy mã Device ID
+                    identifier = Preferences.Get("AnonymousDeviceId", "Guest_Unknown");
+                }
+
+                // 2. Đóng gói và gửi lên Server
+                var data = new { Identifier = identifier, ActionName = actionName };
+                await _httpClient.PostAsJsonAsync("api/Analytics/track", data);
+            }
+            catch
+            {
+                // Rớt mạng thì im lặng bỏ qua, không làm crash app
+            }
         }
 
         public async Task<bool> SyncToursAsync(DatabaseService dbService)
@@ -101,35 +133,42 @@ namespace TourGuideApp.Services
         // ==========================================================
         // 🌟 HÀM MỚI: GỬI ĐỊA ĐIỂM + HÌNH ẢNH LÊN WEB SERVER
         // ==========================================================
-        public async Task<bool> SubmitPoiAsync(POI poi, string localImagePath)
+        public async Task<bool> SubmitPoiAsync(POI poi, string localImagePath, string proofImagePath = "")
         {
             try
             {
-                // Dùng MultipartFormDataContent để chứa cả CHỮ và ẢNH (Bưu kiện tổng hợp)
+                // Sử dụng link Ngrok tĩnh sếp đã thiết lập trong constructor
                 using var form = new MultipartFormDataContent();
 
-                // 1. Nhét thông tin chữ vào bưu kiện
+                // 1. Nhét các thông tin văn bản
                 form.Add(new StringContent(poi.Name_VI ?? ""), "Name_VI");
                 form.Add(new StringContent(poi.Description_VI ?? ""), "Description_VI");
                 form.Add(new StringContent(poi.Latitude.ToString()), "Latitude");
                 form.Add(new StringContent(poi.Longitude.ToString()), "Longitude");
                 form.Add(new StringContent(poi.OwnerId.ToString()), "OwnerId");
-                form.Add(new StringContent(poi.ApprovalStatus.ToString()), "ApprovalStatus"); // Gửi số 0 = Chờ duyệt
+                form.Add(new StringContent(poi.ApprovalStatus.ToString()), "ApprovalStatus");
+                form.Add(new StringContent(poi.PoiType.ToString()), "PoiType"); // 🌟 Loại hình (0: Công cộng, 1: Kinh doanh)
+                form.Add(new StringContent(poi.TriggerRadius.ToString()), "TriggerRadius"); // Luôn ép 50m
 
-                // 2. Nhét file ảnh vào bưu kiện (nếu sếp có chọn ảnh)
+                // 2. Nhét ảnh đại diện địa điểm (Bắt buộc)
                 if (!string.IsNullOrEmpty(localImagePath) && File.Exists(localImagePath))
                 {
                     var fileStream = File.OpenRead(localImagePath);
                     var streamContent = new StreamContent(fileStream);
-
-                    // Đóng dấu đây là file hình ảnh để Server nhận diện
-                    streamContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-
-                    // Lưu ý: Tên "imageFile" phải trùng khớp với tên tham số bên Web API sếp nhé
+                    streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
                     form.Add(streamContent, "imageFile", Path.GetFileName(localImagePath));
                 }
 
-                // 3. Phóng bưu kiện lên Server (Sử dụng link tương đối vì đã có BaseAddress ở trên)
+                // 🌟 3. Nhét ảnh Giấy phép kinh doanh (Nếu có)
+                if (!string.IsNullOrEmpty(proofImagePath) && File.Exists(proofImagePath))
+                {
+                    var fileStream2 = File.OpenRead(proofImagePath);
+                    var streamContent2 = new StreamContent(fileStream2);
+                    streamContent2.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+                    form.Add(streamContent2, "proofImageFile", Path.GetFileName(proofImagePath));
+                }
+
+                // Gửi bưu kiện lên Server
                 var response = await _httpClient.PostAsync("api/MobilePoi/submit", form);
 
                 if (response.IsSuccessStatusCode)
@@ -140,13 +179,13 @@ namespace TourGuideApp.Services
                 else
                 {
                     string errorMsg = await response.Content.ReadAsStringAsync();
-                    Debug.WriteLine($"[GỬI POI BỊ TỪ CHỐI] Lỗi {response.StatusCode}: {errorMsg}");
+                    Debug.WriteLine($"[GỬI POI THẤT BẠI] Lỗi {response.StatusCode}: {errorMsg}");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LỖI ĐƯỜNG TRUYỀN] Không thể gửi POI: {ex.Message}");
+                Debug.WriteLine($"[LỖI ĐƯỜNG TRUYỀN] {ex.Message}");
                 return false;
             }
         }

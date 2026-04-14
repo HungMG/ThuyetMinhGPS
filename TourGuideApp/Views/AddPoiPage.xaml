@@ -18,7 +18,6 @@
 
                 <Grid>
                     <Image x:Name="imgPreview" Aspect="AspectFill" IsVisible="False"/>
-
                     <VerticalStackLayout x:Name="pnlImagePlaceholder" HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
                         <Label Text="📷" FontSize="50" HorizontalOptions="Center"/>
                         <Label Text="{x:Static lang:AppLang.AddPoiImagePrompt}" FontSize="14" TextColor="#8D7A6D" FontAttributes="Bold" HorizontalOptions="Center"/>
@@ -41,32 +40,56 @@
             </Frame>
 
             <Frame CornerRadius="12" Padding="15" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static lang:AppLang.AddPoiTypeLabel}" FontSize="14" FontAttributes="Bold" TextColor="#8D7A6D"/>
+
+                    <Picker x:Name="pckPoiType" 
+                Title="{x:Static lang:AppLang.AddPoiTypePlaceholder}" 
+                TextColor="#4A3A31" 
+                SelectedIndexChanged="OnPoiTypeChanged">
+
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:Static Member="lang:AppLang.AddPoiTypePublic" />
+                                <x:Static Member="lang:AppLang.AddPoiTypeBusiness" />
+                            </x:Array>
+                        </Picker.ItemsSource>
+
+                    </Picker>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame x:Name="frmProofImage" IsVisible="False" CornerRadius="12" Padding="15" BackgroundColor="#FFF3E0" BorderColor="#FFB74D">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static lang:AppLang.AddPoiProofTitle}" FontSize="14" FontAttributes="Bold" TextColor="#E67E22"/>
+                    <Label Text="{x:Static lang:AppLang.AddPoiProofDesc}" FontSize="12" TextColor="#D35400"/>
+
+                    <Button Text="{x:Static lang:AppLang.AddPoiProofBtn}" BackgroundColor="#E67E22" TextColor="White" CornerRadius="8" Clicked="OnSelectProofImageTapped"/>
+                    <Image x:Name="imgProofPreview" HeightRequest="150" Aspect="AspectFit" IsVisible="False" Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame CornerRadius="12" Padding="15" HasShadow="True" BorderColor="Transparent" BackgroundColor="White">
                 <VerticalStackLayout Spacing="15">
                     <Button Text="{x:Static lang:AppLang.AddPoiGetLocation}" 
-                BackgroundColor="#E8E0D5" TextColor="#C0502E" FontAttributes="Bold" CornerRadius="8"
-                Clicked="OnGetLocationClicked"/>
+                            BackgroundColor="#E8E0D5" TextColor="#C0502E" FontAttributes="Bold" CornerRadius="8"
+                            Clicked="OnGetLocationClicked"/>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <VerticalStackLayout Grid.Column="0" Spacing="5">
                             <Label Text="{x:Static lang:AppLang.AddPoiLat}" FontSize="12" FontAttributes="Bold" TextColor="#8D7A6D"/>
-                            <Entry x:Name="txtLat" Placeholder="0.000000" 
-                       Keyboard="Text"
-                       TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13"/>
+                            <Entry x:Name="txtLat" Placeholder="0.000000" Keyboard="Text" TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13"/>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Grid.Column="1" Spacing="5">
                             <Label Text="{x:Static lang:AppLang.AddPoiLng}" FontSize="12" FontAttributes="Bold" TextColor="#8D7A6D"/>
-                            <Entry x:Name="txtLng" Placeholder="0.000000" 
-                       Keyboard="Text"
-                       TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13"/>
+                            <Entry x:Name="txtLng" Placeholder="0.000000" Keyboard="Text" TextColor="#4A3A31" BackgroundColor="#FAF7F2" FontSize="13"/>
                         </VerticalStackLayout>
                     </Grid>
 
                     <VerticalStackLayout Spacing="5" Margin="0,5,0,0">
                         <Label Text="{x:Static lang:AppLang.AddPoiRadius}" FontSize="12" FontAttributes="Bold" TextColor="#8D7A6D"/>
-                        <Entry Text="50" IsReadOnly="True" 
-                   TextColor="#7F8C8D" BackgroundColor="#F2F2F2" 
-                   FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                        <Entry Text="50" IsReadOnly="True" TextColor="#7F8C8D" BackgroundColor="#F2F2F2" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>

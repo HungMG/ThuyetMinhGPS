@@ -381,4 +381,31 @@
   <data name="AddPoiRadius" xml:space="preserve">
     <value>Bán kính hoạt động (m) - Mặc định</value>
   </data>
+  <data name="AddPoiTypeLabel" xml:space="preserve">
+    <value>Loại hình địa điểm:</value>
+  </data>
+  <data name="AddPoiTypePlaceholder" xml:space="preserve">
+    <value>-- Chọn phân loại --</value>
+  </data>
+  <data name="AddPoiTypePublic" xml:space="preserve">
+    <value>🌳 Điểm tham quan (Công cộng)</value>
+  </data>
+  <data name="AddPoiTypeBusiness" xml:space="preserve">
+    <value>🏪 Quán ăn / Dịch vụ (Kinh doanh)</value>
+  </data>
+  <data name="AddPoiProofTitle" xml:space="preserve">
+    <value>Xác thực doanh nghiệp 🔒</value>
+  </data>
+  <data name="AddPoiProofDesc" xml:space="preserve">
+    <value>Vui lòng tải lên ảnh chụp Giấy phép KD hoặc Chứng nhận ATTP để Admin xét duyệt.</value>
+  </data>
+  <data name="AddPoiProofBtn" xml:space="preserve">
+    <value>📷 Tải ảnh Giấy phép lên</value>
+  </data>
+  <data name="AddPoiErrorNoProof" xml:space="preserve">
+    <value>Khai báo quán ăn thì phải có ảnh chụp Giấy Phép Kinh Doanh sếp ơi!</value>
+  </data>
+  <data name="AddPoiErrorNoImage" xml:space="preserve">
+    <value>Sếp chưa chọn ảnh cho địa điểm này kìa!</value>
+  </data>
 </root>

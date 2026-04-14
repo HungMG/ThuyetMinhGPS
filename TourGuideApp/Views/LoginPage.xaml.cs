@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.ApplicationModel; // Bắt buộc để dùng Preferences và MainThread
 using System;
 using TourGuideApp.Services;
 
@@ -6,13 +7,17 @@ namespace TourGuideApp.Views;
 
 public partial class LoginPage : ContentPage
 {
-    AuthService _authService = new AuthService();
+    // 🌟 Gom chung 1 Service để gọi API (Đã có link Ngrok)
+    private readonly ApiService _apiService = new ApiService();
 
     public LoginPage()
     {
         InitializeComponent();
     }
 
+    // ==========================================
+    // 1. LUỒNG ĐĂNG NHẬP CHÍNH THỨC
+    // ==========================================
     // ==========================================
     // 1. LUỒNG ĐĂNG NHẬP CHÍNH THỨC
     // ==========================================
@@ -27,42 +32,42 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        // 🌟 BIẾN KIỂM TRA: CÓ GỌI ĐƯỢC SERVER KHÔNG?
         bool serverIsDown = false;
 
         try
         {
-            // 1. THỬ ĐĂNG NHẬP ONLINE TRƯỚC
-            ApiService apiService = new ApiService();
-            var loginResult = await apiService.LoginAsync(username, password);
+            var loginResult = await _apiService.LoginAsync(username, password);
 
             if (loginResult != null && loginResult.UserId > 0)
             {
-                // Đăng nhập Online thành công -> Cập nhật thẻ căn cước Offline mới nhất
+                // 🌟 BƯỚC 1: CẤP THẺ CĂN CƯỚC
                 Preferences.Set("UserId", loginResult.UserId);
                 Preferences.Set("UserName", loginResult.Username);
+                Preferences.Set("Role", loginResult.Role);
+
                 Preferences.Set("Offline_User", username);
                 Preferences.Set("Offline_Pass", password);
                 Preferences.Set("Offline_Id", loginResult.UserId);
 
+                // 🌟 BƯỚC 2: GỌI MÁY DÒ (Phải để dưới cùng sau khi Set Preferences)
+                _ = _apiService.TrackActionAsync("Đăng nhập hệ thống");
+
+                await DisplayAlert("Thành công", $"Chào mừng {loginResult.Username} trở lại!", "OK");
                 Application.Current.MainPage = new AppShell();
-                return; // Xong việc, thoát hàm
+                return;
             }
-            else if (loginResult == null)
+            else
             {
-                // Nếu Server trả về null, có thể là sai Pass HOẶC Server đang chết
-                // Anh em mình gắn cờ để tí kiểm tra Offline
                 serverIsDown = true;
             }
         }
         catch (Exception)
         {
-            // Nếu bị văng lỗi kết nối (Server sập)
             serverIsDown = true;
         }
 
         // ==========================================================
-        // 🌟 2. LUỒNG CỨU HỘ: NẾU SAI PASS HOẶC SERVER SẬP -> CHECK OFFLINE
+        // 🌟 LUỒNG CỨU HỘ: NẾU SAI PASS HOẶC SERVER SẬP -> CHECK OFFLINE
         // ==========================================================
         if (serverIsDown)
         {
@@ -70,7 +75,6 @@ public partial class LoginPage : ContentPage
             string savedPass = Preferences.Get("Offline_Pass", "");
             int savedId = Preferences.Get("Offline_Id", 0);
 
-            // Kiểm tra xem thông tin nhập vào có khớp với "kỷ niệm" trong máy không
             if (username == savedUser && password == savedPass && savedId > 0)
             {
                 Preferences.Set("UserId", savedId);
@@ -81,8 +85,7 @@ public partial class LoginPage : ContentPage
             }
             else
             {
-                // Nếu cả Online lẫn Offline đều không xong thì mới báo lỗi thật
-                await DisplayAlert("Thất bại", "Tài khoản không chính xác hoặc máy chủ không hoạt động!", "Thử lại");
+                await DisplayAlert("Thất bại", "Tài khoản/Mật khẩu không chính xác hoặc máy chủ không hoạt động!", "Thử lại");
             }
         }
     }
@@ -92,10 +95,21 @@ public partial class LoginPage : ContentPage
     // ==========================================
     private void OnAnonymousClicked(object sender, EventArgs e)
     {
+        string anonymousId = Preferences.Get("AnonymousDeviceId", "");
+        if (string.IsNullOrEmpty(anonymousId))
+        {
+            anonymousId = "Guest_" + Guid.NewGuid().ToString().Substring(0, 8);
+            Preferences.Set("AnonymousDeviceId", anonymousId);
+        }
+
+        // Cấp thẻ "Khách" vào bộ nhớ TRƯỚC
         Preferences.Set("UserId", 0);
         Preferences.Set("UserName", "Khách Vãng Lai");
+        Preferences.Set("Role", 0);
 
-        // 🌟 BỌC LƯỚI AN TOÀN VÀO ĐÂY: Nhờ luồng chính chuyển trang
+        // 🌟 GỬI TÍN HIỆU LÊN DASHBOARD BẰNG HÀM TỰ ĐỘNG
+        _ = _apiService.TrackActionAsync("Truy cập ẩn danh");
+
         MainThread.BeginInvokeOnMainThread(() =>
         {
             Application.Current.MainPage = new AppShell();
@@ -107,7 +121,8 @@ public partial class LoginPage : ContentPage
     // ==========================================
     private void OnRegisterTapped(object sender, TappedEventArgs e)
     {
-        // 🌟 Chuyển sang trang Đăng ký
         Application.Current.MainPage = new RegisterPage();
     }
+
+
 }

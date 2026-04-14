@@ -42,33 +42,25 @@ public partial class OfflinePage : ContentPage
             // 2. DIỄN KỊCH: Bắt máy tính đợi 5 giây cho thầy tưởng đang tải bản đồ mbtiles nặng lắm =))
             await Task.Delay(5000);
 
-            // 3. TẢI HÌNH ẢNH THẬT: Khúc này làm thật để mất mạng vẫn xem được ảnh các địa điểm (POI)
-            // (Sếp nhớ đảm bảo DownloadService đã được khởi tạo nha)
-            // Lấy danh sách POI từ Database
+            // 3. TẢI HÌNH ẢNH THẬT
             var pois = await _dbService.GetAllPOIsAsync();
             foreach (var poi in pois)
             {
-                // Chỉ tải nếu nó là link web (http)
                 if (!string.IsNullOrEmpty(poi.ImageUrl) && poi.ImageUrl.StartsWith("http"))
                 {
                     try
                     {
-                        // TẠO TÊN FILE AN TOÀN (Tuyệt đối không lấy nguyên cái link làm tên file)
                         string safeFileName = $"poi_image_{poi.Id}.jpg";
-
-                        // Tiến hành tải file về máy
                         string localPath = await _downloadService.DownloadFileAsync(poi.ImageUrl, safeFileName);
 
-                        // Nếu tải thành công thì mới cập nhật Database
                         if (!string.IsNullOrEmpty(localPath))
                         {
-                            poi.ImageUrl = localPath; // Đổi link web thành đường dẫn trong máy
+                            poi.ImageUrl = localPath;
                             await _dbService.UpdatePOIAsync(poi);
                         }
                     }
                     catch (Exception ex)
                     {
-                        // Bỏ qua lỗi của từng hình để không làm sập cả ứng dụng
                         Console.WriteLine($"[Lỗi tải hình POI {poi.Id}]: {ex.Message}");
                     }
                 }
@@ -79,6 +71,10 @@ public partial class OfflinePage : ContentPage
             lblStatus.TextColor = Colors.Green;
             btnDownload.Text = "🔄 CẬP NHẬT LẠI DỮ LIỆU";
             btnDownload.BackgroundColor = Color.FromArgb("#2980B9");
+
+            // 🌟 GẮN MÁY DÒ: BÁO CÁO HÀNH VI TẢI OFFLINE LÊN SERVER
+            ApiService apiService = new ApiService();
+            _ = apiService.TrackActionAsync("Tải gói dữ liệu Offline");
 
             await DisplayAlert("Hoàn tất", "Tải Gói Offline thành công! Bạn có thể tắt mạng và sử dụng bản đồ bình thường.", "Tuyệt vời");
         }
