@@ -115,17 +115,20 @@
             </BoxView.GestureRecognizers>
         </BoxView>
 
-        <Frame x:Name="tourPoiPopup" VerticalOptions="End" HeightRequest="600" TranslationY="1200" CornerRadius="32" Margin="0" Padding="0" HasShadow="True" BorderColor="Transparent" BackgroundColor="#F8F9FA">
-            <VerticalStackLayout Padding="0,15,0,0">
+        <Frame x:Name="tourPoiPopup" VerticalOptions="End" 
+               TranslationY="1200" CornerRadius="32" Margin="0" Padding="0" 
+               HasShadow="True" BorderColor="Transparent" BackgroundColor="#F8F9FA">
+            <!-- Grid thay VerticalStackLayout để ScrollView có thể fill đúng chiều cao -->
+            <Grid RowDefinitions="Auto, Auto, Auto, *">
 
-                <BoxView WidthRequest="50" HeightRequest="5" CornerRadius="2.5" BackgroundColor="#D5CDC4" HorizontalOptions="Center" Margin="0,5,0,15"/>
+                <BoxView Grid.Row="0" WidthRequest="50" HeightRequest="5" CornerRadius="2.5" 
+                         BackgroundColor="#D5CDC4" HorizontalOptions="Center" Margin="0,12,0,12"/>
 
-                <Grid ColumnDefinitions="*, Auto" Padding="25,0,25,15">
+                <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Padding="25,0,25,12">
                     <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                         <Label Text="{x:Static lang:AppLang.RouteDetails}" FontSize="13" TextColor="#C0502E" FontAttributes="Bold"/>
                         <Label x:Name="lblPopupTourName" Text="Tên Tour..." FontSize="22" FontAttributes="Bold" TextColor="#4A3A31" FontFamily="Serif" Margin="0,2,0,0" MaxLines="1" LineBreakMode="TailTruncation"/>
                     </VerticalStackLayout>
-
                     <Frame Grid.Column="1" WidthRequest="36" HeightRequest="36" CornerRadius="18" BackgroundColor="#E8E0D5" Padding="0" HasShadow="False" VerticalOptions="Center">
                         <Frame.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnClosePopupTapped"/>
@@ -134,41 +137,45 @@
                     </Frame>
                 </Grid>
 
-                <Button Text="{x:Static lang:AppLang.MapsThisRoute}"
+                <Button Grid.Row="2" Text="{x:Static lang:AppLang.MapsThisRoute}"
                         BackgroundColor="#27AE60" TextColor="White" FontAttributes="Bold" CornerRadius="25"
-                        Margin="20,0,20,15" HeightRequest="50"
+                        Margin="20,0,20,12" HeightRequest="48"
                         Clicked="OnNavigateTourClicked"/>
 
-                <ScrollView BackgroundColor="#FAF7F2">
-                    <VerticalStackLayout x:Name="popupPoiStackLayout" Padding="0,20,0,60">
+                <!-- Row * → ScrollView tự động chiếm toàn bộ phần còn lại -->
+                <ScrollView Grid.Row="3" BackgroundColor="#FAF7F2">
+                    <VerticalStackLayout x:Name="popupPoiStackLayout" Padding="0,12,0,40">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Frame Margin="20,0,20,12" Padding="15" CornerRadius="16" HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White">
+                                <Frame Margin="16,0,16,10" Padding="0" CornerRadius="16"
+                                       HasShadow="False" BorderColor="#E8E0D5" BackgroundColor="White"
+                                       IsClippedToBounds="True">
                                     <Frame.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnPoiCardTapped" CommandParameter="{Binding .}"/>
                                     </Frame.GestureRecognizers>
-
-                                    <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="15">
-                                        <Image Grid.Column="0" WidthRequest="60" HeightRequest="60" Aspect="AspectFill" Source="{Binding LocalImageSource, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}">
-                                            <Image.Clip>
-                                                <RoundRectangleGeometry CornerRadius="12" Rect="0,0,60,60"/>
-                                            </Image.Clip>
-                                        </Image>
-
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                            <Label Text="{Binding CurrentName}" FontSize="16" FontAttributes="Bold" TextColor="#4A3A31" MaxLines="1" LineBreakMode="TailTruncation"/>
-                                            <HorizontalStackLayout Spacing="5" Margin="0,6,0,0">
-                                                <Frame BackgroundColor="#FDEBD0" CornerRadius="4" Padding="4,2" HasShadow="False">
-                                                    <Label Text="{Binding DistanceDisplay}" FontSize="11" FontAttributes="Bold" TextColor="#D35400"/>
-                                                </Frame>
-                                            </HorizontalStackLayout>
+                                    <Grid ColumnDefinitions="76, *, Auto" ColumnSpacing="0">
+                                        <Image Grid.Column="0" WidthRequest="76" HeightRequest="76"
+                                               Aspect="AspectFill" VerticalOptions="Fill"
+                                               Source="{Binding LocalImageSource, TargetNullValue='img_poi_default.jpg', FallbackValue='img_poi_default.jpg'}"/>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="12,8">
+                                            <Label Text="{Binding CurrentName}" FontSize="15" FontAttributes="Bold"
+                                                   TextColor="#2C3E50" MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding CurrentDescription}" FontSize="12"
+                                                   TextColor="#8D7A6D" MaxLines="2" LineBreakMode="TailTruncation" Margin="0,3,0,0"/>
+                                            <Frame BackgroundColor="#FEF9F0" CornerRadius="6" Padding="6,2"
+                                                   HasShadow="False" BorderColor="#FDEBD0" HorizontalOptions="Start" Margin="0,5,0,0">
+                                                <Label Text="{Binding DistanceDisplay}" FontSize="11" FontAttributes="Bold" TextColor="#D35400"/>
+                                            </Frame>
                                         </VerticalStackLayout>
-
-                                        <Frame Grid.Column="2" WidthRequest="36" HeightRequest="36" CornerRadius="18" BackgroundColor="#C0502E" Padding="0" VerticalOptions="Center">
+                                        <Frame Grid.Column="2" WidthRequest="36" HeightRequest="36" CornerRadius="18"
+                                               BackgroundColor="#C0502E" Padding="0" VerticalOptions="Center"
+                                               HasShadow="False" Margin="0,0,12,0">
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnPoiPlayAudioTapped" CommandParameter="{Binding .}"/>
                                             </Frame.GestureRecognizers>
-                                            <Label Text="▶" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                            <Label Text="▶" FontSize="14" TextColor="White"
+                                                   HorizontalOptions="Center" VerticalOptions="Center"
+                                                   HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                                         </Frame>
                                     </Grid>
                                 </Frame>
@@ -177,7 +184,7 @@
                     </VerticalStackLayout>
                 </ScrollView>
 
-            </VerticalStackLayout>
+            </Grid>
         </Frame>
 
         <Button x:Name="btnAddPoi"

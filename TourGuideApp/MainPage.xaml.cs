@@ -262,6 +262,10 @@ public partial class MainPage : ContentPage
                 lblPopupTourName.Text = $"📍 {selectedTour.CurrentName}";
                 BindableLayout.SetItemsSource(popupPoiStackLayout, poisInTour);
 
+                // Chiều cao popup = 85% màn hình để ScrollView có đủ chỗ hiện tất cả POI
+                tourPoiPopup.HeightRequest = DeviceDisplay.MainDisplayInfo.Height
+                    / DeviceDisplay.MainDisplayInfo.Density * 0.85;
+
                 blackOverlay.IsVisible = true;
                 blackOverlay.FadeTo(0.5, 250);
 

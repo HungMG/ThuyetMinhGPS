@@ -45,7 +45,8 @@
                     </a>
                 </li>
                 <li>
-                    <a class="@Active("User")" asp-controller="User" asp-action="Index">
+                    <a class="@Active("User")" 
+                        asp-controller="User" asp-action="Index">
                         <span class="ico">👤</span> Quản lý Tài khoản
                     </a>
                 </li>
@@ -65,6 +66,12 @@
                     <a class="@Active("Home", "Privacy")"
                        asp-controller="Home" asp-action="Privacy">
                         <span class="ico">🔒</span> Chính sách
+                    </a>
+                </li>
+                <li>
+                    <a class="@Active("Analytics")"
+                           asp-controller="Analytics" asp-action="Index">
+                        <span class="ico">📈</span> Phân tích Hành vi
                     </a>
                 </li>
             </ul>

@@ -10,6 +10,7 @@ using BruTile.Cache;
 using BruTile.Predefined;
 using Mapsui.Tiling.Layers;
 using System.IO;
+using QRCoder;
 
 namespace TourGuideApp.Views;
 
@@ -665,5 +666,55 @@ public partial class MapPage : ContentPage
     {
         if (_temporaryPoi == null) return;
         await Microsoft.Maui.ApplicationModel.Map.OpenAsync(_temporaryPoi.Latitude, _temporaryPoi.Longitude, new MapLaunchOptions { Name = _temporaryPoi.CurrentName });
+    }
+
+    // =========================================================
+    // 🌟 NÚT XEM MÃ QR CỦA POI — DÙNG QRCoder GIỐNG HỆT ADMIN
+    // ECCLevel.M + pixelsPerModule=6, sinh PNG local, không cần mạng
+    // =========================================================
+    private async void OnShowQRTapped(object sender, TappedEventArgs e)
+    {
+        if (_temporaryPoi == null) return;
+
+        lblQrPoiName.Text = _temporaryPoi.CurrentName;
+        imgQrCode.Source = null;
+
+        // Hiện overlay
+        qrOverlay.IsVisible = true;
+        qrOverlay.Opacity = 0;
+        await qrOverlay.FadeTo(1, 200);
+
+        // Tính slug đúng theo công thức của QRController
+        string qrContent = QRCodePage.GenerateQrCode(
+            _temporaryPoi.Name_VI ?? _temporaryPoi.Name_EN ?? $"poi_{_temporaryPoi.Id}");
+
+        Console.WriteLine($"[QR] Sinh QR local cho: {qrContent}");
+
+        // Sinh PNG bằng QRCoder với đúng tham số như Admin:
+        // ECCLevel.M và pixelsPerModule = 6
+        await Task.Run(() =>
+        {
+            using var generator = new QRCoder.QRCodeGenerator();
+            var data = generator.CreateQrCode(qrContent, QRCoder.QRCodeGenerator.ECCLevel.M);
+            using var code = new QRCoder.PngByteQRCode(data);
+            byte[] pngBytes = code.GetGraphic(6); // pixelsPerModule=6 như admin
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                imgQrCode.Source = ImageSource.FromStream(() => new MemoryStream(pngBytes));
+            });
+        });
+    }
+
+    private async void OnQrOverlayTapped(object sender, TappedEventArgs e)
+    {
+        await qrOverlay.FadeTo(0, 150);
+        qrOverlay.IsVisible = false;
+    }
+
+    private async void OnCloseQrTapped(object sender, EventArgs e)
+    {
+        await qrOverlay.FadeTo(0, 150);
+        qrOverlay.IsVisible = false;
     }
 }
