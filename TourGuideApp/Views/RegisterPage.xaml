@@ -9,8 +9,10 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30,50,30,30" VerticalOptions="Center">
 
-            <Label Text="{x:Static lang:AppLang.RegisterTitle}" FontSize="28" FontAttributes="Bold" TextColor="#C0502E" HorizontalOptions="Center"/>
-            <Label Text="{x:Static lang:AppLang.RegisterSubtitle}" FontSize="14" TextColor="#7F8C8D" HorizontalOptions="Center" Margin="0,0,0,20"/>
+            <Label Text="{x:Static lang:AppLang.RegisterTitle}" FontSize="28" 
+                   FontAttributes="Bold" TextColor="#C0502E" HorizontalOptions="Center"/>
+            <Label Text="{x:Static lang:AppLang.RegisterSubtitle}" FontSize="14" 
+                   TextColor="#7F8C8D" HorizontalOptions="Center" Margin="0,0,0,20"/>
 
             <Frame CornerRadius="15" HasShadow="True" Padding="20" BackgroundColor="White" BorderColor="#E8E0D5">
                 <VerticalStackLayout Spacing="15">
@@ -19,28 +21,39 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
-                        <Entry x:Name="txtUsername" Placeholder="{x:Static lang:AppLang.LoginUsername}" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
+                        <Entry x:Name="txtUsername" Placeholder="{x:Static lang:AppLang.LoginUsername}" 
+                               TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
                     </Border>
+                    <Label Text="{x:Static lang:AppLang.RegisterUsernameHint}" 
+                           FontSize="12" TextColor="#95A5A6" FontAttributes="Italic" Margin="5,-10,0,0"/>
 
                     <Border Stroke="#E8E0D5" StrokeThickness="1" BackgroundColor="#F8F9FA" Padding="10,0">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
-                        <Entry x:Name="txtPassword" Placeholder="{x:Static lang:AppLang.LoginPassword}" IsPassword="True" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
+                        <Entry x:Name="txtPassword" Placeholder="{x:Static lang:AppLang.LoginPassword}" 
+                               IsPassword="True" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
                     </Border>
+                    <Label Text="{x:Static lang:AppLang.RegisterPasswordHint}" 
+                           FontSize="12" TextColor="#95A5A6" FontAttributes="Italic" Margin="5,-10,0,0"/>
 
                     <Border Stroke="#E8E0D5" StrokeThickness="1" BackgroundColor="#F8F9FA" Padding="10,0">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
-                        <Entry x:Name="txtConfirmPassword" Placeholder="{x:Static lang:AppLang.RegisterConfirmPassword}" IsPassword="True" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
+                        <Entry x:Name="txtConfirmPassword" Placeholder="{x:Static lang:AppLang.RegisterConfirmPassword}" 
+                               IsPassword="True" TextColor="#2C3E50" ClearButtonVisibility="WhileEditing"/>
                     </Border>
+                    <Label Text="{x:Static lang:AppLang.RegisterConfirmPasswordHint}" 
+                           FontSize="12" TextColor="#95A5A6" FontAttributes="Italic" Margin="5,-10,0,5"/>
 
-                    <Button x:Name="btnRegister" Text="{x:Static lang:AppLang.RegisterButton}" FontAttributes="Bold" CornerRadius="25"
+                    <Button x:Name="btnRegister" Text="{x:Static lang:AppLang.RegisterButton}" 
+                            FontAttributes="Bold" CornerRadius="25"
                             BackgroundColor="#27AE60" TextColor="White" Margin="0,10,0,0"
                             Clicked="OnRegisterClicked"/>
 
-                    <Button Text="{x:Static lang:AppLang.RegisterBackToLogin}" FontAttributes="Bold" CornerRadius="25"
+                    <Button Text="{x:Static lang:AppLang.RegisterBackToLogin}" 
+                            FontAttributes="Bold" CornerRadius="25"
                             BackgroundColor="Transparent" TextColor="#7F8C8D" Margin="0,5,0,0"
                             Clicked="OnBackToLoginClicked"/>
 

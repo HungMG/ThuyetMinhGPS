@@ -13,9 +13,10 @@ namespace TourGuideAdmin.Models
 
     [Required]
     [MaxLength(255)]
-    public string Password { get; set; } // Lưu ý: Tạm thời lưu mật khẩu thường để sếp dễ test, mốt bảo vệ thật thì mình dùng hàm băm (Hash) nha.
+    public string Password { get; set; } 
 
     // Phân quyền: 0 = Khách du lịch (Chỉ xài App), 1 = Chủ quán/Admin (Được duyệt bài trên Web)
     public int Role { get; set; } = 0;
-}
+        public bool IsLocked { get; set; } = false;
+    }
 }

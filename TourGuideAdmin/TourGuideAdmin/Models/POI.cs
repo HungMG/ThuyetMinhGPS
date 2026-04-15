@@ -33,10 +33,11 @@ namespace TourGuideAdmin.Models
         // 🌟 BỘ ĐÔI KIỂM DUYỆT CỦA ADMIN 🌟
 
         // 1. Trỏ về ông chủ quán nào đã tạo ra điểm này (Cho phép null 'int?' vì có thể sếp là người tự tạo)
-        public int? OwnerId { get; set; }
+        public int OwnerId { get; set; }
 
         // 2. Trạng thái kiểm duyệt
         // Quy ước: 0 = Đang chờ duyệt | 1 = Đã duyệt (Được lên App) | 2 = Bị từ chối
-        public int ApprovalStatus { get; set; } = 0;
+        public int ApprovalStatus { get; set; }
+        public int PoiType { get; set; }
     }
 }

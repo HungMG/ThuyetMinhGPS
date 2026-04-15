@@ -35,17 +35,17 @@ namespace TourGuideApp.Models
         public string Description_JA { get; set; }
 
         // 🌟 NÂNG CẤP V2: XÁC THỰC DOANH NGHIỆP
-        public int PoiType { get; set; } = 0; // 0 = Công cộng, 1 = Cơ sở kinh doanh
+        public int PoiType { get; set; } // 0 = Công cộng, 1 = Cơ sở kinh doanh
         public string ProofImageUrl { get; set; } // Link ảnh Giấy phép kinh doanh
 
         // 🌟 BỘ ĐÔI KIỂM DUYỆT CỦA ADMIN 🌟
 
         // 1. Trỏ về ông chủ quán nào đã tạo ra điểm này (Cho phép null 'int?' vì có thể sếp là người tự tạo)
-        public int? OwnerId { get; set; }
+        public int OwnerId { get; set; }
 
         // 2. Trạng thái kiểm duyệt
         // Quy ước: 0 = Đang chờ duyệt | 1 = Đã duyệt (Được lên App) | 2 = Bị từ chối
-        public int ApprovalStatus { get; set; } = 0;
+        public int ApprovalStatus { get; set; }
 
         // 👇 TUYỆT CHIÊU TỰ ĐỘNG CHỌN NGÔN NGỮ (Dùng switch cho gọn) 👇
         [Ignore]

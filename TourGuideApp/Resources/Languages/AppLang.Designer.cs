@@ -682,6 +682,24 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to * Phải trùng khớp với mật khẩu ở trên..
+        /// </summary>
+        public static string RegisterConfirmPasswordHint {
+            get {
+                return ResourceManager.GetString("RegisterConfirmPasswordHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to * Mật khẩu phải có ít nhất 6 ký tự..
+        /// </summary>
+        public static string RegisterPasswordHint {
+            get {
+                return ResourceManager.GetString("RegisterPasswordHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tham gia cộng đồng khám phá.
         /// </summary>
         public static string RegisterSubtitle {
@@ -696,6 +714,15 @@ namespace TourGuideApp.Resources.Languages {
         public static string RegisterTitle {
             get {
                 return ResourceManager.GetString("RegisterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to * Ít nhất 5 ký tự, viết liền không dấu, không ký tự đặc biệt..
+        /// </summary>
+        public static string RegisterUsernameHint {
+            get {
+                return ResourceManager.GetString("RegisterUsernameHint", resourceCulture);
             }
         }
         

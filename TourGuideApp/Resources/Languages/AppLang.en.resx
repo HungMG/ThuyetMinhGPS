@@ -408,4 +408,13 @@
   <data name="AddPoiErrorNoImage" xml:space="preserve">
     <value>You haven't selected a photo for this location!</value>
   </data>
+  <data name="RegisterUsernameHint" xml:space="preserve">
+    <value>* At least 5 characters, no spaces, no accents or special characters.</value>
+  </data>
+  <data name="RegisterPasswordHint" xml:space="preserve">
+    <value>* Password must be at least 6 characters long.</value>
+  </data>
+  <data name="RegisterConfirmPasswordHint" xml:space="preserve">
+    <value>* Must match the password above.</value>
+  </data>
 </root>

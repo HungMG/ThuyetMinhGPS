@@ -1,0 +1,64 @@
+﻿@model IEnumerable<TourGuideAdmin.Models.POI>
+@{
+    ViewData["Title"] = "Chi tiết đóng góp của " + ViewBag.UserName;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📂 Danh sách POI của: <span class="text-primary">@ViewBag.UserName</span></h2>
+        <a asp-action="Index" class="btn btn-secondary">⬅️ Quay lại</a>
+    </div>
+
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Tên địa điểm</th>
+                    <th>Loại hình</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var poi in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@poi.Name_VI</td>
+                        <td>
+                            @(poi.PoiType == 1 ? "🏪 Doanh nghiệp" : "🌳 Cộng đồng")
+                        </td>
+                        <td>
+                            @if (poi.ApprovalStatus == 1)
+                            {
+                                <span class="badge bg-success">Đã duyệt</span>
+                            }
+                            // 🌟 SỬA SỐ -1 THÀNH SỐ 2 Ở ĐÂY NỮA NÈ SẾP
+                            else if (poi.ApprovalStatus == 2)
+                            {
+                                <span class="badge bg-danger">Từ chối</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            }
+                        </td>
+                        <td>
+                        <td>
+                            <a asp-controller="POIs" asp-action="Edit" asp-route-id="@poi.Id" class="btn btn-sm btn-primary">
+                                👁️ Xem chi tiết
+                            </a>
+
+                            @if (poi.ApprovalStatus == 2)
+                            {
+                                <a asp-controller="POIs" asp-action="Delete" asp-route-id="@poi.Id" class="btn btn-sm btn-danger ms-1">
+                                    🗑️ Xóa rác
+                                </a>
+                            }
+                        </td>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

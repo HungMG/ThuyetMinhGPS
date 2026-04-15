@@ -61,7 +61,7 @@ namespace TourGuideAdmin.Controllers
         }
 
         // ==========================================
-        // 2. API: HỨNG DỮ LIỆU TỪ MOBILE APP
+        // 2. API: HỨNG DỮ LIỆU TỪ MOBILE APP (CÓ CHỐT CHẶN KHÓA ACC)
         // ==========================================
         [HttpPost("api/Analytics/track")]
         [IgnoreAntiforgeryToken] // Bắt buộc để App Mobile gọi được API mà không bị chặn
@@ -70,6 +70,19 @@ namespace TourGuideAdmin.Controllers
             if (data == null || string.IsNullOrEmpty(data.Identifier))
                 return BadRequest("Dữ liệu không hợp lệ");
 
+            // 🌟 BƯỚC 1: KIỂM TRA TÀI KHOẢN CÓ BỊ KHÓA KHÔNG
+            // Tìm xem cái Identifier (Tên đăng nhập) này có tồn tại trong bảng Users không
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == data.Identifier);
+
+            // Nếu tìm thấy tài khoản VÀ tài khoản đó đang bị khóa (IsLocked = true)
+            if (user != null && user.IsLocked)
+            {
+                // Lập tức ném ra mã 403 (Forbidden). 
+                // Bên Mobile App (ApiService) hứng được mã này sẽ gọi hàm ForceLogout() để đá văng App!
+                return StatusCode(403, new { message = "Tài khoản của bạn đã bị khóa bởi Admin!" });
+            }
+
+            // 🌟 BƯỚC 2: NẾU AN TOÀN THÌ TIẾP TỤC GHI LOG
             var activity = new UserActivity
             {
                 DeviceOrUserName = data.Identifier,
@@ -84,8 +97,8 @@ namespace TourGuideAdmin.Controllers
         }
     }
 
-    // Lớp trung gian để hứng JSON từ điện thoại gửi lên
-    public class ActivityDto
+        // Lớp trung gian để hứng JSON từ điện thoại gửi lên
+        public class ActivityDto
     {
         public string Identifier { get; set; }
         public string ActionName { get; set; }

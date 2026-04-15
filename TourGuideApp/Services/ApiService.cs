@@ -28,7 +28,7 @@ namespace TourGuideApp.Services
         }
 
         // ==========================================================
-        // 🌟 API: TỰ ĐỘNG BÁO CÁO HÀNH VI (BẢN V2 TỰ NHẬN DIỆN USER)
+        // 🌟 API: TỰ ĐỘNG BÁO CÁO HÀNH VI (CÓ TÍCH HỢP ĐÁ VĂNG APP)
         // ==========================================================
         public async Task TrackActionAsync(string actionName)
         {
@@ -51,7 +51,16 @@ namespace TourGuideApp.Services
 
                 // 2. Đóng gói và gửi lên Server
                 var data = new { Identifier = identifier, ActionName = actionName };
-                await _httpClient.PostAsJsonAsync("api/Analytics/track", data);
+
+                // 🌟 LƯU Ý: Phải có chữ "var response =" để hứng kết quả về
+                var response = await _httpClient.PostAsJsonAsync("api/Analytics/track", data);
+
+                // 🌟 3. NẾU SERVER TRẢ VỀ 403 (TÀI KHOẢN ĐÃ BỊ ADMIN KHÓA)
+                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // Gọi vũ khí hạng nặng: Đuổi ra khỏi App ngay lập tức!
+                    App.ForceLogout("Tài khoản của bạn đã bị khóa! Vui lòng liên hệ Admin để biết thêm chi tiết.");
+                }
             }
             catch
             {
@@ -197,22 +206,40 @@ namespace TourGuideApp.Services
         {
             try
             {
-                // Đóng gói tài khoản, mật khẩu
                 var loginData = new { Username = username, Password = password };
-
-                // Gửi lên cổng api/Auth/login của sếp
                 var response = await _httpClient.PostAsJsonAsync("api/Auth/login", loginData);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Lấy cục dữ liệu trả về (gồm UserId, Role...) ép vào cái Khuôn
                     return await response.Content.ReadFromJsonAsync<LoginResponse>();
                 }
-                return null; // Sai pass hoặc không tồn tại
+                // 🌟 LẮNG NGHE TÍN HIỆU 403 (TÀI KHOẢN BỊ KHÓA)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // 1. NGAY LẬP TỨC XÉ VÉ OFFLINE TRONG ĐIỆN THOẠI
+                    Preferences.Remove("Offline_User");
+                    Preferences.Remove("Offline_Pass");
+                    Preferences.Remove("Offline_Id");
+
+                    // 2. Trả về mã bí mật (-999) để LoginPage biết đường báo lỗi
+                    return new LoginResponse { UserId = -999, Message = "Tài khoản của bạn đã bị khóa bởi Admin!" };
+                }
+                // Lắng nghe tín hiệu 401 (Sai mật khẩu)
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    // Sai pass cũng xé vé Offline đi cho an toàn
+                    Preferences.Remove("Offline_User");
+                    Preferences.Remove("Offline_Pass");
+
+                    return new LoginResponse { UserId = -401, Message = "Sai tài khoản hoặc mật khẩu!" };
+                }
+
+                return null;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[LỖI ĐĂNG NHẬP] {ex.Message}");
+                // CHỈ KHI RỚT MẠNG THẬT SỰ mới trả về null để LoginPage chạy luồng cứu hộ Offline
                 return null;
             }
         }

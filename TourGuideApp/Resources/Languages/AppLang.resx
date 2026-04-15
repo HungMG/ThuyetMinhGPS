@@ -408,4 +408,13 @@
   <data name="AddPoiErrorNoImage" xml:space="preserve">
     <value>Sếp chưa chọn ảnh cho địa điểm này kìa!</value>
   </data>
+  <data name="RegisterUsernameHint" xml:space="preserve">
+    <value>* Ít nhất 5 ký tự, viết liền không dấu, không ký tự đặc biệt.</value>
+  </data>
+  <data name="RegisterPasswordHint" xml:space="preserve">
+    <value>* Mật khẩu phải có ít nhất 6 ký tự.</value>
+  </data>
+  <data name="RegisterConfirmPasswordHint" xml:space="preserve">
+    <value>* Phải trùng khớp với mật khẩu ở trên.</value>
+  </data>
 </root>

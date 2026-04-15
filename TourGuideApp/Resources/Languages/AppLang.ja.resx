@@ -408,4 +408,13 @@
   <data name="AddPoiErrorNoImage" xml:space="preserve">
     <value>このスポットの写真が選択されていません！</value>
   </data>
+  <data name="RegisterUsernameHint" xml:space="preserve">
+    <value>* 5文字以上、空白や特殊文字は使用できません。</value>
+  </data>
+  <data name="RegisterPasswordHint" xml:space="preserve">
+    <value>* パスワードは6文字以上である必要があります。</value>
+  </data>
+  <data name="RegisterConfirmPasswordHint" xml:space="preserve">
+    <value>* 上のパスワードと一致する必要があります。</value>
+  </data>
 </root>

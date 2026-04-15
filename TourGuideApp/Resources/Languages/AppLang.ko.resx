@@ -408,4 +408,13 @@
   <data name="AddPoiErrorNoImage" xml:space="preserve">
     <value>이 장소의 사진을 선택하지 않았습니다!</value>
   </data>
+  <data name="RegisterUsernameHint" xml:space="preserve">
+    <value>* 최소 5자 이상, 공백 및 특수문자 없이 입력하세요.</value>
+  </data>
+  <data name="RegisterPasswordHint" xml:space="preserve">
+    <value>* 비밀번호는 최소 6자 이상이어야 합니다.</value>
+  </data>
+  <data name="RegisterConfirmPasswordHint" xml:space="preserve">
+    <value>* 위의 비밀번호와 일치해야 합니다.</value>
+  </data>
 </root>

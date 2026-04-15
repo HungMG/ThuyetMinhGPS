@@ -408,4 +408,13 @@
   <data name="AddPoiErrorNoImage" xml:space="preserve">
     <value>您尚未为此地点选择照片！</value>
   </data>
+  <data name="RegisterUsernameHint" xml:space="preserve">
+    <value>* 至少5个字符，不含空格、重音符号或特殊字符。</value>
+  </data>
+  <data name="RegisterPasswordHint" xml:space="preserve">
+    <value>* 密码长度至少为6个字符。</value>
+  </data>
+  <data name="RegisterConfirmPasswordHint" xml:space="preserve">
+    <value>* 必须与上方密码一致。</value>
+  </data>
 </root>

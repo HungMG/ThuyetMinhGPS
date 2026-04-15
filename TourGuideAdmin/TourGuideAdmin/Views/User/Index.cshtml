@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TourGuideAdmin.Models.User>
+﻿@model IEnumerable<TourGuideAdmin.Controllers.UserStatViewModel>
 
 @{
     ViewData["Title"] = "Quản lý Tài khoản";
@@ -29,10 +29,10 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
                 <tr>
-                    <th class="ps-4">ID</th>
-                    <th>Tên đăng nhập</th>
-                    <th>Mật khẩu</th>
-                    <th>Vai trò</th>
+                    <th class="ps-4">Tài khoản</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Vai trò</th>
+                    <th>Thống kê Đóng góp POI</th>
                     <th class="text-center">Hành động</th>
                 </tr>
             </thead>
@@ -40,41 +40,112 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="ps-4 fw-bold text-muted">#@item.Id</td>
-                        <td class="fw-bold" style="color: #4A3A31;">@item.Username</td>
-
-                        <td>
-                            <span class="text-secondary" style="letter-spacing: 2px;">••••••••</span>
+                        <td class="ps-4">
+                            <div class="fw-bold" style="color: #4A3A31; font-size: 1.1rem;">@item.User.Username</div>
+                            <div class="text-muted small">ID: #@item.User.Id</div>
                         </td>
 
-                        <td>
-                            @if (item.Role == 1)
+                        <td class="text-center">
+                            <div class="d-flex flex-column gap-2 align-items-center">
+
+                                @if (item.User.IsLocked)
+                                {
+                                    <span class="badge bg-danger">🔒 Đã Khóa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">✅ Hoạt động</span>
+                                }
+
+                                @if (item.IsOnline)
+                                {
+                                    <span class="badge rounded-pill border border-success text-success bg-light shadow-sm" style="font-size: 0.75rem;">
+                                        <span class="spinner-grow spinner-grow-sm text-success me-1" role="status" aria-hidden="true" style="width: 0.4rem; height: 0.4rem; margin-bottom: 2px;"></span>
+                                        Online
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill border border-secondary text-secondary bg-light" style="font-size: 0.75rem;">
+                                        ⚫ Offline
+                                    </span>
+                                }
+
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            @if (item.User.Role == 1)
                             {
                                 <span class="badge bg-danger">👑 Admin</span>
                             }
                             else
                             {
-                                <span class="badge bg-secondary">🎒 Khách vãng lai</span>
+                                <span class="badge bg-secondary">🎒 Khách du lịch</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (item.TotalPoi == 0)
+                            {
+                                <span class="text-muted fst-italic">Chưa đăng bài nào</span>
+                            }
+                            else
+                            {
+                                <div class="d-flex flex-column gap-1">
+                                    <div><strong>Tổng: @item.TotalPoi</strong></div>
+                                    <div class="small">
+                                        ✅ <span class="text-success fw-bold">@item.ApprovedPoi</span> |
+                                        ⏳ <span class="text-warning fw-bold">@item.PendingPoi</span> |
+                                        ❌ <span class="text-danger fw-bold">@item.RejectedPoi</span>
+                                    </div>
+                                    <div class="small text-muted">
+                                        🌳 @item.PublicPoi | 🏪 @item.BusinessPoi
+                                    </div>
+                                </div>
                             }
                         </td>
 
                         <td class="text-center">
-                            @if (item.Role != 1)
-                            {
-                                <form asp-action="Delete" method="post" class="d-inline"
-                                      onsubmit="return confirm('Sếp có chắc chắn muốn xóa vĩnh viễn tài khoản [@item.Username] không? Mọi dữ liệu địa điểm của người này có thể trở thành Vô Danh đấy!');">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                        🗑️ Xóa Tài Khoản
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+
+                                <a asp-action="Details" asp-route-id="@item.User.Id" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                    🔍 Soi bài
+                                </a>
+
+                                @if (item.User.Role != 1)
+                                {
+                                    <form asp-action="ToggleLock" method="post" class="d-inline m-0">
+                                        <input type="hidden" name="id" value="@item.User.Id" />
+                                        @if (item.User.IsLocked)
+                                        {
+                                            <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
+                                                🔓 Mở Khóa
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-warning btn-sm rounded-pill px-3 text-dark fw-bold">
+                                                🔒 Khóa Acc
+                                            </button>
+                                        }
+                                    </form>
+
+                                    <form asp-action="Delete" method="post" class="d-inline m-0"
+                                          onsubmit="return confirm('Xóa vĩnh viễn tài khoản [@item.User.Username]? Mọi dữ liệu địa điểm có thể trở thành Vô Danh!');">
+                                        <input type="hidden" name="id" value="@item.User.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                            🗑️ Xóa
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>
+                                        🛡️ Bất tử
                                     </button>
-                                </form>
-                            }
-                            else
-                            {
-                                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" disabled>
-                                    🛡️ Bất tử
-                                </button>
-                            }
+                                }
+                            </div>
                         </td>
                     </tr>
                 }

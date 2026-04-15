@@ -91,4 +91,20 @@ public partial class App : Application
             _ = apiService.TrackActionAsync(actionName);
         }
     }
+
+    // 🌟 VŨ KHÍ HẠNG NẶNG: TRỤC XUẤT NGƯỜI DÙNG
+    public static void ForceLogout(string message)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            // 1. Xóa sạch thẻ căn cước và vé Offline để không bao giờ vào lại được
+            Preferences.Clear();
+
+            // 2. Hiện thông báo đuổi thẳng thừng
+            await Application.Current.MainPage.DisplayAlert("Bị khóa", message, "Chấp nhận");
+
+            // 3. Đá văng ra trang LoginPage
+            Application.Current.MainPage = new NavigationPage(new Views.LoginPage());
+        });
+    }
 }

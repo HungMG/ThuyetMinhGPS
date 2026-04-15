@@ -1,5 +1,5 @@
 ﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.ApplicationModel; // Bắt buộc để dùng Preferences và MainThread
+using Microsoft.Maui.ApplicationModel;
 using System;
 using TourGuideApp.Services;
 
@@ -7,7 +7,6 @@ namespace TourGuideApp.Views;
 
 public partial class LoginPage : ContentPage
 {
-    // 🌟 Gom chung 1 Service để gọi API (Đã có link Ngrok)
     private readonly ApiService _apiService = new ApiService();
 
     public LoginPage()
@@ -15,9 +14,6 @@ public partial class LoginPage : ContentPage
         InitializeComponent();
     }
 
-    // ==========================================
-    // 1. LUỒNG ĐĂNG NHẬP CHÍNH THỨC
-    // ==========================================
     // ==========================================
     // 1. LUỒNG ĐĂNG NHẬP CHÍNH THỨC
     // ==========================================
@@ -36,28 +32,38 @@ public partial class LoginPage : ContentPage
 
         try
         {
+            // 1. THỬ ĐĂNG NHẬP ONLINE TRƯỚC
             var loginResult = await _apiService.LoginAsync(username, password);
 
-            if (loginResult != null && loginResult.UserId > 0)
+            if (loginResult != null)
             {
-                // 🌟 BƯỚC 1: CẤP THẺ CĂN CƯỚC
-                Preferences.Set("UserId", loginResult.UserId);
-                Preferences.Set("UserName", loginResult.Username);
-                Preferences.Set("Role", loginResult.Role);
+                if (loginResult.UserId > 0)
+                {
+                    // 🌟 ĐĂNG NHẬP THÀNH CÔNG
+                    Preferences.Set("UserId", loginResult.UserId);
+                    Preferences.Set("UserName", loginResult.Username);
+                    Preferences.Set("Role", loginResult.Role);
 
-                Preferences.Set("Offline_User", username);
-                Preferences.Set("Offline_Pass", password);
-                Preferences.Set("Offline_Id", loginResult.UserId);
+                    Preferences.Set("Offline_User", username);
+                    Preferences.Set("Offline_Pass", password);
+                    Preferences.Set("Offline_Id", loginResult.UserId);
 
-                // 🌟 BƯỚC 2: GỌI MÁY DÒ (Phải để dưới cùng sau khi Set Preferences)
-                _ = _apiService.TrackActionAsync("Đăng nhập hệ thống");
+                    _ = _apiService.TrackActionAsync("Đăng nhập hệ thống");
 
-                await DisplayAlert("Thành công", $"Chào mừng {loginResult.Username} trở lại!", "OK");
-                Application.Current.MainPage = new AppShell();
-                return;
+                    await DisplayAlert("Thành công", $"Chào mừng {loginResult.Username} trở lại!", "OK");
+                    Application.Current.MainPage = new AppShell();
+                    return;
+                }
+                else if (loginResult.UserId == -999 || loginResult.UserId == -401)
+                {
+                    // 🌟 NẾU BỊ KHÓA HOẶC SAI PASS -> Báo lỗi và DỪNG LẠI NGAY LẬP TỨC
+                    await DisplayAlert("Thất bại", loginResult.Message, "OK");
+                    return;
+                }
             }
             else
             {
+                // Lúc này loginResult == null (Rớt mạng hoặc Web sập thật sự)
                 serverIsDown = true;
             }
         }
@@ -67,7 +73,7 @@ public partial class LoginPage : ContentPage
         }
 
         // ==========================================================
-        // 🌟 LUỒNG CỨU HỘ: NẾU SAI PASS HOẶC SERVER SẬP -> CHECK OFFLINE
+        // 🌟 LUỒNG CỨU HỘ: CHỈ KÍCH HOẠT KHI MẤT MẠNG THẬT SỰ
         // ==========================================================
         if (serverIsDown)
         {
@@ -102,12 +108,10 @@ public partial class LoginPage : ContentPage
             Preferences.Set("AnonymousDeviceId", anonymousId);
         }
 
-        // Cấp thẻ "Khách" vào bộ nhớ TRƯỚC
         Preferences.Set("UserId", 0);
         Preferences.Set("UserName", "Khách Vãng Lai");
         Preferences.Set("Role", 0);
 
-        // 🌟 GỬI TÍN HIỆU LÊN DASHBOARD BẰNG HÀM TỰ ĐỘNG
         _ = _apiService.TrackActionAsync("Truy cập ẩn danh");
 
         MainThread.BeginInvokeOnMainThread(() =>
@@ -123,6 +127,4 @@ public partial class LoginPage : ContentPage
     {
         Application.Current.MainPage = new RegisterPage();
     }
-
-
 }

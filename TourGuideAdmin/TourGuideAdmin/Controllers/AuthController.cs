@@ -46,6 +46,9 @@ namespace TourGuideAdmin.Controllers
         // =====================================
         // 2. API ĐĂNG NHẬP (LOGIN)
         // =====================================
+        // =====================================
+        // 2. API ĐĂNG NHẬP (LOGIN)
+        // =====================================
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] User request)
         {
@@ -58,8 +61,16 @@ namespace TourGuideAdmin.Controllers
                 return Unauthorized(new { message = "Sai tài khoản hoặc mật khẩu!" });
             }
 
-            // Nếu đúng, trả về Id và Role để Mobile App lưu vào Preferences
-            return Ok(new { 
+            // 🌟 CHỐT CHẶN QUAN TRỌNG: Kiểm tra xem tài khoản có bị khóa không
+            if (user.IsLocked)
+            {
+                // Trả về mã lỗi 403 (Cấm truy cập) thay vì 200 Ok
+                return StatusCode(403, new { message = "Tài khoản của bạn đã bị khóa!" });
+            }
+
+            // Nếu đúng và không bị khóa, trả về Id và Role 
+            return Ok(new
+            {
                 message = "Đăng nhập thành công!",
                 userId = user.Id,
                 username = user.Username,
