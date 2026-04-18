@@ -41,19 +41,10 @@ public partial class MapPage : ContentPage
         if (tourMap.Map == null) tourMap.Map = new Mapsui.Map();
 
         // =======================================================
-        // 🌟 BÍ THUẬT BẢN ĐỒ OFFLINE: TỰ ĐỘNG LƯU VÀO CACHE 🌟
+        // 🌟 CÁCH GIẢI QUYẾT BẢN ĐỒ TRẮNG: DÙNG HÀM CHUẨN CỦA MAPSUI
+        // Thằng này đã tự động tích hợp Caching Offline và chống bị chặn!
         // =======================================================
-        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "MapCache");
-        if (!Directory.Exists(cacheDir))
-        {
-            Directory.CreateDirectory(cacheDir);
-        }
-
-        var fileCache = new FileCache(cacheDir, "tile", new TimeSpan(365, 0, 0, 0));
-        var tileSource = KnownTileSources.Create(KnownTileSource.OpenStreetMap, persistentCache: fileCache);
-        var tileLayer = new TileLayer(tileSource) { Name = "OfflineOSM" };
-
-        tourMap.Map.Layers.Add(tileLayer);
+        tourMap.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
 
         tourMap.IsZoomButtonVisible = false;
         tourMap.IsNorthingButtonVisible = false;
@@ -96,7 +87,15 @@ public partial class MapPage : ContentPage
         {
             await Task.Delay(300);
             await FilterAndShowPins("");
-            await GetCurrentLocationAsync();
+
+            // =======================================================
+            // 🌟 VÁ LỖI GPS: Bắt buộc xin quyền và lấy GPS trên MainThread
+            // (Không để chạy ngầm nữa để tránh bị Android "giam" tiến trình)
+            // =======================================================
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await GetCurrentLocationAsync();
+            });
 
             // =========================================================
             // 🌟 XỬ LÝ KHI MỞ TỪ QR: TÌM POI VÀ MỞ BOTTOM SHEET
@@ -150,9 +149,7 @@ public partial class MapPage : ContentPage
     }
 
 
-    // =========================================================
-    // 🌟 ĐỘNG CƠ RADAR V8 (ĐÃ FIX LỖI _allPois)
-    // =========================================================
+
     // =========================================================
     // 🌟 ĐỘNG CƠ RADAR V8 (BẢN CLEAN - CHỈ LOG ĐIỂM GẦN NHẤT)
     // =========================================================

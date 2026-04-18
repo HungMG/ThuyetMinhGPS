@@ -23,8 +23,7 @@ namespace TourGuideAdmin.Controllers
         public async Task<IActionResult> Index()
         {
             var today = DateTime.Today;
-            // 🌟 TẠO MỐC THỜI GIAN: Lùi lại 5 phút so với hiện tại
-            var fiveMinsAgo = DateTime.Now.AddMinutes(-5);
+            var oneMinAgo = DateTime.Now.AddMinutes(-1);
 
             // 1. Đếm TẤT CẢ thiết bị từ trước tới nay
             var totalUsers = await _context.UserActivities
@@ -40,21 +39,32 @@ namespace TourGuideAdmin.Controllers
                 .Where(a => a.Action.Contains("Quét QR") && a.Timestamp >= today)
                 .CountAsync();
 
-            // 🌟 4. ĐẾM SỐ NGƯỜI ĐANG ONLINE (Tương tác trong 5 phút qua)
+            // 4. ĐẾM SỐ NGƯỜI ĐANG ONLINE 
             var onlineNow = await _context.UserActivities
-                .Where(a => a.Timestamp >= fiveMinsAgo)
+                .Where(a => a.Timestamp >= oneMinAgo)
                 .Select(a => a.DeviceOrUserName)
-                .Distinct() // Đảm bảo 1 máy bấm 10 lần vẫn chỉ tính là 1 người online
+                .Distinct()
                 .CountAsync();
 
-            var recentActivities = await _context.UserActivities
-                .OrderByDescending(a => a.Timestamp).Take(15).ToListAsync();
+            // =========================================================
+            // 🌟 5. MÁY LỌC RÁC: GOM NHÓM CÁC HÀNH ĐỘNG BỊ TRÙNG LẶP
+            // =========================================================
+            // Bước A: Kéo 200 hành động mới nhất từ Database lên
+            var rawActivities = await _context.UserActivities
+                .OrderByDescending(a => a.Timestamp)
+                .Take(200)
+                .ToListAsync();
+
+            // Bước B: Dùng LINQ để gom nhóm và lọc
+            var recentActivities = rawActivities
+                .GroupBy(a => new { a.DeviceOrUserName, a.Action }) // Gom những đứa trùng Tên + Trùng Hành động vào 1 cục
+                .Select(g => g.First()) // Ở mỗi cục, chỉ bốc đúng 1 thằng đầu tiên (mới nhất) ra xem
+                .Take(15) // Lấy đúng 15 dòng gọn gàng lên bảng
+                .ToList();
 
             ViewBag.TotalUsers = totalUsers;
             ViewBag.ActiveGuests = activeGuests;
             ViewBag.QRToday = qrToday;
-
-            // 🌟 GỬI SỐ ONLINE RA GIAO DIỆN
             ViewBag.OnlineNow = onlineNow;
 
             return View(recentActivities);

@@ -1,7 +1,7 @@
 using ZXing.Net.Maui;
 using TourGuideApp.Services;
 using TourGuideApp.Models;
-using TourGuideApp.Resources.Languages; // 🌟 Gọi thư viện Đa ngôn ngữ
+using TourGuideApp.Resources.Languages;
 
 namespace TourGuideApp.Views;
 
@@ -11,21 +11,15 @@ public partial class QRCodePage : ContentPage
     private string _lastScanned = "";
     private DateTime _lastScanTime = DateTime.MinValue;
     private DatabaseService _dbService;
+    private ZXing.Net.Maui.Controls.CameraBarcodeReaderView barcodeReader;
+
+    // 🌟 VŨ KHÍ MỚI: KHIÊN BẢO VỆ GIAO DIỆN KHỎI BỊ RESET OAN UỔNG
+    private bool _isRequestingPermission = false;
 
     public QRCodePage()
     {
         InitializeComponent();
         _dbService = new DatabaseService();
-
-        // Cấu hình reader: chỉ quét QR, autorotate, đọc 1 mã/lần
-        barcodeReader.Options = new BarcodeReaderOptions
-        {
-            Formats = BarcodeFormats.TwoDimensional,   // QR, DataMatrix, Aztec...
-            AutoRotate = true,
-            Multiple = false,
-            TryHarder = true,
-            TryInverted = true
-        };
     }
 
     private void barcodeReader_BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
@@ -41,15 +35,12 @@ public partial class QRCodePage : ContentPage
         {
             if (_isProcessing) return;
 
-            // Debounce: cùng 1 mã trong < 2s thì bỏ qua
             if (qrCode == _lastScanned && (DateTime.Now - _lastScanTime).TotalSeconds < 2)
                 return;
             _lastScanned = qrCode;
             _lastScanTime = DateTime.Now;
 
             _isProcessing = true;
-
-            // 🌟 ẨN CHỮ ĐI LÚC QUÉT ĐƯỢC CHO ĐẸP
             barcodeResult.Text = "";
 
             var poi = await FindPoiByQrCodeAsync(qrCode);
@@ -59,8 +50,6 @@ public partial class QRCodePage : ContentPage
                 Preferences.Set("QRScannedPoiId", poi.Id);
                 barcodeReader.IsDetecting = false;
 
-                // 🌟 GẮN MÁY DÒ: BÁO CÁO LÊN SERVER LÀ VỪA QUÉT QR
-                // Bắt buộc có chữ "Quét QR" để Dashboard Admin nó cộng dồn số lượng đếm
                 ApiService apiService = new ApiService();
                 _ = apiService.TrackActionAsync($"Quét QR: {poi.Name_VI}");
 
@@ -68,8 +57,7 @@ public partial class QRCodePage : ContentPage
             }
             else
             {
-                // 🌟 GỌI ĐA NGÔN NGỮ KHI LỖI QR
-                barcodeResult.Text = ""; // Ẩn luôn chữ trên màn hình
+                barcodeResult.Text = "";
                 await DisplayAlert(AppLang.QrNotFoundTitle, AppLang.QrNotFoundDesc, "OK");
                 _isProcessing = false;
             }
@@ -103,7 +91,6 @@ public partial class QRCodePage : ContentPage
     public static string GenerateQrCode(string poiName)
     {
         if (string.IsNullOrWhiteSpace(poiName)) return "";
-
         string result = poiName.ToLower().Trim();
         result = RemoveDiacritics(result);
         result = System.Text.RegularExpressions.Regex.Replace(result, @"\s+", "_");
@@ -129,54 +116,141 @@ public partial class QRCodePage : ContentPage
             {"ỳ","y"},{"ý","y"},{"ỷ","y"},{"ỹ","y"},{"ỵ","y"},
             {"đ","d"},{"ñ","n"},{"ç","c"},
         };
-
         string r = text;
-        foreach (var kvp in map)
-            r = r.Replace(kvp.Key, kvp.Value);
+        foreach (var kvp in map) r = r.Replace(kvp.Key, kvp.Value);
         return r;
     }
 
-    // 🌟 SỬA Ở ĐÂY NÈ SẾP: DÙNG ĐA NGÔN NGỮ VÀ ẨN CHỮ
+    // ==========================================================
+    // 🌟 QUẢN LÝ VÒNG ĐỜI: DỌN RÁC MỖI KHI RA VÀO TAB
+    // ==========================================================
     protected override void OnAppearing()
     {
         base.OnAppearing();
         _isProcessing = false;
         _lastScanned = "";
-
-        // Ẩn chữ lúc mới vào
         barcodeResult.Text = "";
 
-        Dispatcher.Dispatch(async () =>
-        {
-            await Task.Delay(300);
+        if (_isRequestingPermission) return;
 
-            var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
-            if (status != PermissionStatus.Granted)
-            {
-                status = await Permissions.RequestAsync<Permissions.Camera>();
-            }
-
-            if (status == PermissionStatus.Granted)
-            {
-                if (barcodeReader != null)
-                    barcodeReader.IsDetecting = true;
-
-                // Ẩn chữ lúc đang quét luôn cho thoáng
-                barcodeResult.Text = "";
-            }
-            else
-            {
-                // Báo lỗi Đa ngôn ngữ
-                barcodeResult.Text = AppLang.QrCameraDenied;
-                await DisplayAlert(AppLang.QrCameraErrorTitle, AppLang.QrCameraErrorDesc, "OK");
-            }
-        });
+        ResetButton(true);
+        DestroyCamera(); // Vào là dọn sạch tàn dư
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        if (barcodeReader != null)
-            barcodeReader.IsDetecting = false;
+        DestroyCamera(); // Ra cũng dọn sạch để nhường RAM cho Map
     }
+
+    private void DestroyCamera()
+    {
+        if (barcodeReader != null)
+        {
+            barcodeReader.IsDetecting = false;
+            barcodeReader.IsVisible = false;
+        }
+        CameraContainer.Children.Clear();
+        barcodeReader = null;
+    }
+
+    /// ==========================================================
+    // 🌟 SỰ KIỆN BẤM NÚT & GỌI CAMERA (BẢN VÁ LỖI BÓNG MA ASYNC)
+    // ==========================================================
+    private void OnStartScanClicked(object sender, EventArgs e)
+    {
+        // Lưu ý: Hàm này đã bỏ chữ 'async' để chống rớt Context của Android!
+
+        if (_isRequestingPermission) return;
+        _isRequestingPermission = true;
+
+        // 1. Phản hồi giao diện NGAY LẬP TỨC
+        btnStartScan.IsEnabled = false;
+        btnStartScan.Text = AppLang.QROpeningCamera;
+        btnStartScan.BackgroundColor = Colors.Gray;
+
+        // 2. TRÓI CHẶT TOÀN BỘ TIẾN TRÌNH VÀO LUỒNG GIAO DIỆN CHÍNH
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            try
+            {
+                // Cho nút kịp đổi sang màu xám trước khi màn hình bị Android khóa lại để hỏi quyền
+                await Task.Delay(100);
+
+                // 3. Xin quyền (Lúc này chắc chắn 100% Android sẽ hiện bảng vì đang bị ép trên MainThread)
+                var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.Camera>();
+                }
+
+                // 4. Nếu khách đồng ý
+                if (status == PermissionStatus.Granted)
+                {
+                    // Tạo Camera mới cứng
+                    barcodeReader = new ZXing.Net.Maui.Controls.CameraBarcodeReaderView
+                    {
+                        IsVisible = true,
+                        CameraLocation = ZXing.Net.Maui.CameraLocation.Rear,
+                        Options = new ZXing.Net.Maui.BarcodeReaderOptions
+                        {
+                            Formats = ZXing.Net.Maui.BarcodeFormats.TwoDimensional,
+                            AutoRotate = true,
+                            Multiple = false,
+                            TryHarder = true
+                        }
+                    };
+
+                    barcodeReader.BarcodesDetected += barcodeReader_BarcodesDetected;
+
+                    // Vũ khí "Đợi chín mới hái"
+                    barcodeReader.Loaded += async (s, args) =>
+                    {
+                        try
+                        {
+                            await Task.Delay(250);
+                            barcodeReader.IsDetecting = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[Lỗi phần cứng Camera]: {ex.Message}");
+                        }
+                    };
+
+                    // Ném Camera vào khung và giấu nút
+                    CameraContainer.Children.Add(barcodeReader);
+                    btnStartScan.IsVisible = false;
+                }
+                else
+                {
+                    // Nếu từ chối
+                    barcodeResult.Text = "Sếp chưa cho phép dùng Camera!";
+                    ResetButton(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[Lỗi QR Chung]: {ex.Message}");
+                ResetButton(false);
+            }
+            finally
+            {
+                _isRequestingPermission = false;
+            }
+        });
+    }
+
+
+    private void ResetButton(bool isInitial)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            btnStartScan.IsVisible = true;
+            btnStartScan.IsEnabled = true;
+            btnStartScan.Text = AppLang.QRStartScan;
+            btnStartScan.BackgroundColor = Color.FromArgb("#F39C12");
+        });
+    }
+
 }

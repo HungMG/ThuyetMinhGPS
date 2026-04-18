@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Json;
 using TourGuideApp.Models;
 using System.Diagnostics;
-using System.IO; // 🌟 Thêm thư viện File
-using System.Net.Http.Headers; // 🌟 BẮT BUỘC THÊM CÁI NÀY ĐỂ ĐÓNG GÓI FILE ẢNH
+using System.IO;
+using System.Net.Http.Headers;
 
 namespace TourGuideApp.Services
 {
@@ -13,9 +13,18 @@ namespace TourGuideApp.Services
         public ApiService()
         {
             _httpClient = new HttpClient();
-            // 🌟 Đã đổi sang link Ngrok
+            // Link Ngrok của sếp
             _httpClient.BaseAddress = new Uri("https://stauroscopically-unlethargical-merideth.ngrok-free.dev/");
-            _httpClient.Timeout = TimeSpan.FromSeconds(3);
+
+            // =========================================================
+            // 🌟 SỬA LỖI 1: Tăng thời gian chờ lên 15 giây để xài 4G/Wifi yếu không bị văng
+            // =========================================================
+            _httpClient.Timeout = TimeSpan.FromSeconds(15);
+
+            // =========================================================
+            // 🌟 SỬA LỖI 2: Đưa thẻ VIP cho Ngrok để nó không chặn màn hình "Visit Site"
+            // =========================================================
+            _httpClient.DefaultRequestHeaders.Add("ngrok-skip-browser-warning", "true");
         }
 
         // 🌟 KHUÔN ĐỂ HỨNG DỮ LIỆU ĐĂNG NHẬP TỪ SERVER TRẢ VỀ
@@ -34,31 +43,23 @@ namespace TourGuideApp.Services
         {
             try
             {
-                // 1. Tự động kiểm tra xem ai đang dùng App
                 int userId = Preferences.Get("UserId", 0);
                 string identifier = "";
 
                 if (userId > 0)
                 {
-                    // Nếu là Thành viên có tài khoản -> Lấy Tên thật
                     identifier = Preferences.Get("UserName", "Thành Viên Không Tên");
                 }
                 else
                 {
-                    // Nếu là Khách vãng lai -> Lấy mã Device ID
                     identifier = Preferences.Get("AnonymousDeviceId", "Guest_Unknown");
                 }
 
-                // 2. Đóng gói và gửi lên Server
                 var data = new { Identifier = identifier, ActionName = actionName };
-
-                // 🌟 LƯU Ý: Phải có chữ "var response =" để hứng kết quả về
                 var response = await _httpClient.PostAsJsonAsync("api/Analytics/track", data);
 
-                // 🌟 3. NẾU SERVER TRẢ VỀ 403 (TÀI KHOẢN ĐÃ BỊ ADMIN KHÓA)
                 if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
                 {
-                    // Gọi vũ khí hạng nặng: Đuổi ra khỏi App ngay lập tức!
                     App.ForceLogout("Tài khoản của bạn đã bị khóa! Vui lòng liên hệ Admin để biết thêm chi tiết.");
                 }
             }
@@ -77,14 +78,11 @@ namespace TourGuideApp.Services
                 if (toursFromWeb != null && toursFromWeb.Count > 0)
                 {
                     await dbService.SaveToursFromWebAsync(toursFromWeb);
-
-                    // 🌟 GỌI MÁY HÚT ẢNH TOUR (Chạy ngầm không chờ)
                     _ = Task.Run(async () =>
                     {
                         foreach (var t in toursFromWeb)
                             await DownloadAndCacheImageAsync(t.ImageUrl, "tours");
                     });
-
                     return true;
                 }
                 return false;
@@ -105,14 +103,11 @@ namespace TourGuideApp.Services
                 if (poisFromWeb != null && poisFromWeb.Count > 0)
                 {
                     await dbService.SavePOIsFromWebAsync(poisFromWeb);
-
-                    // 🌟 GỌI MÁY HÚT ẢNH POI (Chạy ngầm không chờ)
                     _ = Task.Run(async () =>
                     {
                         foreach (var p in poisFromWeb)
                             await DownloadAndCacheImageAsync(p.ImageUrl, "pois");
                     });
-
                     return true;
                 }
                 return false;
@@ -124,7 +119,6 @@ namespace TourGuideApp.Services
             }
         }
 
-        // 🌟 HÀM LẤY DANH SÁCH ĐỊA ĐIỂM CỦA TÔI TỪ SERVER
         public async Task<List<POI>> GetMyPoisAsync(int userId)
         {
             try
@@ -139,27 +133,21 @@ namespace TourGuideApp.Services
             }
         }
 
-        // ==========================================================
-        // 🌟 HÀM MỚI: GỬI ĐỊA ĐIỂM + HÌNH ẢNH LÊN WEB SERVER
-        // ==========================================================
         public async Task<bool> SubmitPoiAsync(POI poi, string localImagePath, string proofImagePath = "")
         {
             try
             {
-                // Sử dụng link Ngrok tĩnh sếp đã thiết lập trong constructor
                 using var form = new MultipartFormDataContent();
 
-                // 1. Nhét các thông tin văn bản
                 form.Add(new StringContent(poi.Name_VI ?? ""), "Name_VI");
                 form.Add(new StringContent(poi.Description_VI ?? ""), "Description_VI");
                 form.Add(new StringContent(poi.Latitude.ToString()), "Latitude");
                 form.Add(new StringContent(poi.Longitude.ToString()), "Longitude");
                 form.Add(new StringContent(poi.OwnerId.ToString()), "OwnerId");
                 form.Add(new StringContent(poi.ApprovalStatus.ToString()), "ApprovalStatus");
-                form.Add(new StringContent(poi.PoiType.ToString()), "PoiType"); // 🌟 Loại hình (0: Công cộng, 1: Kinh doanh)
-                form.Add(new StringContent(poi.TriggerRadius.ToString()), "TriggerRadius"); // Luôn ép 50m
+                form.Add(new StringContent(poi.PoiType.ToString()), "PoiType");
+                form.Add(new StringContent(poi.TriggerRadius.ToString()), "TriggerRadius");
 
-                // 2. Nhét ảnh đại diện địa điểm (Bắt buộc)
                 if (!string.IsNullOrEmpty(localImagePath) && File.Exists(localImagePath))
                 {
                     var fileStream = File.OpenRead(localImagePath);
@@ -168,7 +156,6 @@ namespace TourGuideApp.Services
                     form.Add(streamContent, "imageFile", Path.GetFileName(localImagePath));
                 }
 
-                // 🌟 3. Nhét ảnh Giấy phép kinh doanh (Nếu có)
                 if (!string.IsNullOrEmpty(proofImagePath) && File.Exists(proofImagePath))
                 {
                     var fileStream2 = File.OpenRead(proofImagePath);
@@ -177,7 +164,6 @@ namespace TourGuideApp.Services
                     form.Add(streamContent2, "proofImageFile", Path.GetFileName(proofImagePath));
                 }
 
-                // Gửi bưu kiện lên Server
                 var response = await _httpClient.PostAsync("api/MobilePoi/submit", form);
 
                 if (response.IsSuccessStatusCode)
@@ -199,9 +185,6 @@ namespace TourGuideApp.Services
             }
         }
 
-        // ==========================================================
-        // 🌟 API: ĐĂNG NHẬP
-        // ==========================================================
         public async Task<LoginResponse> LoginAsync(string username, string password)
         {
             try
@@ -213,47 +196,34 @@ namespace TourGuideApp.Services
                 {
                     return await response.Content.ReadFromJsonAsync<LoginResponse>();
                 }
-                // 🌟 LẮNG NGHE TÍN HIỆU 403 (TÀI KHOẢN BỊ KHÓA)
                 else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
                 {
-                    // 1. NGAY LẬP TỨC XÉ VÉ OFFLINE TRONG ĐIỆN THOẠI
                     Preferences.Remove("Offline_User");
                     Preferences.Remove("Offline_Pass");
                     Preferences.Remove("Offline_Id");
-
-                    // 2. Trả về mã bí mật (-999) để LoginPage biết đường báo lỗi
                     return new LoginResponse { UserId = -999, Message = "Tài khoản của bạn đã bị khóa bởi Admin!" };
                 }
-                // Lắng nghe tín hiệu 401 (Sai mật khẩu)
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    // Sai pass cũng xé vé Offline đi cho an toàn
                     Preferences.Remove("Offline_User");
                     Preferences.Remove("Offline_Pass");
-
                     return new LoginResponse { UserId = -401, Message = "Sai tài khoản hoặc mật khẩu!" };
                 }
-
                 return null;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[LỖI ĐĂNG NHẬP] {ex.Message}");
-                // CHỈ KHI RỚT MẠNG THẬT SỰ mới trả về null để LoginPage chạy luồng cứu hộ Offline
                 return null;
             }
         }
 
-        // ==========================================================
-        // 🌟 API: ĐĂNG KÝ TÀI KHOẢN
-        // ==========================================================
         public async Task<bool> RegisterAsync(string username, string password)
         {
             try
             {
                 var registerData = new { Username = username, Password = password };
                 var response = await _httpClient.PostAsJsonAsync("api/Auth/register", registerData);
-
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
@@ -263,28 +233,20 @@ namespace TourGuideApp.Services
             }
         }
 
-        // ==========================================================
-        // 🌟 BĂNG CHUYỀN HÚT ẢNH OFFLINE NẰM Ở ĐÂY
-        // ==========================================================
         private async Task DownloadAndCacheImageAsync(string fileName, string folderName)
         {
             if (string.IsNullOrEmpty(fileName)) return;
-
             string localPath = Path.Combine(FileSystem.AppDataDirectory, fileName);
-
-            // CÓ RỒI THÌ THÔI KHÔNG TẢI NỮA
             if (File.Exists(localPath)) return;
 
             try
             {
-                // Lên Web tải về
                 string remoteUrl = $"images/{folderName}/{fileName}";
                 var response = await _httpClient.GetAsync(remoteUrl);
-
                 if (response.IsSuccessStatusCode)
                 {
                     var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                    File.WriteAllBytes(localPath, imageBytes); // Cất vào điện thoại
+                    File.WriteAllBytes(localPath, imageBytes);
                     Debug.WriteLine($"[TẢI ẢNH THÀNH CÔNG] {fileName}");
                 }
             }
@@ -294,9 +256,6 @@ namespace TourGuideApp.Services
             }
         }
 
-        // ==========================================================
-        // 🌟 HÀM MỚI: GỬI LỆNH SỬA ĐỊA ĐIỂM LÊN SERVER
-        // ==========================================================
         public async Task<bool> UpdatePoiAsync(POI poi, string localImagePath)
         {
             try
@@ -308,7 +267,6 @@ namespace TourGuideApp.Services
                 form.Add(new StringContent(poi.Latitude.ToString()), "Latitude");
                 form.Add(new StringContent(poi.Longitude.ToString()), "Longitude");
 
-                // Chỉ gói ảnh gửi đi NẾU sếp có chụp/chọn ảnh mới
                 if (!string.IsNullOrEmpty(localImagePath) && File.Exists(localImagePath))
                 {
                     var fileStream = File.OpenRead(localImagePath);
@@ -317,7 +275,6 @@ namespace TourGuideApp.Services
                     form.Add(streamContent, "imageFile", Path.GetFileName(localImagePath));
                 }
 
-                // Phóng bưu kiện cập nhật lên Server
                 var response = await _httpClient.PostAsync($"api/MobilePoi/edit/{poi.Id}", form);
 
                 if (response.IsSuccessStatusCode)

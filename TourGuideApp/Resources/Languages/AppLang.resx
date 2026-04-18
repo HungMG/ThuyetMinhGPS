@@ -417,4 +417,13 @@
   <data name="RegisterConfirmPasswordHint" xml:space="preserve">
     <value>* Phải trùng khớp với mật khẩu ở trên.</value>
   </data>
+  <data name="QRStartScan" xml:space="preserve">
+    <value>BẤM ĐỂ MỞ CAMERA</value>
+  </data>
+  <data name="QROpeningCamera" xml:space="preserve">
+    <value>ĐANG MỞ CAMERA...</value>
+  </data>
+  <data name="QRTryAgain" xml:space="preserve">
+    <value>BẤM ĐỂ THỬ LẠI</value>
+  </data>
 </root>

@@ -152,10 +152,9 @@
     }
 </style>
 <script>
-    // 🌟 VŨ KHÍ BÍ MẬT: TỰ ĐỘNG TẢI LẠI TRANG MỖI 3 GIÂY
-    // Giúp Dashboard nhảy số Real-time ngay khi có người cầm điện thoại bấm
+    // 🌟 TỰ ĐỘNG TẢI LẠI TRANG MỖI 15 GIÂY
+    // 15000 mili-giây = 15 giây. Đỡ chóng mặt và giảm tải cho Server!
     setInterval(function () {
-        // Chỉ tải lại dữ liệu tĩnh, không làm giật màn hình
         window.location.reload();
-    }, 3000);
+    }, 15000);
 </script>

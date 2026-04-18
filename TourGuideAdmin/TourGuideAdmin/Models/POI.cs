@@ -30,6 +30,23 @@ namespace TourGuideAdmin.Models
         public string? ImageUrl { get; set; }
         public DateTime? LastPlayedTime { get; set; }
 
+        // =======================================================
+        // 🎙️ QUẢN LÝ AUDIO THUYẾT MINH (5 NGÔN NGỮ)
+        // =======================================================
+        // Lưu tên file .mp3
+        public string? AudioFile_VI { get; set; }
+        public string? AudioFile_EN { get; set; }
+        public string? AudioFile_ZH { get; set; }
+        public string? AudioFile_KO { get; set; }
+        public string? AudioFile_JA { get; set; }
+
+        // Phân loại (0: Chưa có, 1: Giọng AI - TTS, 2: Giọng người đọc)
+        public int AudioType_VI { get; set; }
+        public int AudioType_EN { get; set; }
+        public int AudioType_ZH { get; set; }
+        public int AudioType_KO { get; set; }
+        public int AudioType_JA { get; set; }
+
         // 🌟 BỘ ĐÔI KIỂM DUYỆT CỦA ADMIN 🌟
 
         // 1. Trỏ về ông chủ quán nào đã tạo ra điểm này (Cho phép null 'int?' vì có thể sếp là người tự tạo)

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using TourGuideApp.Views;
 using TourGuideApp.Resources.Languages;
-using TourGuideApp.Services; // 🌟 Bắt buộc thêm dòng này để gọi ApiService
+using TourGuideApp.Services;
 
 namespace TourGuideApp;
 
@@ -56,6 +56,25 @@ public partial class App : Application
                 MainPage = new AppShell();
             }
         }
+
+        // ========================================================
+        // 🌟 MÁY TẠO NHỊP TIM (HEARTBEAT) - REALTIME 1 PHÚT
+        // ========================================================
+        Application.Current.Dispatcher.StartTimer(TimeSpan.FromSeconds(45), () =>
+        {
+            int userId = Preferences.Get("UserId", -1);
+            string guestId = Preferences.Get("AnonymousDeviceId", "");
+
+            // Chỉ đập nhịp tim nếu đã từng lấy thẻ (Khách hoặc User)
+            if (userId >= 0 || !string.IsNullOrEmpty(guestId))
+            {
+                // Gọi API ngầm báo cáo là đang Online
+                ApiService apiService = new ApiService();
+                _ = apiService.TrackActionAsync("Heartbeat (Online)");
+            }
+
+            return true; // Trả về true để vòng lặp này chạy mãi mãi chừng nào App còn mở
+        });
     }
 
     // ==========================================
@@ -84,7 +103,6 @@ public partial class App : Application
         int userId = Preferences.Get("UserId", -1);
         string guestId = Preferences.Get("AnonymousDeviceId", "");
 
-        // Nếu đã từng lấy thẻ (Khách hoặc User) thì mới báo cáo
         if (userId >= 0 || !string.IsNullOrEmpty(guestId))
         {
             ApiService apiService = new ApiService();
@@ -97,13 +115,8 @@ public partial class App : Application
     {
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            // 1. Xóa sạch thẻ căn cước và vé Offline để không bao giờ vào lại được
             Preferences.Clear();
-
-            // 2. Hiện thông báo đuổi thẳng thừng
             await Application.Current.MainPage.DisplayAlert("Bị khóa", message, "Chấp nhận");
-
-            // 3. Đá văng ra trang LoginPage
             Application.Current.MainPage = new NavigationPage(new Views.LoginPage());
         });
     }

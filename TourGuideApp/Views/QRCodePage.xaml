@@ -18,31 +18,23 @@
                FontSize="14"
                TextColor="Gray"
                HorizontalOptions="Center"/>
+
         <Label x:Name="barcodeResult"
-               FontSize="20"/>
+               FontSize="20"
+               TextColor="Red"
+               HorizontalOptions="Center"/>
 
         <Grid HorizontalOptions="Center" VerticalOptions="Center">
 
-            <Frame
-                WidthRequest="265"
-                HeightRequest="265"
-                CornerRadius="20"
-                Padding="0"
-                IsClippedToBounds="True"
-                HasShadow="True"
-                BorderColor="#4A3A31">
+            <Frame WidthRequest="265" HeightRequest="265"
+                   CornerRadius="20" Padding="0" IsClippedToBounds="True"
+                   HasShadow="True" BorderColor="#4A3A31"
+                   BackgroundColor="LightGray">
 
-                <Grid>
-                    <!-- ZXing CameraBarcodeReaderView -->
-                    <zxing:CameraBarcodeReaderView
-                        x:Name="barcodeReader"
-                        IsDetecting="True"
-                        BarcodesDetected="barcodeReader_BarcodesDetected"/>
-                </Grid>
+                <Grid x:Name="CameraContainer" />
 
             </Frame>
 
-            <!-- Khung scan -->
             <Grid WidthRequest="300"
                   HeightRequest="300"
                   HorizontalOptions="Center"
@@ -74,5 +66,16 @@
                          HorizontalOptions="End" VerticalOptions="End"/>
             </Grid>
         </Grid>
+
+        <Button x:Name="btnStartScan"
+        Text="{x:Static lang:AppLang.QRStartScan}"
+        FontAttributes="Bold"
+        BackgroundColor="#F39C12"
+        TextColor="White"
+        CornerRadius="10"
+        Padding="30,15"
+        HorizontalOptions="Center"
+        Clicked="OnStartScanClicked" />
+
     </VerticalStackLayout>
 </ContentPage>

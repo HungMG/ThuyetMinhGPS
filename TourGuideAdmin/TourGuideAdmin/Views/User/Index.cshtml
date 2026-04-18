@@ -7,7 +7,18 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="color: #C0502E; font-weight: bold;">👥 Quản lý Người Dùng</h2>
-        <span class="badge bg-info text-dark fs-6">Tổng cộng: @Model.Count() tài khoản</span>
+
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-info text-dark fs-6 shadow-sm">Tổng cộng: @Model.Count() tài khoản</span>
+
+            <form asp-action="ClearHeartbeatLogs" asp-controller="User" method="post"
+                  onsubmit="return confirm('Sếp có chắc chắn muốn xóa SẠCH SẼ toàn bộ lịch sử hoạt động và nhịp tim không? (Các thiết bị sẽ bị Offline cho đến khi nhịp tim tiếp theo đập).');"
+                  class="m-0">
+                <button type="submit" class="btn btn-warning btn-sm fw-bold shadow-sm rounded-pill px-3">
+                    🧹 Dọn rác (Demo)
+                </button>
+            </form>
+        </div>
     </div>
 
     @if (TempData["SuccessMessage"] != null)

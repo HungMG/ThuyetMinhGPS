@@ -250,31 +250,51 @@ public partial class MainPage : ContentPage
     {
         if (e.Parameter is Tour selectedTour)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                var poisInTour = _allPois.Where(p => p.TourId == selectedTour.Id).ToList();
-
-                if (_userLocation != null)
+                try
                 {
-                    poisInTour = poisInTour.OrderBy(p => p.DistanceFromUser).ToList();
+                    var poisInTour = _allPois?.Where(p => p.TourId == selectedTour.Id).ToList() ?? new List<POI>();
+
+                    if (_userLocation != null && poisInTour.Any())
+                    {
+                        poisInTour = poisInTour.OrderBy(p => p.DistanceFromUser).ToList();
+                    }
+
+                    lblPopupTourName.Text = $"📍 {selectedTour.CurrentName}";
+
+                    if (this.Height > 0)
+                    {
+                        tourPoiPopup.HeightRequest = this.Height * 0.85;
+                    }
+
+                    tourPoiPopup.TranslationY = 1000;
+                    blackOverlay.IsVisible = true;
+                    tourPoiPopup.IsVisible = true;
+
+                    // 🌟 BẪY BẮT LỖI DỮ LIỆU: 
+                    // Nếu rỗng, app sẽ báo ngay để sếp biết đường lên Web Admin kiểm tra việc map ID
+                    if (poisInTour.Count == 0)
+                    {
+                        await DisplayAlert("Chú ý", $"Không tìm thấy điểm đến nào được gắn vào Tour này (TourId: {selectedTour.Id}). Sếp kiểm tra lại data trên Admin nhé!", "Đã hiểu");
+                    }
+
+                    // 🌟 GÁN DỮ LIỆU CHO COLLECTION VIEW
+                    popupPoiCollectionView.ItemsSource = null;
+                    popupPoiCollectionView.ItemsSource = poisInTour;
+
+                    await Task.WhenAll(
+                        blackOverlay.FadeTo(0.5, 250),
+                        tourPoiPopup.TranslateTo(0, 0, 350, Easing.SpringOut)
+                    );
                 }
-
-                lblPopupTourName.Text = $"📍 {selectedTour.CurrentName}";
-                BindableLayout.SetItemsSource(popupPoiStackLayout, poisInTour);
-
-                // Chiều cao popup = 85% màn hình để ScrollView có đủ chỗ hiện tất cả POI
-                tourPoiPopup.HeightRequest = DeviceDisplay.MainDisplayInfo.Height
-                    / DeviceDisplay.MainDisplayInfo.Density * 0.85;
-
-                blackOverlay.IsVisible = true;
-                blackOverlay.FadeTo(0.5, 250);
-
-                tourPoiPopup.IsVisible = true;
-                tourPoiPopup.TranslateTo(0, 0, 350, Easing.SpringOut);
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[LỖI HIỆN POPUP]: {ex.Message}");
+                }
             });
         }
     }
-
     private async void OnClosePopupTapped(object sender, TappedEventArgs e)
     {
         await tourPoiPopup.TranslateTo(0, 1000, 250, Easing.CubicIn);
@@ -417,7 +437,8 @@ public partial class MainPage : ContentPage
 
     private async void OnNavigateTourClicked(object sender, EventArgs e)
     {
-        var poisInTour = BindableLayout.GetItemsSource(popupPoiStackLayout) as List<POI>;
+        // 🌟 SỬA LẠI CÁCH LẤY DANH SÁCH (Vì mình đã đổi sang CollectionView)
+        var poisInTour = popupPoiCollectionView.ItemsSource as List<POI>;
 
         if (poisInTour == null || !poisInTour.Any()) return;
 

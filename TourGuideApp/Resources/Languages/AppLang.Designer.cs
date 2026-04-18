@@ -628,6 +628,24 @@ namespace TourGuideApp.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ĐANG MỞ CAMERA....
+        /// </summary>
+        public static string QROpeningCamera {
+            get {
+                return ResourceManager.GetString("QROpeningCamera", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BẤM ĐỂ MỞ CAMERA.
+        /// </summary>
+        public static string QRStartScan {
+            get {
+                return ResourceManager.GetString("QRStartScan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Đưa mã QR vào khung.
         /// </summary>
         public static string QRSubtitle {
@@ -642,6 +660,15 @@ namespace TourGuideApp.Resources.Languages {
         public static string QRTitle {
             get {
                 return ResourceManager.GetString("QRTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BẤM ĐỂ THỬ LẠI.
+        /// </summary>
+        public static string QRTryAgain {
+            get {
+                return ResourceManager.GetString("QRTryAgain", resourceCulture);
             }
         }
         

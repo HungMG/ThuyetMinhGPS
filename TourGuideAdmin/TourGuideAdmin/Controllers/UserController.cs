@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TourGuideAdmin.Models; // Hoặc tên namespace chứa Models của sếp
-using TourGuideAdmin;   // Hoặc tên namespace chứa AppDbContext của sếp
+using TourGuideAdmin.Models;
+using TourGuideAdmin;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace TourGuideAdmin.Controllers
 {
-    // 🌟 1. TẠO CÁI "GIỎ" CHỨA USER VÀ SỐ LIỆU ĐẾM KÈM THEO
     public class UserStatViewModel
     {
         public User User { get; set; }
@@ -30,17 +29,17 @@ namespace TourGuideAdmin.Controllers
         }
 
         // =========================================================
-        // 🌟 1. HIỂN THỊ DANH SÁCH TÀI KHOẢN KÈM THỐNG KÊ CHI TIẾT
+        // 🌟 1. HIỂN THỊ DANH SÁCH TÀI KHOẢN (REAL-TIME 1 PHÚT)
         // =========================================================
         public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
             var allPois = await _context.POIs.ToListAsync();
 
-            // 🌟 BƯỚC 1: DÙNG RA-ĐA QUÉT TÌM CÁC TÀI KHOẢN HOẠT ĐỘNG TRONG 5 PHÚT QUA
-            var fiveMinsAgo = DateTime.Now.AddMinutes(-5);
+            // 🌟 ĐÃ ÉP XUỐNG CÒN 1 PHÚT NHÉ SẾP
+            var oneMinAgo = DateTime.Now.AddMinutes(-1);
             var onlineUsernames = await _context.UserActivities
-                .Where(a => a.Timestamp >= fiveMinsAgo)
+                .Where(a => a.Timestamp >= oneMinAgo)
                 .Select(a => a.DeviceOrUserName)
                 .Distinct()
                 .ToListAsync();
@@ -53,11 +52,9 @@ namespace TourGuideAdmin.Controllers
                     TotalPoi = userPois.Count,
                     ApprovedPoi = userPois.Count(p => p.ApprovalStatus == 1),
                     PendingPoi = userPois.Count(p => p.ApprovalStatus == 0),
-                    RejectedPoi = userPois.Count(p => p.ApprovalStatus == 2), // Số 2 là đúng chuẩn bài sếp rồi nhé
+                    RejectedPoi = userPois.Count(p => p.ApprovalStatus == 2),
                     PublicPoi = userPois.Count(p => p.PoiType == 0),
                     BusinessPoi = userPois.Count(p => p.PoiType == 1),
-
-                    // 🌟 BƯỚC 2: KIỂM TRA TÊN TÀI KHOẢN NÀY CÓ NẰM TRONG DANH SÁCH ONLINE KHÔNG
                     IsOnline = onlineUsernames.Contains(u.Username)
                 };
             }).ToList();
@@ -95,7 +92,6 @@ namespace TourGuideAdmin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Đảo ngược trạng thái: Đang khóa thì thành Mở, đang Mở thì thành Khóa
                 user.IsLocked = !user.IsLocked;
                 await _context.SaveChangesAsync();
 
@@ -106,7 +102,7 @@ namespace TourGuideAdmin.Controllers
         }
 
         // =========================================================
-        // 🌟 3. HÀM XÓA TÀI KHOẢN RÁC (Giữ nguyên của sếp)
+        // 🌟 3. HÀM XÓA TÀI KHOẢN RÁC 
         // =========================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -126,6 +122,25 @@ namespace TourGuideAdmin.Controllers
 
                 TempData["SuccessMessage"] = $"Đã tiễn tài khoản '{user.Username}' ra đảo thành công!";
             }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // =========================================================
+        // 🌟 4. NÚT BẤM DỌN RÁC HEARTBEAT (DÀNH CHO LÚC DEMO)
+        // =========================================================
+        [HttpPost]
+        public async Task<IActionResult> ClearHeartbeatLogs()
+        {
+            // Lấy toàn bộ rác trong bảng UserActivities ra
+            var allActivities = await _context.UserActivities.ToListAsync();
+
+            // Xóa sạch sẽ và lưu lại
+            _context.UserActivities.RemoveRange(allActivities);
+            await _context.SaveChangesAsync();
+
+            // Báo cáo thành công
+            TempData["SuccessMessage"] = "Đã dọn sạch lịch sử rác Heartbeat! Mọi người đang Offline, vui lòng đợi 45 giây để nhịp tim đập lại.";
+
             return RedirectToAction(nameof(Index));
         }
     }

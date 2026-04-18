@@ -417,4 +417,13 @@
   <data name="RegisterConfirmPasswordHint" xml:space="preserve">
     <value>* 위의 비밀번호와 일치해야 합니다.</value>
   </data>
+  <data name="QRStartScan" xml:space="preserve">
+    <value>카메라 열기 탭</value>
+  </data>
+  <data name="QROpeningCamera" xml:space="preserve">
+    <value>카메라 여는 중...</value>
+  </data>
+  <data name="QRTryAgain" xml:space="preserve">
+    <value>다시 시도하려면 탭하세요</value>
+  </data>
 </root>

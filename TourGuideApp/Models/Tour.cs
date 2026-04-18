@@ -5,7 +5,9 @@ namespace TourGuideApp.Models
 {
     public class Tour
     {
-        [PrimaryKey, AutoIncrement]
+        // 🌟 XÓA BỎ AutoIncrement ĐỂ NGĂN SQLITE TỰ CHẾ ID LUNG TUNG
+        [PrimaryKey]
+        [JsonPropertyName("id")] // 🌟 Ép nó phải lấy đúng chữ 'id' từ Web
         public int Id { get; set; }
 
         public string ImageUrl { get; set; }

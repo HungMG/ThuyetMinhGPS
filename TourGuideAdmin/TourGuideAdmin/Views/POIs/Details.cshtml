@@ -12,28 +12,126 @@
 <div class="qr-card">
     @if (!string.IsNullOrEmpty(Model.ImageUrl))
     {
-        <img src="~/images/pois/@Model.ImageUrl" class="card-img-top" alt="@Model.Name_VI" style="max-width:500px;width:100%;border-radius:12px;border:1px solid var(--qr-border);" />
+        <img src="~/images/pois/@Model.ImageUrl" class="card-img-top mx-auto d-block mb-4" alt="@Model.Name_VI" style="max-width:500px;width:100%;border-radius:12px;border:1px solid var(--qr-border);" />
     }
     else
     {
-        <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 250px;">
+        <div class="bg-light text-center d-flex align-items-center justify-content-center mb-4 mx-auto" style="height: 250px; max-width:500px; border-radius:12px;">
             <span class="text-muted">📷 Chưa có hình ảnh</span>
         </div>
     }
-    
-    
+
     <div class="qr-info-row"><div class="lbl">Mã ID</div><div class="val">#@Model.Id</div></div>
     <div class="qr-info-row"><div class="lbl">Thuộc Tour</div><div class="val">Tour #@Model.TourId</div></div>
-    <div class="qr-info-row"><div class="lbl">Tên (VI)</div><div class="val" style="font-weight:600;color:var(--qr-accent-dark);">@Model.Name_VI</div></div>
-    <div class="qr-info-row"><div class="lbl">Vĩ độ</div><div class="val">@Model.Latitude</div></div>
-    <div class="qr-info-row"><div class="lbl">Kinh độ</div><div class="val">@Model.Longitude</div></div>
-    <div class="qr-info-row"><div class="lbl">Bán kính kích hoạt</div><div class="val">@Model.TriggerRadius m</div></div>
+    <div class="qr-info-row"><div class="lbl">Vị trí</div><div class="val">@Model.Latitude, @Model.Longitude</div></div>
+    <div class="qr-info-row"><div class="lbl">Bán kính</div><div class="val">@Model.TriggerRadius m</div></div>
     <div class="qr-info-row"><div class="lbl">Độ ưu tiên</div><div class="val">@Model.Priority</div></div>
     <div class="qr-info-row"><div class="lbl">Nổi bật</div><div class="val">@(Model.IsFavorite ? "❤️ Có" : "—")</div></div>
-    <div class="qr-info-row"><div class="lbl">Thuyết minh (VI)</div><div class="val" style="white-space:pre-wrap;line-height:1.7;">@Model.Description_VI</div></div>
+
+    <hr class="my-4" style="border-top: 2px dashed #E8E0D5;" />
+
+    <h5 class="fw-bold mb-3" style="color: var(--qr-accent-dark);">🌍 Thuyết minh Đa ngôn ngữ & Audio:</h5>
+
+    <ul class="nav nav-tabs" id="langTabs" role="tablist" style="border-bottom: 2px solid #E8E0D5;">
+        <li class="nav-item">
+            <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#vi" type="button">🇻🇳 VI</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#en" type="button">🇬🇧 EN</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#zh" type="button">🇨🇳 ZH</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#ko" type="button">🇰🇷 KO</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold text-secondary" data-bs-toggle="tab" data-bs-target="#ja" type="button">🇯🇵 JA</button>
+        </li>
+    </ul>
+
+    <div class="tab-content p-3 border border-top-0 rounded-bottom mb-4" style="background-color: #fdfcfb;">
+        @{
+            var languages = new[] {
+                new { Id = "vi", Name = Model.Name_VI, Desc = Model.Description_VI, Audio = Model.AudioFile_VI, Type = Model.AudioType_VI },
+                new { Id = "en", Name = Model.Name_EN, Desc = Model.Description_EN, Audio = Model.AudioFile_EN, Type = Model.AudioType_EN },
+                new { Id = "zh", Name = Model.Name_ZH, Desc = Model.Description_ZH, Audio = Model.AudioFile_ZH, Type = Model.AudioType_ZH },
+                new { Id = "ko", Name = Model.Name_KO, Desc = Model.Description_KO, Audio = Model.AudioFile_KO, Type = Model.AudioType_KO },
+                new { Id = "ja", Name = Model.Name_JA, Desc = Model.Description_JA, Audio = Model.AudioFile_JA, Type = Model.AudioType_JA }
+                };
+        }
+
+        @foreach (var l in languages)
+        {
+            <div class="tab-pane fade @(l.Id == "vi" ? "show active" : "")" id="@l.Id" role="tabpanel">
+                <div class="mb-3">
+                    <strong style="color: #C0502E; font-size: 1.2rem;">@l.Name</strong>
+                </div>
+
+                <div class="p-2 mb-3 bg-white border rounded">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="fw-bold text-muted">🎙️ Audio:</small>
+                        @if (l.Type == 1)
+                        {
+                            <span class="badge bg-info text-dark">🤖 AI (TTS)</span>
+                        }
+                        else if (l.Type == 2)
+                        {
+
+                            <span class="badge bg-success">👤 Người đọc</span>
+                        }
+                        else
+                        {
+
+                            <span class="badge bg-secondary">🔇 Trống</span>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(l.Audio))
+                    {
+                        <audio controls class="w-100 mt-1" style="height: 35px;">
+                            <source src="~/audio/pois/@l.Audio" type="audio/mpeg">
+                        </audio>
+                    }
+                </div>
+
+                <div style="white-space:pre-wrap; line-height:1.6; color: #4A3A31;">
+                    @l.Desc
+                </div>
+            </div>
+        }
+    </div>
 
     <div class="qr-form-actions">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-qr">✏️ Sửa</a>
-        <a asp-action="Index" class="btn-qr-outline">← Quay lại danh sách</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-qr">✏️ Sửa bài & Audio</a>
+        <a asp-action="Index" class="btn-qr-outline">← Danh sách</a>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 🌟 TỰ ĐỘNG KÍCH HOẠT CHUYỂN TAB (DÀNH CHO SẾP NẾU THIẾU THƯ VIỆN)
+            var tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
+
+            tabButtons.forEach(function (button) {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // 1. Tắt hết các tab đang active
+                    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+
+                    // 2. Bật cái tab vừa nhấn lên
+                    this.classList.add('active');
+                    var targetId = this.getAttribute('data-bs-target');
+                    var targetPane = document.querySelector(targetId);
+                    if (targetPane) {
+                        targetPane.classList.add('show', 'active');
+                    }
+                });
+            });
+        });
+    </script>
+}

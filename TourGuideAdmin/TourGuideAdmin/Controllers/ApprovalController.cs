@@ -2,14 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using TourGuideAdmin;
 using TourGuideAdmin.Models;
-using TourGuideAdmin.Services; // 🌟 Gọi thêm thư viện Services để xài máy dịch
+using TourGuideAdmin.Services;
 
 namespace TourGuideAdmin.Controllers
 {
     public class ApprovalController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly TranslationService _translationService; // 🌟 Thêm biến máy dịch
+        private readonly TranslationService _translationService;
 
         public ApprovalController(AppDbContext context, TranslationService translationService)
         {
@@ -17,38 +17,53 @@ namespace TourGuideAdmin.Controllers
             _translationService = translationService;
         }
 
-        // 1. TRANG DANH SÁCH CHỜ DUYỆT
-        public async Task<IActionResult> Index(string searchString)
+        // ==========================================================
+        // 🌟 1. TRANG DANH SÁCH (CÓ HIỂN THỊ THÔNG TIN NGƯỜI ĐĂNG)
+        // ==========================================================
+        public async Task<IActionResult> Index(string searchString, int status = 0)
         {
-            var pois = _context.POIs.Where(p => p.ApprovalStatus == 0).AsEnumerable();
+            var poisQuery = _context.POIs.Where(p => p.ApprovalStatus == status);
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 var keyword = RemoveDiacritics(searchString.ToLower());
-
-                pois = pois.Where(p =>
-                    !string.IsNullOrEmpty(p.Name_VI) &&
-                    RemoveDiacritics(p.Name_VI.ToLower()).Contains(keyword)
-                );
+                poisQuery = poisQuery.Where(p =>
+                    p.Name_VI != null && p.Name_VI.ToLower().Contains(keyword));
             }
 
-            return View(pois.ToList());
-        }
+            var pois = await poisQuery.OrderByDescending(p => p.Id).ToListAsync();
 
+            // 🌟 BƯỚC MỚI: Lấy danh sách tất cả User liên quan để hiển thị tên
+            var ownerIds = pois.Select(p => p.OwnerId).Distinct().ToList();
+            var owners = await _context.Users
+                .Where(u => ownerIds.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u);
+
+            ViewBag.Owners = owners; // Gửi danh sách chủ sở hữu ra View
+            ViewBag.CountPending = _context.POIs.Count(p => p.ApprovalStatus == 0);
+            ViewBag.CountApproved = _context.POIs.Count(p => p.ApprovalStatus == 1);
+            ViewBag.CountRejected = _context.POIs.Count(p => p.ApprovalStatus == 2);
+            ViewBag.CurrentStatus = status;
+
+            return View(pois);
+        }
+        // ==========================================================
         // 2. TRANG XEM CHI TIẾT ĐỂ THẨM ĐỊNH
+        // ==========================================================
         public async Task<IActionResult> Details(int id)
         {
             var poi = await _context.POIs.FindAsync(id);
             if (poi == null) return NotFound();
 
-            // Lấy tên ông khách ra xem
             var owner = await _context.Users.FindAsync(poi.OwnerId);
             ViewBag.OwnerName = owner != null ? owner.Username : "Khách Vãng Lai";
 
             return View(poi);
         }
 
-        // 🌟 3. HÀM XỬ LÝ: VỪA DUYỆT VỪA DỊCH VÀ CHỐT CHẶN BÁN KÍNH
+        // ==========================================================
+        // 🌟 3. HÀM XỬ LÝ: DUYỆT / TỪ CHỐI
+        // ==========================================================
         [HttpPost]
         public async Task<IActionResult> ChangeStatus(int id, int status)
         {
@@ -57,19 +72,16 @@ namespace TourGuideAdmin.Controllers
                 var poi = await _context.POIs.FindAsync(id);
                 if (poi != null)
                 {
-                    // 🌟 1. ÉP NGAY TRẠNG THÁI MỚI (1 = Duyệt, 2 = Từ chối)
                     poi.ApprovalStatus = status;
 
-                    // 🌟 2. NẾU LÀ DUYỆT THÌ THỰC HIỆN CÁC BƯỚC CHUẨN HÓA
+                    // Nếu Duyệt (1) thì mới chạy máy dịch
                     if (status == 1)
                     {
-                        // 🛡️ CHỐT CHẶN BÁN KÍNH: Ép về 50m nếu đang là 0
                         if (poi.TriggerRadius <= 0)
                         {
                             poi.TriggerRadius = 50;
                         }
 
-                        // Gọi máy dịch
                         try
                         {
                             if (!string.IsNullOrEmpty(poi.Name_VI))
@@ -89,13 +101,13 @@ namespace TourGuideAdmin.Controllers
                         }
                         catch (Exception transEx)
                         {
-                            Console.WriteLine($"[LỖI MÁY DỊCH] Kệ nó, vẫn cho duyệt qua! Lỗi: {transEx.Message}");
+                            Console.WriteLine($"[LỖI MÁY DỊCH] {transEx.Message}");
                         }
                     }
 
-                    // 🌟 3. BƯỚC QUAN TRỌNG NHẤT: LƯU VÀO DATABASE
                     _context.Update(poi);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = status == 1 ? "Đã duyệt địa điểm lên App!" : "Đã từ chối địa điểm này!";
                 }
             }
             catch (Exception ex)
@@ -103,26 +115,22 @@ namespace TourGuideAdmin.Controllers
                 Console.WriteLine($"[LỖI DATABASE] Không lưu được: {ex.Message}");
             }
 
-            return RedirectToAction(nameof(Index));
+            // Xử lý xong quay về Tab tương ứng (vd: duyệt xong thì quay về tab Đã duyệt)
+            return RedirectToAction(nameof(Index), new { status = status });
         }
 
-        // 🌟 HÀM HỖ TRỢ XÓA DẤU TIẾNG VIỆT
         public static string RemoveDiacritics(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
-
             var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
             var sb = new System.Text.StringBuilder();
-
             foreach (var c in normalized)
             {
-                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c)
-                    != System.Globalization.UnicodeCategory.NonSpacingMark)
+                if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
                 {
                     sb.Append(c);
                 }
             }
-
             return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
     }

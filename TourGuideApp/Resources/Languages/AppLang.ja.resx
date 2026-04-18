@@ -417,4 +417,13 @@
   <data name="RegisterConfirmPasswordHint" xml:space="preserve">
     <value>* 上のパスワードと一致する必要があります。</value>
   </data>
+  <data name="QRStartScan" xml:space="preserve">
+    <value>タップしてカメラを開く</value>
+  </data>
+  <data name="QROpeningCamera" xml:space="preserve">
+    <value>カメラを起動中...</value>
+  </data>
+  <data name="QRTryAgain" xml:space="preserve">
+    <value>タップして再試行</value>
+  </data>
 </root>

@@ -417,4 +417,13 @@
   <data name="RegisterConfirmPasswordHint" xml:space="preserve">
     <value>* Must match the password above.</value>
   </data>
+  <data name="QRStartScan" xml:space="preserve">
+    <value>TAP TO OPEN CAMERA</value>
+  </data>
+  <data name="QROpeningCamera" xml:space="preserve">
+    <value>OPENING CAMERA...</value>
+  </data>
+  <data name="QRTryAgain" xml:space="preserve">
+    <value>TAP TO TRY AGAIN</value>
+  </data>
 </root>

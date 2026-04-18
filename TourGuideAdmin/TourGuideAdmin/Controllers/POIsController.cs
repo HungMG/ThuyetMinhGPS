@@ -88,6 +88,9 @@ namespace TourGuideAdmin.Controllers
                 // 🌟 BÙA BẢO MỆNH ADMIN: Đánh dấu bài này là đã duyệt (Status = 1) ngay từ lúc mới sinh ra!
                 pOI.ApprovalStatus = 1;
 
+                // 🌟 ĐÓNG DẤU CHỦ SỞ HỮU LÀ ADMIN (Id = 1) ĐỂ KHÔNG BỊ NHẬN NHẦM LÀ KHÁCH
+                pOI.OwnerId = -1;
+
                 // 1. TỰ ĐỘNG DỊCH
                 if (!string.IsNullOrEmpty(pOI.Name_VI))
                 {
@@ -227,5 +230,6 @@ namespace TourGuideAdmin.Controllers
         {
             return _context.POIs.Any(e => e.Id == id);
         }
+
     }
 }
